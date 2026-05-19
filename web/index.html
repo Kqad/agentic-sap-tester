@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>SAPTest Console</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230d0d0d'/><text x='32' y='42' font-family='-apple-system,system-ui' font-size='32' font-weight='600' fill='white' text-anchor='middle'>S</text></svg>" />
+</head>
+<body>
+  <div id="app"></div>
+  <template id="tpl-login">
+    <div class="login-screen">
+      <button class="lang-toggle floating" data-action="lang-toggle" type="button" data-bind="lang-label"></button>
+      <div class="login-card">
+        <div class="login-brand">
+          <div class="logo-mark">S</div>
+          <div>
+            <div class="brand-title">SAPTest Console</div>
+            <div class="brand-sub" data-i18n="login.tagline"></div>
+          </div>
+        </div>
+        <form class="login-form" data-action="login">
+          <label class="field">
+            <span data-i18n="login.username"></span>
+            <input name="username" autocomplete="username" required autofocus />
+          </label>
+          <label class="field">
+            <span data-i18n="login.password"></span>
+            <input name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <div class="login-error" data-bind="error"></div>
+          <button class="btn primary block" type="submit">
+            <span data-bind="submit-text" data-i18n="login.submit"></span>
+          </button>
+        </form>
+        <div class="login-foot" data-i18n="login.foot"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-shell">
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo-mark sm">S</div>
+          <div class="brand-text">
+            <div class="brand-title">SAPTest</div>
+            <div class="brand-sub">Console</div>
+          </div>
+        </div>
+        <nav class="nav" data-bind="nav"></nav>
+        <div class="sidebar-foot">
+          <div class="user-card" data-bind="user-card"></div>
+          <button class="btn ghost block" data-action="logout" data-i18n="shell.logout"></button>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <div class="crumbs" data-bind="crumbs"></div>
+          <div class="topbar-right">
+            <span class="env-pill" data-bind="env-pill"></span>
+            <button class="lang-toggle" data-action="lang-toggle" type="button" data-bind="lang-label"></button>
+          </div>
+        </header>
+        <section class="view" data-bind="view"></section>
+      </main>
+    </div>
+    <div class="toast-stack" data-bind="toasts"></div>
+  </template>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

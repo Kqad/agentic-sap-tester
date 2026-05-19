@@ -1,0 +1,18 @@
+{
+  "$schema": "Parameters for asset-balance-check.spec.ts",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "S_ALR_87011990",
+  "favoritesEntry": "Asset Balances",
+  "query": {
+    "companyCode": "8540",
+    "assetNumber": "1010001732",
+    "reportDate": "30.04.2026",
+    "listAssets": true
+  },
+  "extract": {
+    "a1ColumnLabel": "Curr.bk.val.",
+    "a1Source": "Asset History Sheet 报表中匹配上述资产的那一行 Curr.bk.val. 列的数值",
+    "a2ColumnLabel": "Book val.",
+    "a2Source": "Asset Balances 报表数据表第一行 Book val. 列的数值"
+  }
+}

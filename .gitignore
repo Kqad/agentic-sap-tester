@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+
+playwright-report/
+test-results/
+midscene_run/
+
+.DS_Store
+*.log
+
+# Web console runtime data (users, jwt secret, audit log)
+server/data/

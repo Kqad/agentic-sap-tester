@@ -1,0 +1,31 @@
+{
+  "name": "saptest1",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Midscene.js + Playwright web testing project (Qwen2.5-VL)",
+  "scripts": {
+    "web": "node server/index.js",
+    "web:dev": "node --watch server/index.js",
+    "test": "cross-env NODE_OPTIONS=--use-system-ca NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://localhost:3128 HTTP_PROXY=http://localhost:3128 playwright test",
+    "test:headed": "cross-env NODE_OPTIONS=--use-system-ca NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://localhost:3128 HTTP_PROXY=http://localhost:3128 playwright test --headed",
+    "test:ui": "cross-env NODE_OPTIONS=--use-system-ca NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://localhost:3128 HTTP_PROXY=http://localhost:3128 playwright test --ui",
+    "report": "playwright show-report",
+    "install:browsers": "cross-env NODE_OPTIONS=--use-system-ca NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://localhost:3128 HTTP_PROXY=http://localhost:3128 playwright install chromium",
+    "smoke": "cross-env NODE_OPTIONS=--use-system-ca NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://localhost:3128 HTTP_PROXY=http://localhost:3128 node smoke.mjs"
+  },
+  "devDependencies": {
+    "@midscene/web": "latest",
+    "@playwright/test": "latest",
+    "cross-env": "latest",
+    "dotenv": "latest"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "ws": "^8.20.1"
+  }
+}
