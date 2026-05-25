@@ -4,7 +4,7 @@
 import express from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { REPORT_DIR, RESULTS_DIR } from '../paths.js';
+import { REPORT_DIR, RESULTS_DIR, RUNS_DIR } from '../paths.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 
 const router = express.Router();
@@ -61,6 +61,26 @@ router.get('/', async (_req, res) => {
   };
 
   res.json({ items, lastRun, stats });
+});
+
+// Recent runs across all cases — drives the dashboard's "recent activity"
+// panel after the dedicated Results view was removed.
+router.get('/recent', async (req, res) => {
+  const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 10));
+  await fs.mkdir(RUNS_DIR, { recursive: true });
+  const entries = await fs.readdir(RUNS_DIR, { withFileTypes: true });
+  const runs = [];
+  for (const e of entries) {
+    if (!e.isFile() || !e.name.endsWith('.json')) continue;
+    try {
+      const raw = await fs.readFile(path.join(RUNS_DIR, e.name), 'utf8');
+      const rec = JSON.parse(raw);
+      const { events, logTail, ...summary } = rec;
+      runs.push(summary);
+    } catch { /* skip malformed */ }
+  }
+  runs.sort((a, b) => (b.startedAt || '').localeCompare(a.startedAt || ''));
+  res.json({ runs: runs.slice(0, limit) });
 });
 
 export default router;

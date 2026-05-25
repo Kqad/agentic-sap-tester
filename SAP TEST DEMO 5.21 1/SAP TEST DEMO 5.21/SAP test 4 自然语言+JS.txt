@@ -1,0 +1,42 @@
+BP_IT_B2P_FIORI_Report Supplier Balances and Line Items （Row 6/7)
+
+自然语言：
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FBL1N，点击execute，company code输入8540，点击execute，滑动到最底下，查找最底下的local crcy的值记录为A2。
+2.返回主页，进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存， 在 矩形输入框  输入 /n/UI2/FLP，点击右下角execute
+3. 点击add apps，搜索Manage Supplier Line Items，点击搜索，等4s，点击新出现的第一个Manage Supplier Line Items，company code输入8540， 点击execute
+4. 滑动到最底下，查找最底下的local crcy的值记录为A1
+5. A1和A2 相等则测试用例执行成功,不成功，则失败。
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "FBL1N" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiAct("按住右侧的纵向滚动条的滑块，拖到最底端");
+  const result = await agent.aiQuery("string, 查找最底下的local crcy的值记录为A2");
+  await agent.aiTap("返回主页");
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("矩形", { value: "/n/UI2/FLP" });
+  await agent.aiTap("点击右下角execute");
+  await agent.aiTap("点击add apps");
+  await agent.aiInput("搜索输入框", { value: "Manage Supplier Line Items" });
+  await agent.aiTap("点击搜索");
+  await sleep(4000);
+  await agent.aiTap("点击新出现的第一个Manage Supplier Line Items");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiAct("按住右侧的纵向滚动条的滑块，拖到最底端");
+  const result = await agent.aiQuery("string, 查找最底下的local crcy的值记录为A1");
+  await agent.aiAssert("比较变量 A1 和 A2 是否相等");
+  await agent.aiAssert("如果 A1 和 A2 相等，则判定测试用例执行成功；否则判定失败");
+}

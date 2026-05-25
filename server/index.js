@@ -17,8 +17,9 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
 
-import { ROOT, CASES_DIR, REPORT_DIR, RESULTS_DIR } from './paths.js';
+import { ROOT, CASES_DIR, REPORT_DIR, RESULTS_DIR, RUNS_DIR } from './paths.js';
 import { bootstrapAdminIfNeeded } from './auth/users.js';
+import { stripBrandingForReports, watchAndStripReports } from './lib/strip-branding.js';
 import authRouter from './auth/routes.js';
 import casesRouter from './api/cases.js';
 import configRouter from './api/config.js';
@@ -67,8 +68,14 @@ app.use('/reports', express.static(REPORT_DIR, {
   setHeaders: (res) => { res.setHeader('X-Content-Type-Options', 'nosniff'); },
 }));
 
-// Static SPA
-app.use(express.static(WEB_DIR, { extensions: ['html'] }));
+// Static SPA. Use no-cache (= browser must revalidate every request, but
+// can keep the cached bytes if the server returns 304). This stops the
+// console from going stale after we ship UI changes — without it the
+// browser will happily serve a months-old app.js from disk forever.
+app.use(express.static(WEB_DIR, {
+  extensions: ['html'],
+  setHeaders: (res) => { res.setHeader('Cache-Control', 'no-cache'); },
+}));
 
 // SPA fallback (don't swallow /api or /reports)
 app.get(/^(?!\/api|\/reports).*/, (_req, res) => {
@@ -93,10 +100,19 @@ const PORT = Number(process.env.PORT || 5174);
 const HOST = process.env.HOST || '127.0.0.1';
 
 (async () => {
-  for (const dir of [CASES_DIR, REPORT_DIR, RESULTS_DIR, path.join(ROOT, 'server', 'data')]) {
+  for (const dir of [CASES_DIR, REPORT_DIR, RESULTS_DIR, RUNS_DIR, path.join(ROOT, 'server', 'data')]) {
     await fs.mkdir(dir, { recursive: true }).catch(() => {});
   }
   const bootstrap = await bootstrapAdminIfNeeded();
+
+  // Strip Midscene branding from any HTML reports already on disk (catches
+  // reports produced while the server was down), then keep watching the dir
+  // so CLI-driven runs (`npm test`) get sanitized too. Both are best-effort.
+  stripBrandingForReports(REPORT_DIR, 0).then(r => {
+    if (r.processed > 0) console.log(`  → Stripped Midscene branding from ${r.processed} existing report(s)`);
+  }).catch(() => {});
+  watchAndStripReports(REPORT_DIR);
+
   server.listen(PORT, HOST, () => {
     const url = `http://${HOST}:${PORT}`;
     console.log('');

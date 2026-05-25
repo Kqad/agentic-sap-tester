@@ -9,5 +9,8 @@ export const E2E_DIR    = path.join(ROOT, 'e2e');
 export const CASES_DIR  = path.join(E2E_DIR, 'cases');
 export const REPORT_DIR = path.join(ROOT, 'midscene_run', 'report');
 export const RESULTS_DIR = path.join(ROOT, 'test-results');
+// History records live OUTSIDE test-results/ because Playwright wipes its
+// outputDir (= test-results) at the start of every run.
+export const RUNS_DIR    = path.join(ROOT, 'run-history');
 export const ENV_FILE   = path.join(ROOT, '.env');
 export const PW_CONFIG  = path.join(ROOT, 'playwright.config.ts');

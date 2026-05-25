@@ -1,0 +1,14 @@
+{
+  "$schema": "DEMO Test 6 — PSL_CT_B2P_PE_GUI_FI line item reports additional fields (Row 10): FAGLL03H + Change Layout add Operational Division column",
+  "title": "DEMO 6 · FAGLL03H Operational Division Column",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "FAGLL03H",
+  "filter": {
+    "companyCode": "8540",
+    "allItems": true,
+    "postingDateFrom": "01.12.2025",
+    "postingDateTo":   "31.12.2025"
+  },
+  "layoutField": "Operational Division",
+  "layoutFieldAbbrev": "Oper.Div."
+}

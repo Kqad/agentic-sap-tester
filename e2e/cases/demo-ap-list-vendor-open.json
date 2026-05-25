@@ -1,0 +1,12 @@
+{
+  "$schema": "DEMO Test 2 — Manage Accounts payable Reports & Analytics Row 20/21 (S_ALR_87012083 + Export to spreadsheet)",
+  "title": "DEMO 2 · S_ALR_87012083 List of Vendor Open Items → Export",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "S_ALR_87012083",
+  "query": {
+    "companyCode": "8540"
+  },
+  "export": {
+    "expectDownload": true
+  }
+}

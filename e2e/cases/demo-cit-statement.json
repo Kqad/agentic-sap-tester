@@ -1,0 +1,14 @@
+{
+  "$schema": "DEMO Test 5 — BP_IT_B2P_GUI_CIT (Row 8/9): S_ALR_87012284 IFR4 statement print preview export",
+  "title": "DEMO 5 · CIT Financial Statement Export (S_ALR_87012284)",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "S_ALR_87012284",
+  "query": {
+    "companyCode": "8540",
+    "ledger": "L2",
+    "financialStatementVersion": "IFR4"
+  },
+  "export": {
+    "expectDownload": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "Parameters for auc-asset-master-creation.spec.ts — BP_IT_B2P_GUI_AuC Asset Master Data Creation-VendorTool (AS01 → AS03)",
+  "$note": "AS01 is DESTRUCTIVE — it creates a real Asset Under Construction master record in SAP. The spec captures the new asset number from the SAP status bar and uses it for AS03 verification. Adjust costCenter / plant to values valid in your company code before running.",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCodes": {
+    "createAsset": "AS01",
+    "displayAsset": "AS03"
+  },
+  "entry": {
+    "assetClass": "A3450000",
+    "companyCode": "8540",
+    "numberOfSimilarAssets": "1"
+  },
+  "general": {
+    "description": "AuC VendorTool Test Asset",
+    "assetMainNoText": "AuC VendorTool Master Text"
+  },
+  "timeDependent": {
+    "costCenter": "",
+    "plant": ""
+  },
+  "discoverFromAsset": {
+    "$comment": "Before AS01, open AS03 on this existing asset to discover a valid Cost Center / Plant. Same asset as the asset-balance-check test, known-good in company 8540.",
+    "assetNumber": "1010001732",
+    "subAssetNumber": "0",
+    "companyCode": "8540"
+  },
+  "display": {
+    "subAssetNumber": "0"
+  }
+}

@@ -1,0 +1,31 @@
+Manage Accounts payable Reports & Analytics Row 19
+ (Open new Fiori App)
+
+
+自然语言：
+1.进入 Menu， 点击setting，点击visualization 并启用show Ok code field, 并保存。
+2.在 矩形输入框 输入 /n/UI2/FLP，点击右下角execute
+3.在新页面点搜索图标 xpath=//*[@id="sf"]/span ,搜索Aging Analysis，点结果里的aging analysis模块，点击屏幕上部向下展开的图标，点击漏斗图标，点击conpany code，搜索8540，点击ok
+4. 点export to spreadsheet图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]，查看是否excel下载成功
+
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("矩形", { value: "/n/UI2/FLP" });
+  await agent.aiTap("点击右下角execute");
+  await agent.aiTap("在新页面点图标", { xpath: "//*[@id=\"sf\"]/span" });
+  await agent.aiInput("搜索输入框", { value: "Aging Analysis" });
+  await agent.aiTap("点结果里的aging analysis模块");
+  await agent.aiTap("点击屏幕上部向下展开的图标");
+  await agent.aiTap("点击漏斗图标");
+  await agent.aiTap("点击conpany code");
+  await agent.aiInput("搜索输入框", { value: "8540" });
+  await agent.aiTap("点击ok");
+  await agent.aiTap("点图标", { xpath: "/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]" });
+  await agent.aiAssert("查看是否excel下载成功");
+}

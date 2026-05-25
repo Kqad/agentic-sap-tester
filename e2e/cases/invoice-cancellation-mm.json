@@ -1,0 +1,30 @@
+{
+  "$schema": "Parameters for invoice-cancellation-mm.spec.ts — BP_IT_S2P_MM_GR-COR_Invoice cancellation in ERP (MR8M → FB03L → FBL1N)",
+  "$note": "MR8M Step 1 is DESTRUCTIVE — it actually reverses a posted MM invoice. The spec auto-SKIPs when mr8mFilter.invoiceDocumentNumber is empty or starts with 'PLACEHOLDER'. Fill a real invoice doc + fiscal year before running.",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCodes": {
+    "cancelInvoice": "MR8M",
+    "documentDisplay": "FB03L",
+    "vendorLineItems": "FBL1N"
+  },
+  "mr8mFilter": {
+    "invoiceDocumentNumber": "PLACEHOLDER_INVOICE_DOC",
+    "fiscalYear": "2026",
+    "reversalReason": "01"
+  },
+  "fb03Filter": {
+    "documentNumber": "",
+    "companyCode": "8540",
+    "fiscalYear": "2026",
+    "ledger": "0L"
+  },
+  "fbl1nFilter": {
+    "vendorAccount": "*",
+    "companyCode": "8540",
+    "openAtKeyDate": "30.04.2026",
+    "openItems": true
+  },
+  "expected": {
+    "documentType": "KC"
+  }
+}

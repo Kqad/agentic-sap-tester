@@ -1,0 +1,33 @@
+Manage Accounts payable Reports & Analytics Row 20/21
+ (20: All item / 21: Open Items as key dates)
+
+
+自然语言：
+1.进入 Menu，  点击setting，点击visualization 并启用show Ok code field, 并保存。
+2.在 矩形输入框 输入 S_ALR_87012083，点击右下角execute
+3. company code输入8540，点击execute
+4. 点击menu，点击system，点击list，点击save，点击新跳出来的框里的save，点击spreadsheet，点击continue，点击export to，点击ok 
+5.页面底部显示绿色√符号加download xxx文件即为成功
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("矩形", { value: "S_ALR_87012083" });
+  await agent.aiTap("点击右下角execute");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiTap("点击menu");
+  await agent.aiTap("点击system");
+  await agent.aiTap("点击list");
+  await agent.aiTap("点击save");
+  await agent.aiTap("点击新跳出来的框里的save");
+  await agent.aiTap("点击spreadsheet");
+  await agent.aiTap("点击continue");
+  await agent.aiTap("点击export to");
+  await agent.aiTap("点击ok");
+  await agent.aiAssert("页面底部显示绿色√符号加download xxx文件即为成功");
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "DEMO Test 7 — BP_IT_B2P_GUI_AuC Asset Master Data Creation-VendorTool (Row 21/22): AS01 create → AS03 display verifies asset class A3200000",
+  "$note": "AS01 is DESTRUCTIVE — actually creates an Asset Master record. Run only against a non-production SAP client.",
+  "title": "DEMO 7 · AS01 Create AuC Asset → AS03 Display",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCodes": {
+    "createAsset":  "AS01",
+    "displayAsset": "AS03"
+  },
+  "entry": {
+    "companyCode": "8540",
+    "assetClass":  "A3200000"
+  },
+  "general": {
+    "description": "ai test"
+  },
+  "timeDependent": {
+    "costCenter": "C854100263",
+    "plant":      "8543"
+  },
+  "expectedAssetClass": "A3200000"
+}

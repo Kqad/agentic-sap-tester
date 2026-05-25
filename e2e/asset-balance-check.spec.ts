@@ -1,6 +1,6 @@
 import { test, expect } from './fixture';
 import type { Page } from '@playwright/test';
-import params from './cases/asset-balance-check.json';
+import params from './cases/asset-balance-check.json' with { type: 'json' };
 
 test.setTimeout(15 * 60 * 1000);
 
@@ -115,10 +115,22 @@ test('SAP Asset Balance: Curr.bk.val. == Book val.', async ({
     await page.waitForTimeout(1500);
   };
 
+  // SAP 登陆后常弹 "System Messages" / "Information" 公告窗，需要先确定性 Continue
+  const dismissContinuePopup = async () => {
+    const btn = page.getByRole('button', { name: /^Continue$/i }).first();
+    if (await btn.isVisible({ timeout: 1500 }).catch(() => false)) {
+      console.log('[POPUP] Continue 关闭弹窗');
+      try { await btn.click({ timeout: 3000 }); }
+      catch { try { await btn.click({ force: true, timeout: 3000 }); } catch {} }
+      await page.waitForTimeout(1500);
+    }
+  };
+
   await test.step('打开 SAP WebGUI 首页', async () => {
     await page.goto(params.sapUrl, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.waitForTimeout(3000);
+    await dismissContinuePopup();
   });
 
   await test.step('Step 1: 在 Settings → Interaction Design → Visualization 启用 Show OK Code Field', async () => {
@@ -224,6 +236,31 @@ test('SAP Asset Balance: Curr.bk.val. == Book val.', async ({
     );
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.waitForTimeout(3500);
+    await dismissContinuePopup();
+
+    // 收藏夹里的 Asset Balances 经常绑定了一个 variant，会跳过查询界面直接出结果。
+    // 用 Company code label 探测当前是不是查询表单；不是就回退到选择屏（F3 / 直接 TC）。
+    const onQueryForm = async () => page.getByLabel('Company code')
+      .first()
+      .isVisible({ timeout: 2000 })
+      .catch(() => false);
+
+    if (!(await onQueryForm())) {
+      console.log('[Step 3] Favorites 直接进入结果页，按 F3 回到选择屏');
+      await page.keyboard.press('F3');
+      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForTimeout(2500);
+      await dismissContinuePopup();
+    }
+
+    if (!(await onQueryForm())) {
+      console.log('[Step 3] F3 仍未回到选择屏，直接走 TC S_ALR_87011963');
+      await aiInput('/nS_ALR_87011963', '左上角 TC / OK Code 输入框');
+      await ai('按下回车键，使刚刚输入的事务码生效并跳转到 Asset Balances 查询界面');
+      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForTimeout(3500);
+      await dismissContinuePopup();
+    }
 
     await fillSapField(page, 'Company code', params.query.companyCode);
     await fillSapField(page, 'Asset number', params.query.assetNumber);
@@ -258,7 +295,9 @@ test('SAP Asset Balance: Curr.bk.val. == Book val.', async ({
 
     const a2 = await withRetry<{ bookVal: string }>('aiQuery A2', () =>
       aiQuery<{ bookVal: string }>(
-        `从当前 Asset Balances 报表结果表格中取第一条数据行（不含表头/合计行），`
+        `从当前 Asset Balances 报表结果表格中，`
+        + `定位到资产编号 ${params.query.assetNumber} 对应的那一行`
+        + `（如果只有一条数据行就取该行；若有合计行/小计行，请取数据行而非合计行），`
         + `提取 "${params.extract.a2ColumnLabel}" 列的单元格文本（保留原始格式），`
         + `返回 JSON: { "bookVal": <字符串> }`,
       ),

@@ -1,0 +1,39 @@
+BP_IT_B2P_GUI_CIT (Row 8/9)
+
+自然语言：
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入S_ALR_87012284，点击execute。
+2. company code输入8540，在ledger输入L2，在financial statement version输入IFR4, 滑动到最底下，点击ALV tree control，点击execute, 点击对勾，等10s，点击打印机右边的下箭头，点击print preview of view, 
+3.点击menu，点击system，点击system底下的list，点击save，点击新跳出来的框里的save，点击spreadsheet，点击continue，点击export to，点击ok 
+5.页面底部显示绿色√符号加download xxx文件即为成功
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "S_ALR_87012284" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("ledger", { value: "L2" });
+  await agent.aiInput("financial statement version", { value: "IFR4" });
+  await agent.aiAct("按住边缘滚动条滑块，拖到最底端");
+  await agent.aiTap("点击ALV tree control");
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiTap("点击对勾");
+  await sleep(10000);
+  await agent.aiTap("点击打印机右边的下箭头");
+  await agent.aiTap("点击print preview of view");
+  await agent.aiTap("点击menu");
+  await agent.aiTap("点击system");
+  await agent.aiTap("点击system底下的list");
+  await agent.aiTap("点击save");
+  await agent.aiTap("点击新跳出来的框里的save");
+  await agent.aiTap("点击spreadsheet");
+  await agent.aiTap("点击continue");
+  await agent.aiTap("点击export to");
+  await agent.aiTap("点击ok");
+  await agent.aiAssert("页面底部显示绿色√符号加download xxx文件即为成功");
+}
+

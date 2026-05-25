@@ -1,0 +1,13 @@
+{
+  "$schema": "DEMO Test 4 — BP_IT_B2P_FIORI_Report Supplier Balances and Line Items (Row 6/7): FBL1N local crcy ↔ Fiori Manage Supplier Line Items local crcy",
+  "title": "DEMO 4 · FBL1N vs Fiori Manage Supplier Line Items",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCodes": {
+    "fbl1n": "FBL1N",
+    "fiori": "/n/UI2/FLP"
+  },
+  "fioriApp": "Manage Supplier Line Items",
+  "query": {
+    "companyCode": "8540"
+  }
+}

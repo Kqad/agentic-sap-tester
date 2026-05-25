@@ -1,0 +1,343 @@
+
+# SAP test 1
+
+BP_IT_B2P_GUI_Report Asset HistorySheet. (Row 2/3)
+Calling up and evaluating the report data
+
+自然语言：
+1.进入 Menu， 点击setting，点击visualization 并启用show Ok code field, 并保存。
+2.在 矩形输入框 输入 S_ALR_87011990 ，点击右下角execute
+3. company code输入8540， Asset number 输入1010001732
+4. 点击跳出栏目的第一个。 
+5.Report date 输入上个月的最后一个自然日, 并勾选List assets, 执行Execute 查询。
+6.在查询到的Asset History Sheet页面中，滑动到最右边，查找Curr.bk.val.列的值，记录为变量A1.
+7. 返回 SAP 主页, 选择Favorites文件夹下面的Asset Balances, 执行Execute。
+8.company code处输入8540, Asset number输入1010001732。
+9. 点击跳出栏目的第一个。  
+10. Report date输入30.04.2026, 勾选List assets, 执行Execute。 
+11. 记录查询到的数据表格 第一行，Book val.l列的值为变量A2.
+12. A1和A2相等则测试用例执行成功。
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("矩形", { value: "S_ALR_87011990" });
+  await agent.aiTap("点击右下角execute");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("Asset number", { value: "1010001732" });
+  await agent.aiTap("点击跳出栏目的第一个");
+  await agent.aiInput("Report date", { value: "30.04.2026" });
+  await agent.aiTap("勾选 List assets 复选框");
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiTap("在查询到的Asset History Sheet页面中");
+  await agent.aiAct("按住底部的横向滚动条的滑块，拖到最右端");
+  const result = await agent.aiQuery("string, 从查询结果表格中读取 Curr.bk.val.列，保存为变量 A1");
+  await agent.aiTap("返回 SAP 主页");
+  await agent.aiTap("展开 Favorites 文件夹并选择 Asset Balances");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("Asset number", { value: "1010001732" });
+  await agent.aiTap("点击跳出栏目的第一个");
+  await agent.aiInput("Report date", { value: "30.04.2026" });
+  await agent.aiTap("勾选 List assets 复选框");
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  const result = await agent.aiQuery("string, 记录查询到的数据表格 第一行");
+  const result = await agent.aiQuery("string, Book val.l列的值为变量A2.");
+  await agent.aiAssert("如果 A1 和 A2 相等，则判定测试用例执行成功；否则判定失败");
+}
+
+
+
+# SAP test 2
+
+Manage Accounts payable Reports & Analytics Row 20/21
+ (20: All item / 21: Open Items as key dates)
+
+
+自然语言：
+1.进入 Menu，  点击setting，点击visualization 并启用show Ok code field, 并保存。
+2.在 矩形输入框 输入 S_ALR_87012083，点击右下角execute
+3. company code输入8540，点击execute
+4. 点击menu，点击system，点击list，点击save，点击新跳出来的框里的save，点击spreadsheet，点击continue，点击export to，点击ok 
+5.页面底部显示绿色√符号加download xxx文件即为成功
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("矩形", { value: "S_ALR_87012083" });
+  await agent.aiTap("点击右下角execute");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiTap("点击menu");
+  await agent.aiTap("点击system");
+  await agent.aiTap("点击list");
+  await agent.aiTap("点击save");
+  await agent.aiTap("点击新跳出来的框里的save");
+  await agent.aiTap("点击spreadsheet");
+  await agent.aiTap("点击continue");
+  await agent.aiTap("点击export to");
+  await agent.aiTap("点击ok");
+  await agent.aiAssert("页面底部显示绿色√符号加download xxx文件即为成功");
+}
+
+
+
+# SAP test 3
+
+Manage Accounts payable Reports & Analytics Row 19
+ (Open new Fiori App)
+
+
+自然语言：
+1.进入 Menu， 点击setting，点击visualization 并启用show Ok code field, 并保存。
+2.在 矩形输入框 输入 /n/UI2/FLP，点击右下角execute
+3.在新页面点搜索图标 xpath=//*[@id="sf"]/span ,搜索Aging Analysis，点结果里的aging analysis模块，点击屏幕上部向下展开的图标，点击漏斗图标，点击conpany code，搜索8540，点击ok
+4. 点export to spreadsheet图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]，查看是否excel下载成功
+
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("矩形", { value: "/n/UI2/FLP" });
+  await agent.aiTap("点击右下角execute");
+  await agent.aiTap("在新页面点图标", { xpath: "//*[@id=\"sf\"]/span" });
+  await agent.aiInput("搜索输入框", { value: "Aging Analysis" });
+  await agent.aiTap("点结果里的aging analysis模块");
+  await agent.aiTap("点击屏幕上部向下展开的图标");
+  await agent.aiTap("点击漏斗图标");
+  await agent.aiTap("点击conpany code");
+  await agent.aiInput("搜索输入框", { value: "8540" });
+  await agent.aiTap("点击ok");
+  await agent.aiTap("点图标", { xpath: "/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]" });
+  await agent.aiAssert("查看是否excel下载成功");
+}
+
+
+
+# SAP test 4
+
+BP_IT_B2P_FIORI_Report Supplier Balances and Line Items （Row 6/7)
+
+自然语言：
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FBL1N，点击execute，company code输入8540，点击execute，滑动到最底下，查找最底下的local crcy的值记录为A2。
+2.返回主页，进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存， 在 矩形输入框  输入 /n/UI2/FLP，点击右下角execute
+3. 点击add apps，搜索Manage Supplier Line Items，点击搜索，等4s，点击新出现的第一个Manage Supplier Line Items，company code输入8540， 点击execute
+4. 滑动到最底下，查找最底下的local crcy的值记录为A1
+5. A1和A2 相等则测试用例执行成功,不成功，则失败。
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "FBL1N" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiAct("按住右侧的纵向滚动条的滑块，拖到最底端");
+  const result = await agent.aiQuery("string, 查找最底下的local crcy的值记录为A2");
+  await agent.aiTap("返回主页");
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("矩形", { value: "/n/UI2/FLP" });
+  await agent.aiTap("点击右下角execute");
+  await agent.aiTap("点击add apps");
+  await agent.aiInput("搜索输入框", { value: "Manage Supplier Line Items" });
+  await agent.aiTap("点击搜索");
+  await sleep(4000);
+  await agent.aiTap("点击新出现的第一个Manage Supplier Line Items");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiAct("按住右侧的纵向滚动条的滑块，拖到最底端");
+  const result = await agent.aiQuery("string, 查找最底下的local crcy的值记录为A1");
+  await agent.aiAssert("比较变量 A1 和 A2 是否相等");
+  await agent.aiAssert("如果 A1 和 A2 相等，则判定测试用例执行成功；否则判定失败");
+}
+
+
+
+# SAP test 5
+
+BP_IT_B2P_GUI_CIT (Row 8/9)
+
+自然语言：
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入S_ALR_87012284，点击execute。
+2. company code输入8540，在ledger输入L2，在financial statement version输入IFR4, 滑动到最底下，点击ALV tree control，点击execute, 点击对勾，等10s，点击打印机右边的下箭头，点击print preview of view, 
+3.点击menu，点击system，点击system底下的list，点击save，点击新跳出来的框里的save，点击spreadsheet，点击continue，点击export to，点击ok 
+5.页面底部显示绿色√符号加download xxx文件即为成功
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "S_ALR_87012284" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("ledger", { value: "L2" });
+  await agent.aiInput("financial statement version", { value: "IFR4" });
+  await agent.aiAct("按住边缘滚动条滑块，拖到最底端");
+  await agent.aiTap("点击ALV tree control");
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiTap("点击对勾");
+  await sleep(10000);
+  await agent.aiTap("点击打印机右边的下箭头");
+  await agent.aiTap("点击print preview of view");
+  await agent.aiTap("点击menu");
+  await agent.aiTap("点击system");
+  await agent.aiTap("点击system底下的list");
+  await agent.aiTap("点击save");
+  await agent.aiTap("点击新跳出来的框里的save");
+  await agent.aiTap("点击spreadsheet");
+  await agent.aiTap("点击continue");
+  await agent.aiTap("点击export to");
+  await agent.aiTap("点击ok");
+  await agent.aiAssert("页面底部显示绿色√符号加download xxx文件即为成功");
+}
+
+
+
+
+# SAP test 6
+
+PSL_CT_B2P_PE_GUI_FI line item reports additional fields （row 10）
+
+自然语言：
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FAGLL03H，点击execute。
+2. 在company code输入8540， 点击all items， 在posting date开始日期输入01.12.2025,在posting date截至日期输入31.12.2025，点击execute,等4s
+3. 点击图标 xpath=//*[@id="C185_toolbar_btn10"]，等2s
+4.点击右边栏目column set下面的搜索，在search term输入operational division，点击ok，点击×，点击向左的箭头，点击adopt，等6s
+5. 页面拖动到最右边，页面上能看到oper. div.即为测试成功
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "FAGLL03H" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiTap("点击all items");
+  await agent.aiInput("posting date开始日期", { value: "01.12.2025" });
+  await agent.aiInput("posting date截至日期", { value: "31.12.2025" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await sleep(4000);
+  await agent.aiTap("点击图标", { xpath: "//*[@id=\"C185_toolbar_btn10\"]" });
+  await sleep(2000);
+  await agent.aiTap("点击右边栏目column set下面的搜索");
+  await agent.aiInput("search term", { value: "operational division" });
+  await agent.aiTap("点击ok");
+  await agent.aiTap("点击×");
+  await agent.aiTap("点击向左的箭头");
+  await agent.aiTap("点击adopt");
+  await sleep(6000);
+  await agent.aiAct("按住底部的横向滚动条的滑块，拖到最右端");
+  await agent.aiAssert("页面上能看到oper. div.即为测试成功");
+}
+
+
+
+# SAP test 7
+
+BP_IT_B2P_GUI_AuC Asset Master Data Creation-VendorTool （Row 21/22）
+Create single asset master data from transaction AS01
+
+自然语言：
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入AS01，点击execute。
+2. 在company code输入8540，在asset class输入A3200000，点击master data。
+3. 在description第一行输入ai test，点击save，在cost center输入C854100263，在plant输入8543，点击save，返回sap主页
+4. 进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存，在左上角矩形输入框输入AS03，点击execute。
+5. 点击master data，如果界面显示AC3200000则测试成功
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "AS01" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("asset class", { value: "A3200000" });
+  await agent.aiTap("点击master data");
+  await agent.aiInput("description第一行", { value: "ai test" });
+  await agent.aiTap("点击save");
+  await agent.aiInput("cost center", { value: "C854100263" });
+  await agent.aiInput("plant", { value: "8543" });
+  await agent.aiTap("点击save");
+  await agent.aiTap("返回sap主页");
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "AS03" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiTap("点击master data");
+  await agent.aiAssert("如果界面显示AC3200000则测试成功");
+}
+
+
+
+# SAP test 8
+
+PSL_CT_B2P_PE_GUI_FI line item reports additional fields (Row 12)
+
+自然语言；
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FB03L，点击execute。
+2. 在fiscal year输入2026，在company code输入8540，在document number输入1700000299，点击continue
+3. 点击change layout图标 xpath=//*[@id="_MB_VARIANT117"]
+4.点击右边栏目column set下面的搜索，在search term输入Reference Key，点击ok，点击×，点击向左的箭头，点击Reference Key 2，点击向左的箭头，点击对勾
+5. 将页面滑到最右边，如果能同时看到reference key 1和reference key 2 测试用例即成功
+JS：
+
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "FB03L" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("fiscal year", { value: "2026" });
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("document number", { value: "1700000299" });
+  await agent.aiTap("点击continue");
+  await agent.aiTap("点击change layout图标", { xpath: "//*[@id=\"_MB_VARIANT117\"]" });
+  await agent.aiTap("点击右边栏目column set下面的搜索");
+  await agent.aiInput("search term", { value: "Reference Key" });
+  await agent.aiTap("点击ok");
+  await agent.aiTap("点击×");
+  await agent.aiTap("点击向左的箭头");
+  await agent.aiTap("点击Reference Key 2");
+  await agent.aiTap("点击向左的箭头");
+  await agent.aiTap("点击对勾");
+  await agent.aiAct("按住底部的横向滚动条的滑块，拖到最右端");
+  await agent.aiAssert("如果能同时看到reference key 1和reference key 2 测试用例即成功");
+}
+
+
+
+
+

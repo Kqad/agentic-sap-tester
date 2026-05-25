@@ -1,0 +1,17 @@
+{
+  "$schema": "DEMO Test 1 — BP_IT_B2P_GUI_Report Asset HistorySheet (Row 2/3): compare Curr.bk.val. (S_ALR_87011990) vs Book val. (Asset Balances)",
+  "title": "DEMO 1 · Asset History Sheet vs Asset Balances",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "S_ALR_87011990",
+  "favoritesEntry": "Asset Balances",
+  "query": {
+    "companyCode": "8540",
+    "assetNumber": "1010001732",
+    "reportDate": "30.04.2026",
+    "listAssets": true
+  },
+  "extract": {
+    "a1ColumnLabel": "Curr.bk.val.",
+    "a2ColumnLabel": "Book val."
+  }
+}

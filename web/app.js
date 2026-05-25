@@ -99,6 +99,16 @@ const I18N = {
     'run.start': '开始运行',
     'run.stop': '停止',
     'run.headed': 'headed (有头模式)',
+    'run.useCache': '启用缓存重放',
+    'run.useCache.tip': '复用上次成功运行记录的 AI 计划与定位 xpath，命中时跳过模型调用（更快、更稳定，受页面结构变化影响）。',
+    'run.cacheStrategy.label': '缓存策略',
+    'run.cacheStrategy.readWrite': '读写（默认）',
+    'run.cacheStrategy.readOnly': '只读（仅重放）',
+    'run.cacheStrategy.writeOnly': '只写（重新录制）',
+    'run.cacheClear': '清空缓存',
+    'run.cacheClear.confirm': '确认删除 Midscene 缓存目录下的所有 .cache.yaml？下一次运行会重新询问模型。',
+    'run.cacheClear.done': '已删除 {n} 个缓存文件',
+    'run.cacheActive': '缓存重放：{strategy}',
     'run.pleaseSelect': '请选择一个 spec',
     'run.started': '已启动运行',
     'run.confirmStop': '确认停止当前运行？',
@@ -109,10 +119,39 @@ const I18N = {
     'run.status.passed': '上次：通过',
     'run.status.failed': '上次：失败 (exit {code})',
     'run.status.startedBy': ' · 由 @{user} 启动',
+    'run.preview.title': '本次将要执行的步骤',
+    'run.preview.subtitle': '由 spec.ts 静态解析得出（参数 JSON 已合并）。运行时实际顺序可能因条件分支略有不同。',
+    'run.preview.empty': '先在上方选一个 spec',
+    'run.preview.loading': '解析中…',
+    'run.preview.loadFailed': '解析失败：',
+    'run.preview.noSteps': '此 spec 没有任何 test.step 块。',
+    'run.preview.test': '测试函数',
+    'run.preview.actionsCount': '{n} 个动作',
+    'run.preview.stepsCount': '{n} 个步骤',
+    'run.preview.conditional': '条件执行',
+    'run.preview.loop': '循环',
+    'run.preview.retried': '失败重试',
+    'run.preview.openSource': '在源码中查看',
+    'run.preview.resolvedParam': '从参数 JSON 解析得到',
+    'run.preview.status.pending': '待执行',
+    'run.preview.status.running': '执行中',
+    'run.preview.status.passed': '通过',
+    'run.preview.status.failed': '失败',
+    'run.preview.duration': '耗时 {d}',
     'results.title': '测试结果 / 报告',
     'results.empty': '尚无报告。',
+    'results.subtitle': '所有 midscene_run/report/*.html 报告。「内嵌预览」会弹窗内打开，「新标签页打开」会弹出独立窗口。',
+    'results.refresh': '刷新',
+    'results.filter.placeholder': '按文件名过滤…',
+    'results.kind.all': '全部',
+    'results.kind.merged': '合并报表',
+    'results.kind.single': '单次运行',
+    'results.kind.other': '其他',
+    'results.summary': '显示 {shown} / {total} 条',
     'results.col.kind': '类型',
     'results.col.name': '文件名',
+    'results.col.when': '生成时间',
+    'results.col.size': '体积',
     'results.col.openTab': '新标签页打开',
     'generate.title': 'AI 用例生成器',
     'generate.subtitleA': '用配置中的 ',
@@ -175,6 +214,58 @@ const I18N = {
     'audit.col.user': '用户',
     'audit.col.source': '来源',
     'audit.col.detail': '详情',
+    'detail.backToList': '← 用例列表',
+    'detail.tabs.params': '参数',
+    'detail.tabs.run': '步骤 & 运行',
+    'detail.tabs.history': '历史',
+    'detail.latest': '最近一次',
+    'detail.never': '从未运行',
+    'detail.runNow': '▶ 运行',
+    'detail.openSpec': '查看 Spec 源码',
+    'detail.runs.count': '{n} 次运行',
+    'detail.replayBanner': '正在查看历史运行（{when}）',
+    'detail.replayLive': '回到当前',
+    'detail.notFound': '找不到此用例。',
+    'detail.summary.spec': 'Spec',
+    'detail.summary.tx': '事务码',
+    'detail.summary.favorites': '收藏',
+    'detail.summary.id': '用例 ID',
+    'cases.openDetail': '打开',
+    'params.title': '参数',
+    'params.subtitle': '改完保存。每个字段都映射到 Spec 里 ${params.xxx} 的引用。',
+    'params.save': '保存参数',
+    'params.empty': '此用例还没有参数。点击「原始 JSON」开始添加。',
+    'params.usedBy': '用于步骤',
+    'params.usedByNone': '未被任何步骤引用',
+    'params.showRaw': '查看原始 JSON ▾',
+    'params.hideRaw': '收起 ▴',
+    'params.complexHint': '此用例含数组或嵌套结构，建议在原始 JSON 视图中编辑。',
+    'params.saved': '参数已保存',
+    'params.parseError': '无法解析 JSON：',
+    'params.unsaved': '有未保存的修改',
+    'history.title': '运行历史',
+    'history.empty': '该用例还没有运行记录。点击「▶ 运行」执行第一次。',
+    'history.replayBtn': '查看步骤',
+    'history.preview': '内嵌预览',
+    'history.previewHide': '收起预览',
+    'history.openReport': '新标签页打开',
+    'history.noReport': '无报告（运行可能失败或被中断）',
+    'history.col.when': '时间',
+    'history.col.status': '状态',
+    'history.col.who': '运行者',
+    'history.col.duration': '耗时',
+    'history.col.actions': '操作',
+    'history.status.passed': '通过',
+    'history.status.failed': '失败',
+    'history.delete': '删除',
+    'history.confirmDelete': '删除这条运行记录？（不会影响报告文件本身）',
+    'history.deleted': '已删除运行记录',
+    'history.clearAll': '清空全部历史',
+    'history.confirmClearAll': '清空 "{id}" 的全部 {n} 条运行记录？此操作无法撤销。',
+    'history.clearedAll': '已清空 {n} 条运行记录',
+    'dashboard.recent.title': '最近运行',
+    'dashboard.recent.empty': '还没有运行记录。打开任意一个用例并点击「▶ 运行」。',
+    'dashboard.recent.openCase': '打开用例',
   },
   en: {
     'login.tagline': 'SAP WebGUI Test Automation Console',
@@ -271,6 +362,16 @@ const I18N = {
     'run.start': 'Start',
     'run.stop': 'Stop',
     'run.headed': 'headed mode',
+    'run.useCache': 'Replay cache',
+    'run.useCache.tip': 'Reuse AI plans and located xpaths recorded by the last successful run; cache hits skip the model call (faster, deterministic, but sensitive to page changes).',
+    'run.cacheStrategy.label': 'Cache strategy',
+    'run.cacheStrategy.readWrite': 'Read/write (default)',
+    'run.cacheStrategy.readOnly': 'Read only (replay only)',
+    'run.cacheStrategy.writeOnly': 'Write only (re-record)',
+    'run.cacheClear': 'Clear cache',
+    'run.cacheClear.confirm': 'Delete every .cache.yaml under midscene_run/cache? The next run will fall back to the AI.',
+    'run.cacheClear.done': 'Removed {n} cache file(s)',
+    'run.cacheActive': 'Cache replay: {strategy}',
     'run.pleaseSelect': 'Please select a spec',
     'run.started': 'Run started',
     'run.confirmStop': 'Stop the current run?',
@@ -281,10 +382,39 @@ const I18N = {
     'run.status.passed': 'Last: passed',
     'run.status.failed': 'Last: failed (exit {code})',
     'run.status.startedBy': ' · started by @{user}',
+    'run.preview.title': 'Steps this run will execute',
+    'run.preview.subtitle': 'Statically parsed from the spec.ts (params JSON merged in). Actual order may vary slightly due to conditional branches.',
+    'run.preview.empty': 'Pick a spec above to preview steps',
+    'run.preview.loading': 'Parsing…',
+    'run.preview.loadFailed': 'Parse failed: ',
+    'run.preview.noSteps': 'This spec has no test.step blocks.',
+    'run.preview.test': 'test',
+    'run.preview.actionsCount': '{n} actions',
+    'run.preview.stepsCount': '{n} steps',
+    'run.preview.conditional': 'conditional',
+    'run.preview.loop': 'loop',
+    'run.preview.retried': 'retried',
+    'run.preview.openSource': 'View in source',
+    'run.preview.resolvedParam': 'resolved from params JSON',
+    'run.preview.status.pending': 'pending',
+    'run.preview.status.running': 'running',
+    'run.preview.status.passed': 'passed',
+    'run.preview.status.failed': 'failed',
+    'run.preview.duration': '{d}',
     'results.title': 'Results & reports',
     'results.empty': 'No reports yet.',
+    'results.subtitle': 'Every HTML report under midscene_run/report. "Inline preview" opens a modal; "Open in new tab" pops a standalone window.',
+    'results.refresh': 'Refresh',
+    'results.filter.placeholder': 'Filter by filename…',
+    'results.kind.all': 'All',
+    'results.kind.merged': 'Merged',
+    'results.kind.single': 'Single run',
+    'results.kind.other': 'Other',
+    'results.summary': 'Showing {shown} of {total}',
     'results.col.kind': 'Type',
     'results.col.name': 'Filename',
+    'results.col.when': 'Created',
+    'results.col.size': 'Size',
     'results.col.openTab': 'Open in new tab',
     'generate.title': 'AI case generator',
     'generate.subtitleA': 'Uses the configured ',
@@ -347,6 +477,58 @@ const I18N = {
     'audit.col.user': 'User',
     'audit.col.source': 'Source',
     'audit.col.detail': 'Detail',
+    'detail.backToList': '← All cases',
+    'detail.tabs.params': 'Parameters',
+    'detail.tabs.run': 'Steps & Run',
+    'detail.tabs.history': 'History',
+    'detail.latest': 'Latest',
+    'detail.never': 'Never run',
+    'detail.runNow': '▶ Run',
+    'detail.openSpec': 'View spec source',
+    'detail.runs.count': '{n} run(s)',
+    'detail.replayBanner': 'Viewing a past run ({when})',
+    'detail.replayLive': 'Back to live',
+    'detail.notFound': 'Case not found.',
+    'detail.summary.spec': 'Spec',
+    'detail.summary.tx': 'Transaction',
+    'detail.summary.favorites': 'Favorites',
+    'detail.summary.id': 'Case ID',
+    'cases.openDetail': 'Open',
+    'params.title': 'Parameters',
+    'params.subtitle': 'Each field maps to a ${params.xxx} reference inside the spec.',
+    'params.save': 'Save parameters',
+    'params.empty': 'This case has no parameters yet. Open “Raw JSON” to start adding some.',
+    'params.usedBy': 'Used by step',
+    'params.usedByNone': 'Not referenced by any step',
+    'params.showRaw': 'Raw JSON ▾',
+    'params.hideRaw': 'Hide raw ▴',
+    'params.complexHint': 'This case contains arrays or deeply nested objects — prefer the raw JSON view.',
+    'params.saved': 'Parameters saved',
+    'params.parseError': 'Could not parse JSON: ',
+    'params.unsaved': 'Unsaved changes',
+    'history.title': 'Run history',
+    'history.empty': 'No run history yet. Click “▶ Run” to execute it for the first time.',
+    'history.replayBtn': 'View steps',
+    'history.preview': 'Inline preview',
+    'history.previewHide': 'Hide preview',
+    'history.openReport': 'Open in new tab',
+    'history.noReport': 'No report (run may have failed or been aborted)',
+    'history.col.when': 'When',
+    'history.col.status': 'Status',
+    'history.col.who': 'Run by',
+    'history.col.duration': 'Duration',
+    'history.col.actions': 'Actions',
+    'history.status.passed': 'passed',
+    'history.status.failed': 'failed',
+    'history.delete': 'Delete',
+    'history.confirmDelete': 'Delete this run record? (The report file itself is kept.)',
+    'history.deleted': 'Run record deleted',
+    'history.clearAll': 'Clear all history',
+    'history.confirmClearAll': 'Clear all {n} run record(s) for "{id}"? This cannot be undone.',
+    'history.clearedAll': 'Cleared {n} run record(s)',
+    'dashboard.recent.title': 'Recent runs',
+    'dashboard.recent.empty': 'No runs yet. Open any case and click “▶ Run”.',
+    'dashboard.recent.openCase': 'Open case',
   },
 };
 
@@ -506,10 +688,18 @@ function modal({ title, body, wide = false, footer = null, onClose }) {
 
 // ───────── Router ─────────
 const VIEWS = {}; // populated below
+// Hash format:
+//   #/dashboard
+//   #/cases                       → cases list
+//   #/cases/<id>                  → case detail, default tab (params)
+//   #/cases/<id>/run              → case detail, run tab (live)
+//   #/cases/<id>/runs/<runId>     → case detail, run tab in replay mode
+//   #/cases/<id>/history          → case detail, history tab
 function parseHash() {
   const raw = (location.hash || '#/dashboard').slice(2);
-  const [view, ...rest] = raw.split('/').filter(Boolean);
-  return { view: view || 'dashboard', params: { rest } };
+  const segs = raw.split('/').filter(Boolean);
+  const view = segs[0] || 'dashboard';
+  return { view, params: { rest: segs.slice(1) } };
 }
 function go(path) { location.hash = '#/' + path; }
 window.addEventListener('hashchange', () => render());
@@ -565,10 +755,12 @@ function renderLogin() {
 }
 
 // ───────── Shell ─────────
+// Top-level navigation. "Run" and "Results" used to live here but were merged
+// into the case detail page (#/cases/:id) so each case is the one place to
+// edit params, run it, and inspect history — see VIEWS.caseDetail.
 const NAV = [
   { id: 'dashboard',  labelKey: 'nav.dashboard', sectionKey: 'nav.section.workspace', perm: null },
   { id: 'cases',      labelKey: 'nav.cases',     sectionKey: 'nav.section.workspace', perm: 'cases:read' },
-  { id: 'run',        labelKey: 'nav.run',       sectionKey: 'nav.section.workspace', perm: 'results:read' },
   { id: 'results',    labelKey: 'nav.results',   sectionKey: 'nav.section.workspace', perm: 'results:read' },
   { id: 'generate',   labelKey: 'nav.generate',  sectionKey: 'nav.section.workspace', perm: 'agent:use' },
   { id: 'config',     labelKey: 'nav.config',    sectionKey: 'nav.section.admin',     perm: 'config:read' },
@@ -639,20 +831,34 @@ function render() {
   if (!state.user) return;
   const route = parseHash();
   state.route = route;
-  // mark active nav
-  $$('.nav-item').forEach(a => a.classList.toggle('active', a.dataset.view === route.view));
+  // Resolve which view function to use. "cases/<id>/..." is rendered by the
+  // case detail view; everything else maps 1:1 to a VIEWS key.
+  const isCaseDetail = route.view === 'cases' && route.params.rest.length > 0;
+  const effectiveViewId = isCaseDetail ? 'caseDetail' : route.view;
+  // mark active nav — case detail keeps the Cases item highlighted
+  const navMatchId = isCaseDetail ? 'cases' : route.view;
+  $$('.nav-item').forEach(a => a.classList.toggle('active', a.dataset.view === navMatchId));
   // crumbs
   const crumbs = $('[data-bind=crumbs]');
   if (crumbs) {
     crumbs.innerHTML = '';
-    crumbs.append(h('span', {}, 'SAPTest · '), h('strong', {}, navLabel(route.view)));
+    if (isCaseDetail) {
+      crumbs.append(
+        h('span', {}, 'SAPTest · '),
+        h('a', { href: '#/cases', style: { borderBottom: 'none', color: 'inherit' } }, navLabel('cases')),
+        h('span', {}, ' · '),
+        h('strong', { class: 'mono' }, route.params.rest[0]),
+      );
+    } else {
+      crumbs.append(h('span', {}, 'SAPTest · '), h('strong', {}, navLabel(route.view)));
+    }
   }
   // view
   const viewEl = $('[data-bind=view]');
   viewEl.innerHTML = '';
   viewEl.appendChild(h('div', { class: 'muted' }, t('shell.loading')));
   Promise.resolve()
-    .then(() => (VIEWS[route.view] || VIEWS.dashboard)(route))
+    .then(() => (VIEWS[effectiveViewId] || VIEWS.dashboard)(route))
     .then(node => { viewEl.innerHTML = ''; viewEl.appendChild(node); })
     .catch(err => {
       viewEl.innerHTML = '';
@@ -669,13 +875,18 @@ VIEWS.dashboard = async () => {
   const stats = h('div', { class: 'grid cols-4' });
   wrap.appendChild(stats);
 
-  let casesCount = 0, lastRun = null, latest = null, mergedRuns = 0;
+  let casesCount = 0, lastRun = null, latest = null, mergedRuns = 0, recentRuns = [];
   try {
     if (hasPerm('cases:read')) {
       const cs = await api.get('/api/cases'); casesCount = cs.cases.length;
     }
     if (hasPerm('results:read')) {
-      const rs = await api.get('/api/results'); lastRun = rs.lastRun; latest = rs.stats.latest; mergedRuns = rs.stats.mergedRuns;
+      const [rs, rr] = await Promise.all([
+        api.get('/api/results'),
+        api.get('/api/results/recent?limit=8').catch(() => ({ runs: [] })),
+      ]);
+      lastRun = rs.lastRun; latest = rs.stats.latest; mergedRuns = rs.stats.mergedRuns;
+      recentRuns = rr.runs || [];
     }
   } catch (e) { /* ignore */ }
 
@@ -685,7 +896,7 @@ VIEWS.dashboard = async () => {
       hasPerm('cases:read') ? () => go('cases') : null),
     statCard(t('dashboard.stat.runs'), mergedRuns,
       hasPerm('results:read') ? t('dashboard.stat.runsHint') : t('dashboard.stat.runsNoPerm'),
-      hasPerm('results:read') ? () => go('results') : null),
+      null),
     statCard(t('dashboard.stat.lastRun'),
       lastRun?.status ? lastRun.status.toUpperCase() : '—',
       lastRun?.failedTests?.length
@@ -699,9 +910,8 @@ VIEWS.dashboard = async () => {
     h('div', { class: 'card' },
       h('div', { class: 'card-head' }, h('h2', {}, t('dashboard.quick.title'))),
       h('div', { class: 'row' },
-        hasPerm('runs:execute') && h('button', { class: 'btn primary', onClick: () => go('run') }, t('dashboard.quick.run')),
+        hasPerm('cases:read') && h('button', { class: 'btn primary', onClick: () => go('cases') }, t('dashboard.quick.cases')),
         hasPerm('agent:use') && h('button', { class: 'btn', onClick: () => go('generate') }, t('dashboard.quick.gen')),
-        hasPerm('cases:write') && h('button', { class: 'btn ghost', onClick: () => go('cases') }, t('dashboard.quick.cases')),
         hasPerm('config:read') && h('button', { class: 'btn ghost', onClick: () => go('config') }, t('dashboard.quick.config')),
       ),
       h('div', { class: 'divider' }),
@@ -712,20 +922,31 @@ VIEWS.dashboard = async () => {
       ),
     ),
     h('div', { class: 'card' },
-      h('div', { class: 'card-head' }, h('h2', {}, t('dashboard.report.title'))),
-      latest
-        ? h('div', {},
-            h('div', { class: 'kv' },
-              h('div', { class: 'k' }, t('dashboard.report.file')),    h('div', { class: 'mono' }, latest.name),
-              h('div', { class: 'k' }, t('dashboard.report.created')), h('div', {}, fmtDate(latest.modifiedAt)),
-              h('div', { class: 'k' }, t('dashboard.report.size')),    h('div', {}, fmtBytes(latest.bytes)),
-            ),
-            h('div', { class: 'row', style: { marginTop: '12px' } },
-              h('a', { class: 'btn primary sm', href: latest.url, target: '_blank' }, t('dashboard.report.open')),
-              h('button', { class: 'btn sm', onClick: () => openReportModal(latest) }, t('dashboard.report.preview')),
-            ),
-          )
-        : h('div', { class: 'muted' }, t('dashboard.report.empty')),
+      h('div', { class: 'card-head' },
+        h('h2', {}, t('dashboard.recent.title')),
+        h('div', { class: 'row' },
+          latest && h('button', { class: 'btn sm', onClick: () => openReportModal(latest) }, t('dashboard.report.preview')),
+          latest && h('a', { class: 'btn sm ghost', href: reportPreviewUrl(latest.url), target: '_blank' }, t('dashboard.report.open')),
+          hasPerm('results:read') && h('a', { class: 'btn sm ghost', href: '#/results', style: { borderBottom: 'none' } }, t('nav.results')),
+        ),
+      ),
+      recentRuns.length === 0
+        ? h('div', { class: 'muted' }, t('dashboard.recent.empty'))
+        : h('ul', { class: 'recent-list' }, recentRuns.map(r => {
+            const ok = r.status === 'passed';
+            return h('li', { class: 'recent-item' },
+              h('span', { class: 'status-dot ' + (ok ? 'ok' : 'err') }),
+              h('a', {
+                href: '#/cases/' + encodeURIComponent(r.caseId) + '/runs/' + encodeURIComponent(r.runId),
+                class: 'mono',
+                style: { borderBottom: 'none' },
+              }, r.caseId),
+              h('span', { class: 'spacer' }),
+              h('span', { class: 'muted small' }, fmtMs(r.durationMs) || ''),
+              h('span', { class: 'muted small' }, ' · '),
+              h('span', { class: 'muted small' }, fmtRel(r.startedAt)),
+            );
+          })),
     ),
   ));
 
@@ -742,24 +963,39 @@ function statCard(label, value, sub, onClick) {
   return el;
 }
 
+// Append `?theme=light|dark` to a Midscene report URL so the in-report theme
+// (injected by server/lib/strip-branding.js) matches the SAPTest UI. Falls
+// back to prefers-color-scheme if the SPA hasn't pinned a theme.
+function reportPreviewUrl(url) {
+  if (!url) return url;
+  let theme = document.documentElement.getAttribute('data-theme');
+  if (theme !== 'light' && theme !== 'dark') {
+    theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}theme=${theme}`;
+}
+
 function openReportModal(report) {
   modal({
     title: report.name,
     wide: true,
     body: h('iframe', {
-      src: report.url,
-      style: { width: '100%', height: 'calc(80vh - 110px)', border: '1px solid var(--border)', borderRadius: '8px', background: 'white' },
+      src: reportPreviewUrl(report.url),
+      style: { width: '100%', height: 'calc(80vh - 110px)', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius-md)', background: 'hsl(var(--background))' },
     }),
   });
 }
 
-// ───────── View: Test Cases ─────────
+// ───────── View: Test Cases (list) ─────────
+// Cases are the primary entry point. Clicking a row navigates to the case
+// detail page (#/cases/:id) where the user can edit parameters, run it, and
+// review past runs — all in one place.
 VIEWS.cases = async () => {
   const wrap = h('div', { class: 'grid' });
-  const [casesRes, specsRes] = await Promise.all([
-    api.get('/api/cases'),
-    api.get('/api/cases/_specs/list').catch(() => ({ specs: [] })),
-  ]);
+  const casesRes = await api.get('/api/cases');
+
+  const openDetail = (id) => go('cases/' + encodeURIComponent(id));
 
   wrap.appendChild(h('div', { class: 'card' },
     h('div', { class: 'card-head' },
@@ -771,7 +1007,7 @@ VIEWS.cases = async () => {
     ),
     casesRes.cases.length === 0
       ? h('div', { class: 'muted' }, t('cases.empty'))
-      : h('table', { class: 'tbl' },
+      : h('table', { class: 'tbl tbl-clickable' },
           h('thead', {}, h('tr', {},
             h('th', {}, t('cases.col.id')),
             h('th', {}, t('cases.col.summary')),
@@ -780,78 +1016,41 @@ VIEWS.cases = async () => {
             h('th', {}, t('cases.col.size')),
             h('th', { class: 'actions' }, t('cases.col.actions')),
           )),
-          h('tbody', {}, casesRes.cases.map(c => h('tr', {},
-            h('td', {}, h('span', { class: 'mono' }, c.id)),
-            h('td', {},
-              c.parseError
-                ? h('span', { class: 'tag err' }, t('cases.jsonError') + c.parseError)
-                : h('div', {},
-                    c.summary?.transactionCode && h('span', { class: 'tag info' }, t('cases.txPrefix') + c.summary.transactionCode),
-                    ' ',
-                    c.summary?.favoritesEntry && h('span', { class: 'tag' }, c.summary.favoritesEntry),
-                  ),
-            ),
-            h('td', {},
-              c.specPath
-                ? h('span', { class: 'mono' }, c.specPath)
-                : h('span', { class: 'tag warn' }, t('cases.noSpec')),
-            ),
-            h('td', {}, fmtRel(c.modifiedAt)),
-            h('td', {}, fmtBytes(c.bytes)),
-            h('td', { class: 'actions' },
-              h('button', { class: 'btn sm', onClick: () => viewCase(c.id) }, t('cases.view')),
-              ' ',
-              hasPerm('cases:write') && h('button', { class: 'btn sm', onClick: () => editCase(c.id) }, t('cases.edit')),
-              ' ',
-              hasPerm('runs:execute') && c.specPath && h('button', {
-                class: 'btn primary sm',
-                onClick: () => { sessionStorage.setItem('runSpec', c.specPath); go('run'); },
-              }, t('cases.run')),
-              ' ',
-              hasPerm('cases:delete') && h('button', { class: 'btn danger sm', onClick: () => deleteCase(c.id) }, t('cases.delete')),
-            ),
-          ))),
+          h('tbody', {}, casesRes.cases.map(c => {
+            const row = h('tr', { dataset: { caseId: c.id } },
+              h('td', {}, h('span', { class: 'mono' }, c.id)),
+              h('td', {},
+                c.parseError
+                  ? h('span', { class: 'tag err' }, t('cases.jsonError') + c.parseError)
+                  : h('div', {},
+                      c.summary?.transactionCode && h('span', { class: 'tag info' }, t('cases.txPrefix') + c.summary.transactionCode),
+                      ' ',
+                      c.summary?.favoritesEntry && h('span', { class: 'tag' }, c.summary.favoritesEntry),
+                    ),
+              ),
+              h('td', {},
+                c.specPath
+                  ? h('span', { class: 'mono' }, c.specPath)
+                  : h('span', { class: 'tag warn' }, t('cases.noSpec')),
+              ),
+              h('td', {}, fmtRel(c.modifiedAt)),
+              h('td', {}, fmtBytes(c.bytes)),
+              h('td', { class: 'actions' },
+                h('button', { class: 'btn sm', onClick: (e) => { e.stopPropagation(); openDetail(c.id); } }, t('cases.openDetail')),
+                ' ',
+                hasPerm('cases:delete') && h('button', {
+                  class: 'btn danger sm',
+                  onClick: (e) => { e.stopPropagation(); deleteCase(c.id); },
+                }, t('cases.delete')),
+              ),
+            );
+            row.addEventListener('click', () => openDetail(c.id));
+            return row;
+          })),
         ),
   ));
-
-  if (specsRes.specs.length > 0) {
-    wrap.appendChild(h('div', { class: 'card' },
-      h('div', { class: 'card-head' }, h('h2', {}, t('specs.title'))),
-      h('div', { class: 'muted', style: { marginBottom: '10px', fontSize: '12.5px' } }, t('specs.desc')),
-      h('table', { class: 'tbl' },
-        h('thead', {}, h('tr', {},
-          h('th', {}, t('specs.col.file')),
-          h('th', {}, t('cases.col.modified')),
-          h('th', {}, t('cases.col.size')),
-          h('th', { class: 'actions' }, t('cases.col.actions')),
-        )),
-        h('tbody', {}, specsRes.specs.map(s => h('tr', {},
-          h('td', {}, h('span', { class: 'mono' }, s.path)),
-          h('td', {}, fmtRel(s.modifiedAt)),
-          h('td', {}, fmtBytes(s.bytes)),
-          h('td', { class: 'actions' },
-            h('button', { class: 'btn sm', onClick: () => viewSpec(s.name) }, t('specs.col.viewCode')),
-            ' ',
-            hasPerm('runs:execute') && h('button', {
-              class: 'btn primary sm',
-              onClick: () => { sessionStorage.setItem('runSpec', s.path); go('run'); },
-            }, t('cases.run')),
-          ),
-        ))),
-      ),
-    ));
-  }
   return wrap;
 };
-
-async function viewCase(id) {
-  const c = await api.get('/api/cases/' + encodeURIComponent(id));
-  modal({
-    title: t('cases.viewTitle') + id,
-    wide: true,
-    body: h('pre', { class: 'code-block' }, c.raw),
-  });
-}
 
 async function viewSpec(name) {
   const s = await api.get('/api/cases/_specs/' + encodeURIComponent(name));
@@ -909,22 +1108,98 @@ async function deleteCase(id) {
   } catch (e) { toast(e.message, 'err'); }
 }
 
-// ───────── View: Run ─────────
+// ───────── Run panel (embedded inside the case detail page) ─────────
+// Module-level WebSocket so we can tear it down before opening a new one when
+// the user navigates between case detail pages.
 let runWs = null;
-VIEWS.run = async () => {
-  const specs = (await api.get('/api/cases/_specs/list')).specs;
-  const cached = sessionStorage.getItem('runSpec') || specs[0]?.path || '';
-  sessionStorage.removeItem('runSpec');
-  const sel = h('select', {},
-    h('option', { value: '' }, t('run.selectSpec')),
-    ...specs.map(s => h('option', { value: s.path, selected: s.path === cached }, s.path)),
-  );
-  const headedChk = h('input', { type: 'checkbox' });
-  const startBtn = h('button', { class: 'btn primary' }, t('run.start'));
-  const stopBtn  = h('button', { class: 'btn danger', disabled: true }, t('run.stop'));
-  const statusEl = h('div', { class: 'muted', html: statusHtml({ running: false }) });
+
+function fmtMs(ms) {
+  if (ms == null || !Number.isFinite(ms)) return '';
+  if (ms < 1000) return `${Math.round(ms)} ms`;
+  if (ms < 60_000) return `${(ms / 1000).toFixed(1)} s`;
+  const m = Math.floor(ms / 60_000), s = Math.round((ms % 60_000) / 1000);
+  return `${m}m ${s}s`;
+}
+
+function clearStepStatuses(previewEl) {
+  if (!previewEl) return;
+  for (const n of previewEl.querySelectorAll('.step')) {
+    n.classList.remove('is-running', 'is-passed', 'is-failed');
+    const s = n.querySelector(':scope > .step-head > .step-status');
+    if (s) { s.textContent = '○'; s.title = t('run.preview.status.pending'); }
+    const d = n.querySelector(':scope > .step-head > .step-duration');
+    if (d) d.textContent = '';
+    const e = n.querySelector(':scope > .step-error');
+    if (e) { e.textContent = ''; e.style.display = 'none'; }
+  }
+}
+
+function applyEventToPreview(previewEl, evt) {
+  if (!evt || !previewEl) return;
+  if (evt.type === 'session' && evt.phase === 'begin') {
+    clearStepStatuses(previewEl);
+    return;
+  }
+  if (evt.type !== 'step' || evt.line == null) return;
+  const node = previewEl.querySelector(`.step[data-step-line="${evt.line}"]`);
+  if (!node) return;
+  const statusEl = node.querySelector(':scope > .step-head > .step-status');
+  const durEl = node.querySelector(':scope > .step-head > .step-duration');
+  const errEl = node.querySelector(':scope > .step-error');
+  if (evt.phase === 'begin') {
+    node.classList.remove('is-passed', 'is-failed');
+    node.classList.add('is-running');
+    if (statusEl) { statusEl.textContent = '◐'; statusEl.title = t('run.preview.status.running'); }
+    if (durEl) durEl.textContent = '';
+    if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
+    try { node.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch {}
+  } else if (evt.phase === 'end') {
+    node.classList.remove('is-running');
+    const ok = evt.status === 'passed';
+    node.classList.add(ok ? 'is-passed' : 'is-failed');
+    if (statusEl) {
+      statusEl.textContent = ok ? '✓' : '✗';
+      statusEl.title = t(ok ? 'run.preview.status.passed' : 'run.preview.status.failed');
+    }
+    if (durEl) durEl.textContent = fmtMs(evt.durationMs);
+    if (errEl && !ok && evt.errorMessage) {
+      errEl.textContent = evt.errorMessage;
+      errEl.style.display = '';
+    }
+  }
+}
+
+// Builds the run UI for a single spec. Two modes:
+//   live   — open the WS, stream logs/events, allow Start/Stop.
+//   replay — render the step tree once, replay the supplied events,
+//            show a banner telling the user they're looking at history.
+async function createRunPanel({ specPath, replayRun = null, onAfterRun }) {
+  const isReplay = !!replayRun;
   const consoleEl = h('div', { class: 'console' });
   const reportLink = h('div', { class: 'muted' });
+  const previewEl = h('div', { class: 'step-preview' },
+    h('div', { class: 'muted' }, t('run.preview.loading')));
+
+  // Header — status + controls (live) or replay banner.
+  const statusEl = h('div', { class: 'muted', html: statusHtml({ running: false }) });
+  const headedChk = h('input', { type: 'checkbox' });
+  const cacheChk  = h('input', { type: 'checkbox' });
+  const cacheStrategySel = h('select', { disabled: true },
+    h('option', { value: 'read-write' }, t('run.cacheStrategy.readWrite')),
+    h('option', { value: 'read-only' },  t('run.cacheStrategy.readOnly')),
+    h('option', { value: 'write-only' }, t('run.cacheStrategy.writeOnly')),
+  );
+  cacheChk.addEventListener('change', () => { cacheStrategySel.disabled = !cacheChk.checked; });
+  const clearCacheBtn = h('button', { class: 'btn sm ghost', type: 'button' }, t('run.cacheClear'));
+  clearCacheBtn.addEventListener('click', async () => {
+    if (!confirm(t('run.cacheClear.confirm'))) return;
+    try {
+      const r = await api.del('/api/run/cache');
+      toast(t('run.cacheClear.done', { n: r.removed ?? 0 }), 'ok');
+    } catch (e) { toast(e.message, 'err'); }
+  });
+  const startBtn = h('button', { class: 'btn primary' }, t('detail.runNow'));
+  const stopBtn  = h('button', { class: 'btn danger', disabled: true }, t('run.stop'));
 
   function appendLog(entry) {
     const ln = h('div', { class: 'ln ' + (entry.stream || '') });
@@ -935,25 +1210,90 @@ VIEWS.run = async () => {
   }
   function setStatus(s, report) {
     statusEl.innerHTML = statusHtml(s);
+    const runningThisSpec = s.running && s.spec === specPath;
     startBtn.disabled = s.running || !hasPerm('runs:execute');
-    stopBtn.disabled = !s.running || !hasPerm('runs:stop');
+    stopBtn.disabled = !runningThisSpec || !hasPerm('runs:stop');
+    // Lock cache controls while ANY run is in progress — the server refuses
+    // cache mutations during a run, and the toggles only take effect at spawn.
+    cacheChk.disabled = s.running || !hasPerm('runs:execute');
+    cacheStrategySel.disabled = s.running || !cacheChk.checked || !hasPerm('runs:execute');
+    clearCacheBtn.disabled = s.running || !hasPerm('runs:execute');
     if (report) {
       reportLink.innerHTML = '';
       reportLink.append(
         t('run.report'),
-        h('a', { class: 'mono', href: report.url, target: '_blank' }, report.name),
+        ' ',
+        h('a', { class: 'mono', href: reportPreviewUrl(report.url), target: '_blank' }, report.name),
         ' ',
         h('button', { class: 'btn sm', onClick: () => openReportModal(report) }, t('dashboard.report.preview')),
       );
     }
   }
 
+  // Load the static step tree for this spec.
+  let runEvents = [];
+  async function loadPreview() {
+    const name = specPath.replace(/^e2e\//, '');
+    try {
+      const data = await api.get('/api/cases/_specs/' + encodeURIComponent(name) + '/steps');
+      previewEl.innerHTML = '';
+      previewEl.appendChild(renderPreview(data));
+      runEvents.forEach(evt => applyEventToPreview(previewEl, evt));
+    } catch (e) {
+      previewEl.innerHTML = '';
+      previewEl.appendChild(h('div', { class: 'muted' }, t('run.preview.loadFailed') + e.message));
+    }
+  }
+
+  // ── Replay mode ──────────────────────────────────────────────
+  if (isReplay) {
+    runEvents = Array.isArray(replayRun.events) ? replayRun.events.slice() : [];
+    await loadPreview();
+    const when = fmtDate(replayRun.startedAt);
+    const banner = h('div', { class: 'replay-banner' },
+      h('span', {}, t('detail.replayBanner', { when })),
+      h('span', { class: 'spacer' }),
+      h('a', {
+        href: '#/cases/' + encodeURIComponent(replayRun.caseId) + '/run',
+        class: 'btn sm',
+        style: { borderBottom: 'none' },
+      }, t('detail.replayLive')),
+    );
+    if (replayRun.report) {
+      reportLink.innerHTML = '';
+      reportLink.append(
+        t('run.report'),
+        ' ',
+        h('a', { class: 'mono', href: reportPreviewUrl(replayRun.report.url), target: '_blank' }, replayRun.report.name),
+        ' ',
+        h('button', { class: 'btn sm', onClick: () => openReportModal(replayRun.report) }, t('dashboard.report.preview')),
+      );
+    }
+    // Logs aren't shown for replays (we only persist a tail; future work).
+    consoleEl.style.display = 'none';
+    return {
+      root: h('div', { class: 'grid' },
+        banner,
+        previewEl,
+        h('div', { style: { marginTop: '10px' } }, reportLink),
+      ),
+      dispose: () => {},
+    };
+  }
+
+  // ── Live mode ────────────────────────────────────────────────
   startBtn.addEventListener('click', async () => {
-    if (!sel.value) return toast(t('run.pleaseSelect'), 'warn');
     consoleEl.innerHTML = '';
     reportLink.innerHTML = '';
+    runEvents = [];
+    clearStepStatuses(previewEl);
     try {
-      await api.post('/api/run/start', { spec: sel.value, headed: headedChk.checked });
+      await api.post('/api/run/start', {
+        spec: specPath,
+        headed: headedChk.checked,
+        useCache: cacheChk.checked,
+        cacheStrategy: cacheChk.checked ? cacheStrategySel.value : null,
+      });
       toast(t('run.started'), 'ok');
     } catch (e) { toast(e.message, 'err'); }
   });
@@ -963,44 +1303,349 @@ VIEWS.run = async () => {
     catch (e) { toast(e.message, 'err'); }
   });
 
-  // open WS
+  await loadPreview();
+
+  // Open WebSocket. We replace any previous connection so an older case
+  // detail page can't keep mutating the new panel's DOM.
   try { runWs?.close(); } catch {}
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  runWs = new WebSocket(`${proto}://${location.host}/ws/run`);
-  runWs.onmessage = (ev) => {
+  const ws = new WebSocket(`${proto}://${location.host}/ws/run`);
+  runWs = ws;
+  ws.onmessage = (ev) => {
     let msg; try { msg = JSON.parse(ev.data); } catch { return; }
     if (msg.type === 'hello') {
       setStatus(msg.status);
       (msg.backlog || []).forEach(appendLog);
+      // Only paint events from a run that actually belongs to this spec —
+      // a leftover run for a different case shouldn't smear status onto
+      // unrelated steps.
+      const evts = Array.isArray(msg.events) ? msg.events.slice() : [];
+      if (msg.status?.spec === specPath) {
+        runEvents = evts;
+        evts.forEach(evt => applyEventToPreview(previewEl, evt));
+      }
     } else if (msg.type === 'log') {
-      appendLog(msg);
+      // Only show logs for runs of this spec.
+      if (!ws._currentSpec || ws._currentSpec === specPath) appendLog(msg);
+    } else if (msg.type === 'event') {
+      if (msg.event && (!ws._currentSpec || ws._currentSpec === specPath)) {
+        runEvents.push(msg.event);
+        applyEventToPreview(previewEl, msg.event);
+      }
     } else if (msg.type === 'status') {
+      ws._currentSpec = msg.status?.spec || ws._currentSpec;
       setStatus(msg.status, msg.report);
+      // When a run finishes, refresh any caller-supplied history list.
+      if (!msg.status?.running && onAfterRun) onAfterRun();
     }
   };
-  // initial fetch in case WS isn't open yet
-  try { const s = await api.get('/api/run/status'); setStatus(s); } catch {}
+  try {
+    const s = await api.get('/api/run/status');
+    ws._currentSpec = s.spec || null;
+    setStatus(s);
+  } catch {}
 
-  return h('div', { class: 'grid' },
-    h('div', { class: 'card' },
-      h('div', { class: 'card-head' },
-        h('h2', {}, t('run.title')),
+  return {
+    root: h('div', { class: 'grid' },
+      h('div', { class: 'row', style: { alignItems: 'center', flexWrap: 'wrap', gap: '8px' } },
         statusEl,
-      ),
-      h('div', { class: 'row', style: { marginBottom: '12px' } },
-        h('div', { class: 'field', style: { flex: '1', minWidth: '280px' } },
-          h('span', {}, t('run.specFile')), sel,
+        h('span', { class: 'spacer' }),
+        h('label', { class: 'row', style: { gap: '6px' }, title: t('run.useCache.tip') },
+          cacheChk, h('span', { class: 'muted' }, t('run.useCache')),
         ),
+        cacheStrategySel,
+        clearCacheBtn,
         h('label', { class: 'row', style: { gap: '6px' } },
           headedChk, h('span', { class: 'muted' }, t('run.headed')),
         ),
-        startBtn, stopBtn,
+        startBtn,
+        stopBtn,
       ),
+      previewEl,
       consoleEl,
       h('div', { style: { marginTop: '10px' } }, reportLink),
     ),
+    dispose: () => { try { ws.close(); } catch {} },
+  };
+}
+
+// VIEWS.run is kept as a redirect so any stale link or cached hash still lands
+// somewhere sensible — the run flow itself now lives inside VIEWS.caseDetail.
+VIEWS.run     = async () => { go('cases'); return h('div', { class: 'muted' }, t('shell.loading')); };
+
+// Cross-case browser for every Midscene/Playwright HTML report under
+// midscene_run/report. Per-case history is still on the case detail page;
+// this view exists so users can pull up any historical report without
+// remembering which case produced it.
+VIEWS.results = async () => {
+  const wrap = h('div', { class: 'grid' });
+
+  const filterInput = h('input', {
+    type: 'search',
+    placeholder: t('results.filter.placeholder'),
+    style: { minWidth: '220px', flex: '1' },
+  });
+  const kindSel = h('select', {},
+    h('option', { value: 'all' },    t('results.kind.all')),
+    h('option', { value: 'merged' }, t('results.kind.merged')),
+    h('option', { value: 'single' }, t('results.kind.single')),
+    h('option', { value: 'other' },  t('results.kind.other')),
   );
+  const refreshBtn = h('button', { class: 'btn sm' }, t('results.refresh'));
+
+  const tbody = h('tbody', {});
+  const emptyEl = h('div', { class: 'muted', style: { display: 'none', padding: '8px 4px' } }, t('results.empty'));
+  const summary = h('div', { class: 'muted small', style: { marginTop: '8px' } });
+
+  let items = [];
+
+  const kindTagClass = (k) => k === 'merged' ? 'tag ok' : k === 'single' ? 'tag info' : 'tag';
+
+  function paint() {
+    const q = filterInput.value.trim().toLowerCase();
+    const k = kindSel.value;
+    const filtered = items.filter(it =>
+      (k === 'all' || it.kind === k) &&
+      (!q || it.name.toLowerCase().includes(q))
+    );
+    tbody.innerHTML = '';
+    emptyEl.style.display = filtered.length ? 'none' : 'block';
+    for (const it of filtered) {
+      tbody.appendChild(h('tr', {},
+        h('td', {}, h('span', { class: kindTagClass(it.kind) }, t('results.kind.' + it.kind))),
+        h('td', { class: 'mono', style: { wordBreak: 'break-all', maxWidth: '520px' } }, it.name),
+        h('td', {}, fmtDate(it.modifiedAt)),
+        h('td', { class: 'mono' }, fmtBytes(it.bytes)),
+        h('td', { class: 'actions' },
+          h('button', { class: 'btn sm', onClick: () => openReportModal(it) }, t('dashboard.report.preview')),
+          ' ',
+          h('a', { class: 'btn sm', href: reportPreviewUrl(it.url), target: '_blank', rel: 'noopener' }, t('results.col.openTab')),
+        ),
+      ));
+    }
+    summary.textContent = t('results.summary', { shown: filtered.length, total: items.length });
+  }
+
+  async function load() {
+    try {
+      const r = await api.get('/api/results');
+      items = r.items || [];
+      paint();
+    } catch (e) {
+      items = [];
+      tbody.innerHTML = '';
+      emptyEl.style.display = 'block';
+      emptyEl.textContent = e.message || t('shell.loadFailed');
+      summary.textContent = '';
+    }
+  }
+
+  filterInput.addEventListener('input', paint);
+  kindSel.addEventListener('change', paint);
+  refreshBtn.addEventListener('click', load);
+
+  wrap.appendChild(h('div', { class: 'card' },
+    h('div', { class: 'card-head' },
+      h('h2', {}, t('results.title')),
+      h('div', { class: 'row' }, filterInput, kindSel, refreshBtn),
+    ),
+    h('div', { class: 'muted', style: { marginBottom: '8px', fontSize: '12.5px' } }, t('results.subtitle')),
+    h('table', { class: 'tbl' },
+      h('thead', {}, h('tr', {},
+        h('th', {}, t('results.col.kind')),
+        h('th', {}, t('results.col.name')),
+        h('th', {}, t('results.col.when')),
+        h('th', {}, t('results.col.size')),
+        h('th', { class: 'actions' }, t('cases.col.actions')),
+      )),
+      tbody,
+    ),
+    emptyEl,
+    summary,
+  ));
+
+  await load();
+  return wrap;
 };
+
+// ───────── Step preview rendering ─────────
+// Resolve `params.foo.bar` against the parameter JSON loaded alongside the
+// spec. Returns null if any segment isn't found, so the caller can fall back
+// to showing the raw token.
+function resolveParamPath(params, path) {
+  if (!params || typeof path !== 'string') return null;
+  const m = path.trim().match(/^params(?:\.[a-zA-Z_$][a-zA-Z0-9_$]*)+$/);
+  if (!m) return null;
+  const segs = path.trim().split('.').slice(1);
+  let cur = params;
+  for (const s of segs) {
+    if (cur == null || typeof cur !== 'object' || !(s in cur)) return null;
+    cur = cur[s];
+  }
+  if (cur && typeof cur === 'object') return null;
+  return String(cur);
+}
+
+// Replace ${params.x.y} inside a string with the resolved value, returning
+// rich segments so the UI can style resolved values distinctly.
+function resolveTemplateText(text, params) {
+  if (typeof text !== 'string' || !text) return [{ kind: 'text', value: text || '' }];
+  const parts = [];
+  const re = /\$\{([^}]+)\}/g;
+  let last = 0, m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push({ kind: 'text', value: text.slice(last, m.index) });
+    const expr = m[1];
+    const resolved = resolveParamPath(params, expr);
+    if (resolved != null) {
+      parts.push({ kind: 'resolved', value: resolved, source: expr });
+    } else {
+      parts.push({ kind: 'expr', value: '${' + expr + '}' });
+    }
+    last = re.lastIndex;
+  }
+  if (last < text.length) parts.push({ kind: 'text', value: text.slice(last) });
+  return parts;
+}
+
+function renderResolvedText(parts) {
+  return parts.map(p => {
+    if (p.kind === 'resolved') {
+      return h('span', { class: 'tok-resolved', title: t('run.preview.resolvedParam') + ' (' + p.source + ')' }, p.value);
+    }
+    if (p.kind === 'expr') {
+      return h('span', { class: 'tok-expr' }, p.value);
+    }
+    return document.createTextNode(p.value);
+  });
+}
+
+// Pick a glyph for each kind of action.
+function actionGlyph(kind) {
+  switch (kind) {
+    case 'ai':            return '✦';
+    case 'aiTap':         return '◉';
+    case 'aiInput':       return '⌨';
+    case 'aiHover':       return '◌';
+    case 'aiScroll':      return '↕';
+    case 'aiQuery':       return '?';
+    case 'aiAssert':      return '✓';
+    case 'aiKeyboardPress': return '⏎';
+    case 'aiWaitFor':     return '⏳';
+    case 'helper':        return '⚙';
+    case 'call':          return '→';
+    default:              return '·';
+  }
+}
+
+function renderAction(a, params) {
+  const head = h('div', { class: 'act-head' },
+    h('span', { class: 'act-glyph k-' + a.kind }, actionGlyph(a.kind)),
+    h('span', { class: 'act-kind' }, (a.kind === 'helper' || a.kind === 'call') ? a.name : a.kind),
+  );
+  if (a.conditional) head.appendChild(h('span', { class: 'badge cond' }, t('run.preview.conditional')));
+  if (a.loop)        head.appendChild(h('span', { class: 'badge loop' }, t('run.preview.loop')));
+  if (a.wrappedIn)   head.appendChild(h('span', { class: 'badge retry' }, t('run.preview.retried')));
+
+  let body;
+  if (a.kind === 'helper' || a.kind === 'call') {
+    // e.g. fillSapField(page, "Company code", params.query.companyCode)
+    body = h('div', { class: 'act-body' },
+      a.args.map((arg, i) => h('span', { class: 'arg' },
+        i > 0 ? ', ' : '',
+        ...renderResolvedText(resolveTemplateText(String(arg), params)),
+      )),
+    );
+  } else if (a.kind === 'aiInput') {
+    // aiInput("value", "into hint")
+    const value = a.text ?? '';
+    const hint = a.hint ?? '';
+    body = h('div', { class: 'act-body' },
+      h('span', { class: 'arg' }, ...renderResolvedText(resolveTemplateText(value, params))),
+      hint ? h('span', { class: 'arg-sep' }, ' → ') : null,
+      hint ? h('span', { class: 'arg arg-hint' }, ...renderResolvedText(resolveTemplateText(hint, params))) : null,
+    );
+  } else {
+    body = h('div', { class: 'act-body' },
+      h('span', { class: 'arg arg-text' }, ...renderResolvedText(resolveTemplateText(a.text || '', params))),
+    );
+  }
+
+  return h('li', { class: 'act' + (a.conditional ? ' is-cond' : '') + (a.loop ? ' is-loop' : '') },
+    head, body,
+    h('span', { class: 'act-line mono' }, ':' + a.line),
+  );
+}
+
+function renderStep(step, idx, params, specPath) {
+  const statusEl = h('span', {
+    class: 'step-status',
+    title: t('run.preview.status.pending'),
+  }, '○');
+  const durationEl = h('span', { class: 'step-duration mono' });
+  const errorEl = h('div', { class: 'step-error mono' });
+  const headBits = [
+    statusEl,
+    h('span', { class: 'step-num' }, '#' + (idx + 1)),
+    h('span', { class: 'step-title' }, step.title),
+  ];
+  if (step.conditional) headBits.push(h('span', { class: 'badge cond' }, t('run.preview.conditional')));
+  if (step.loop)        headBits.push(h('span', { class: 'badge loop' }, t('run.preview.loop')));
+  if (step.actions?.length)  headBits.push(h('span', { class: 'muted small' }, t('run.preview.actionsCount', { n: step.actions.length })));
+  if (step.children?.length) headBits.push(h('span', { class: 'muted small' }, t('run.preview.stepsCount', { n: step.children.length })));
+
+  const actionList = step.actions?.length
+    ? h('ol', { class: 'act-list' }, step.actions.map(a => renderAction(a, params)))
+    : null;
+
+  const childList = step.children?.length
+    ? h('ol', { class: 'step-list nested' }, step.children.map((c, i) => renderStep(c, i, params, specPath)))
+    : null;
+
+  return h('li', {
+    class: 'step',
+    dataset: { stepLine: String(step.line), stepTitle: step.title },
+  },
+    h('div', { class: 'step-head' },
+      ...headBits,
+      durationEl,
+      h('span', { class: 'step-line mono' }, ':' + step.line),
+    ),
+    errorEl,
+    actionList,
+    childList,
+  );
+}
+
+function renderPreview(data) {
+  const tests = data.tests || [];
+  if (tests.length === 0 || tests.every(t => !t.steps?.length && !t.actions?.length)) {
+    return h('div', { class: 'muted' }, t('run.preview.noSteps'));
+  }
+  const wrap = h('div', { class: 'preview-card' });
+  wrap.appendChild(h('div', { class: 'preview-head' },
+    h('strong', {}, t('run.preview.title')),
+    h('span', { class: 'muted small' }, ' · ' + t('run.preview.subtitle')),
+  ));
+  for (const tc of tests) {
+    wrap.appendChild(h('div', { class: 'test-head' },
+      h('span', { class: 'test-tag' }, t('run.preview.test')),
+      h('span', { class: 'test-title mono' }, tc.title),
+    ));
+    if (tc.steps?.length) {
+      wrap.appendChild(h('ol', { class: 'step-list' },
+        tc.steps.map((s, i) => renderStep(s, i, data.params, data.file)),
+      ));
+    }
+    if (tc.actions?.length) {
+      // Actions before the first test.step (rare).
+      wrap.appendChild(h('ol', { class: 'act-list act-orphan' },
+        tc.actions.map(a => renderAction(a, data.params)),
+      ));
+    }
+  }
+  return wrap;
+}
 
 function statusHtml(s) {
   if (!s) return '';
@@ -1013,35 +1658,480 @@ function statusHtml(s) {
   return `<span class="status-dot ${dot}"></span>${label}${spec}${who}`;
 }
 
-// ───────── View: Results ─────────
-VIEWS.results = async () => {
-  const r = await api.get('/api/results');
-  return h('div', { class: 'card' },
-    h('div', { class: 'card-head' }, h('h2', {}, t('results.title'))),
-    r.items.length === 0
-      ? h('div', { class: 'muted' }, t('results.empty'))
-      : h('table', { class: 'tbl' },
-          h('thead', {}, h('tr', {},
-            h('th', {}, t('results.col.kind')),
-            h('th', {}, t('results.col.name')),
-            h('th', {}, t('dashboard.report.created')),
-            h('th', {}, t('cases.col.size')),
-            h('th', { class: 'actions' }, t('cases.col.actions')),
-          )),
-          h('tbody', {}, r.items.map(it => h('tr', {},
-            h('td', {}, h('span', { class: 'tag ' + (it.kind === 'merged' ? 'info' : '') }, it.kind)),
-            h('td', {}, h('span', { class: 'mono', style: { fontSize: '11.5px' } }, it.name)),
-            h('td', {}, fmtDate(it.timestamp)),
-            h('td', {}, fmtBytes(it.bytes)),
-            h('td', { class: 'actions' },
-              h('a', { class: 'btn sm', href: it.url, target: '_blank' }, t('results.col.openTab')),
-              ' ',
-              h('button', { class: 'btn sm', onClick: () => openReportModal(it) }, t('dashboard.report.preview')),
-            ),
-          ))),
-        ),
+// ───────── View: Case detail (params + run + history under one roof) ─────────
+// Route shapes handled here (segs[0] is always "cases"):
+//   ['<id>']                     → params tab
+//   ['<id>', 'run']              → run tab, live
+//   ['<id>', 'runs', '<runId>']  → run tab, replaying a past run
+//   ['<id>', 'history']          → history tab
+VIEWS.caseDetail = async (route) => {
+  const [caseId, sub, runId] = route.params.rest;
+
+  // Resolve which tab is active. The run tab handles both live and replay.
+  let activeTab = 'params';
+  let replayRunId = null;
+  if (sub === 'run') activeTab = 'run';
+  else if (sub === 'runs' && runId) { activeTab = 'run'; replayRunId = runId; }
+  else if (sub === 'history') activeTab = 'history';
+
+  // Load the case + spec metadata in parallel. Missing case → friendly 404.
+  let caseData;
+  try {
+    caseData = await api.get('/api/cases/' + encodeURIComponent(caseId));
+  } catch (e) {
+    return h('div', { class: 'card' },
+      h('h2', {}, t('detail.notFound')),
+      h('div', { class: 'muted' }, e.message),
+      h('div', { style: { marginTop: '12px' } },
+        h('a', { class: 'btn', href: '#/cases' }, t('detail.backToList'))),
+    );
+  }
+  const specName = caseId + '.spec.ts';
+  const specRelPath = 'e2e/' + specName;
+  const [stepsTree, runsList] = await Promise.all([
+    api.get('/api/cases/_specs/' + encodeURIComponent(specName) + '/steps').catch(() => null),
+    hasPerm('results:read') ? api.get('/api/cases/' + encodeURIComponent(caseId) + '/runs').catch(() => ({ runs: [] })) : Promise.resolve({ runs: [] }),
+  ]);
+  const hasSpec = !!stepsTree;
+  const latestRun = runsList.runs?.[0] || null;
+  const summary = caseData.parsed && typeof caseData.parsed === 'object' ? summarizeParsed(caseData.parsed) : {};
+
+  // ── Header (always visible above the tabs) ──
+  const header = h('div', { class: 'case-header' },
+    h('div', { class: 'case-header-top' },
+      h('a', { class: 'case-back', href: '#/cases' }, t('detail.backToList')),
+      h('div', { class: 'spacer' }),
+      hasSpec && hasPerm('runs:execute') && activeTab !== 'run' && h('button', {
+        class: 'btn primary',
+        onClick: () => go('cases/' + encodeURIComponent(caseId) + '/run'),
+      }, t('detail.runNow')),
+    ),
+    h('div', { class: 'case-title-row' },
+      h('h1', { class: 'case-title' }, summary.title || caseId),
+      summary.transactionCode && h('span', { class: 'tag info' }, t('cases.txPrefix') + summary.transactionCode),
+      summary.favoritesEntry && h('span', { class: 'tag' }, summary.favoritesEntry),
+    ),
+    h('div', { class: 'case-meta-row' },
+      h('span', { class: 'kv-inline' },
+        h('span', { class: 'muted' }, t('detail.summary.id')), ' ',
+        h('span', { class: 'mono' }, caseId)),
+      hasSpec
+        ? h('span', { class: 'kv-inline' },
+            h('span', { class: 'muted' }, t('detail.summary.spec')), ' ',
+            h('a', {
+              class: 'mono',
+              href: '#',
+              onClick: (e) => { e.preventDefault(); viewSpec(specName); },
+            }, specRelPath))
+        : h('span', { class: 'tag warn' }, t('cases.noSpec')),
+      h('span', { class: 'kv-inline' },
+        h('span', { class: 'muted' }, t('detail.latest')), ' ',
+        latestRun
+          ? renderRunChip(latestRun, caseId)
+          : h('span', { class: 'muted' }, t('detail.never'))),
+      runsList.runs?.length
+        ? h('span', { class: 'muted small' }, t('detail.runs.count', { n: runsList.runs.length }))
+        : null,
+    ),
   );
+
+  // ── Tabs ──
+  const tabBar = h('div', { class: 'tabs' },
+    tabLink('params',  t('detail.tabs.params'),  'cases/' + encodeURIComponent(caseId)),
+    tabLink('run',     t('detail.tabs.run'),     'cases/' + encodeURIComponent(caseId) + '/run', !hasSpec),
+    tabLink('history', t('detail.tabs.history'), 'cases/' + encodeURIComponent(caseId) + '/history'),
+  );
+  function tabLink(id, label, target, disabled) {
+    const a = h('a', {
+      class: 'tab' + (id === activeTab ? ' active' : '') + (disabled ? ' disabled' : ''),
+      href: disabled ? null : '#/' + target,
+    }, label);
+    return a;
+  }
+
+  // ── Body, varies per tab ──
+  const body = h('div', { class: 'case-tab-body' });
+  if (activeTab === 'params') {
+    body.appendChild(renderParamsTab(caseData, stepsTree));
+  } else if (activeTab === 'run') {
+    let replayRun = null;
+    if (replayRunId) {
+      try { replayRun = await api.get('/api/cases/' + encodeURIComponent(caseId) + '/runs/' + encodeURIComponent(replayRunId)); }
+      catch (e) { body.appendChild(h('div', { class: 'card' }, h('div', { class: 'muted' }, e.message))); }
+    }
+    if (!replayRunId || replayRun) {
+      if (!hasSpec) {
+        body.appendChild(h('div', { class: 'card' }, h('div', { class: 'muted' }, t('cases.noSpec'))));
+      } else {
+        const panel = await createRunPanel({
+          specPath: specRelPath,
+          replayRun,
+          onAfterRun: () => { /* user can hit history tab to see the new entry */ },
+        });
+        body.appendChild(h('div', { class: 'card' }, panel.root));
+      }
+    }
+  } else if (activeTab === 'history') {
+    body.appendChild(renderHistoryTab(caseId, runsList.runs || []));
+  }
+
+  return h('div', { class: 'case-detail' }, header, tabBar, body);
 };
+
+// Inline summary helper used by the case-detail header (mirrors what the
+// server returns under c.summary on the list endpoint).
+function summarizeParsed(p) {
+  if (!p || typeof p !== 'object') return {};
+  return {
+    title: p.title || null,
+    transactionCode: p.transactionCode || null,
+    favoritesEntry: p.favoritesEntry || null,
+  };
+}
+
+// A small chip showing pass/fail + relative time for one run. Optionally
+// links to the replay route when caseId is provided.
+function renderRunChip(run, caseId) {
+  const ok = run.status === 'passed';
+  const wrap = h('span', { class: 'run-chip' },
+    h('span', { class: 'status-dot ' + (ok ? 'ok' : 'err') }),
+    h('span', {}, ok ? t('history.status.passed') : t('history.status.failed')),
+    h('span', { class: 'muted small' }, ' · ' + fmtRel(run.startedAt)),
+  );
+  if (caseId && run.runId) {
+    return h('a', {
+      href: '#/cases/' + encodeURIComponent(caseId) + '/runs/' + encodeURIComponent(run.runId),
+      style: { borderBottom: 'none' },
+    }, wrap);
+  }
+  return wrap;
+}
+
+// ── Parameters tab ──
+// Renders a flat field-by-field form when the JSON is "simple" (objects with
+// primitive leaves). Reverse-maps each ${params.xxx} reference found in the
+// spec to the steps that use it, so the user can see immediately which field
+// drives which step. Complex shapes (arrays of objects, deeply nested) fall
+// back to a raw JSON view to avoid lossy round-tripping.
+function renderParamsTab(caseData, stepsTree) {
+  const wrap = h('div', { class: 'card' });
+  wrap.appendChild(h('div', { class: 'card-head' },
+    h('h2', {}, t('params.title')),
+    h('span', { class: 'muted small' }, t('params.subtitle')),
+  ));
+
+  const parsed = caseData.parsed && typeof caseData.parsed === 'object' && !Array.isArray(caseData.parsed)
+    ? caseData.parsed : null;
+  const leaves = parsed ? flattenParams(parsed) : [];
+  const isFormable = parsed && leaves.length > 0 && leaves.every(l => l.formable);
+  const usageByPath = stepsTree ? buildParamUseMap(stepsTree) : new Map();
+
+  const dirtyFlag = h('span', { class: 'muted small', style: { marginLeft: 'auto', opacity: '0' } }, t('params.unsaved'));
+  const errEl = h('div', { class: 'muted', style: { color: 'var(--err)', minHeight: '18px' } });
+  const saveBtn = h('button', { class: 'btn primary', disabled: !hasPerm('cases:write') }, t('params.save'));
+
+  // Track input state so save can collect current values without re-querying DOM.
+  const inputs = [];
+
+  // Track whether the user has edited anything since load — drives the
+  // "unsaved" hint and prevents accidentally overwriting from a stale form.
+  let dirty = false;
+  function markDirty() {
+    if (dirty) return;
+    dirty = true;
+    dirtyFlag.style.opacity = '1';
+  }
+
+  if (isFormable) {
+    const formGrid = h('div', { class: 'param-grid' });
+    for (const leaf of leaves) {
+      const uses = usageByPath.get(leaf.path) || [];
+      const inp = h('input', {
+        value: leaf.value == null ? '' : String(leaf.value),
+        type: typeof leaf.value === 'number' ? 'number' : 'text',
+        disabled: !hasPerm('cases:write'),
+      });
+      // Hint about original type so save can preserve it (string vs number vs bool).
+      inputs.push({ path: leaf.path, input: inp, origType: typeof leaf.value, origValue: leaf.value });
+      inp.addEventListener('input', markDirty);
+      const usageEl = uses.length === 0
+        ? h('span', { class: 'param-usage muted' }, t('params.usedByNone'))
+        : h('span', { class: 'param-usage' },
+            h('span', { class: 'muted' }, t('params.usedBy')), ' ',
+            ...uses.map((u, i) => [
+              i > 0 ? h('span', { class: 'muted' }, ', ') : null,
+              h('span', { class: 'param-step-ref' }, '#' + u.stepNum + ' ' + u.stepTitle),
+            ].filter(Boolean)).flat(),
+          );
+      formGrid.appendChild(h('div', { class: 'param-field' },
+        h('div', { class: 'param-field-head' },
+          h('label', { class: 'param-path mono' }, leaf.path),
+          dirtyFlag,
+        ),
+        inp,
+        usageEl,
+      ));
+    }
+    wrap.appendChild(formGrid);
+  } else if (parsed) {
+    wrap.appendChild(h('div', { class: 'muted', style: { marginBottom: '10px' } }, t('params.complexHint')));
+  } else {
+    wrap.appendChild(h('div', { class: 'muted', style: { marginBottom: '10px' } }, t('params.empty')));
+  }
+
+  // Raw JSON — always available, collapsed by default for "formable" cases.
+  const rawToggle = h('button', { class: 'btn ghost sm' }, isFormable ? t('params.showRaw') : t('params.hideRaw'));
+  const rawTa = h('textarea', { style: { minHeight: '320px' }, disabled: !hasPerm('cases:write') }, caseData.raw);
+  rawTa.addEventListener('input', markDirty);
+  const rawWrap = h('div', { class: 'raw-json', style: { display: isFormable ? 'none' : 'block' } },
+    h('div', { class: 'field' }, h('span', {}, t('cases.paramsLabel')), rawTa),
+  );
+  rawToggle.addEventListener('click', () => {
+    const open = rawWrap.style.display !== 'none';
+    rawWrap.style.display = open ? 'none' : 'block';
+    rawToggle.textContent = open ? t('params.showRaw') : t('params.hideRaw');
+  });
+  wrap.appendChild(h('div', { class: 'divider' }));
+  wrap.appendChild(h('div', { class: 'row' }, rawToggle, h('span', { class: 'spacer' }), errEl, saveBtn));
+  wrap.appendChild(rawWrap);
+
+  saveBtn.addEventListener('click', async () => {
+    errEl.textContent = '';
+    let nextParsed;
+    const rawVisible = rawWrap.style.display !== 'none';
+    if (rawVisible || !isFormable) {
+      try { nextParsed = JSON.parse(rawTa.value); }
+      catch (e) { errEl.textContent = t('params.parseError') + e.message; return; }
+    } else {
+      // Re-fold the form values into a fresh object using the original
+      // parsed JSON as the skeleton, so unrelated keys/metadata survive.
+      nextParsed = JSON.parse(JSON.stringify(parsed));
+      for (const { path, input, origType, origValue } of inputs) {
+        let v = input.value;
+        if (origType === 'number') v = v === '' ? null : Number(v);
+        else if (origType === 'boolean') v = /^(true|1|yes)$/i.test(v);
+        else if (origValue === null && v === '') v = null;
+        setByPath(nextParsed, path, v);
+      }
+    }
+    try {
+      await api.put('/api/cases/' + encodeURIComponent(caseData.id), nextParsed);
+      toast(t('params.saved'), 'ok');
+      dirty = false;
+      dirtyFlag.style.opacity = '0';
+      // Refresh the page so the saved values flow into the spec preview too.
+      render();
+    } catch (e) { errEl.textContent = e.message; }
+  });
+
+  return wrap;
+}
+
+// Flatten a JSON object into [{ path, value, formable }] leaves. Marks
+// "formable: false" for arrays-of-objects so the form falls back to raw JSON.
+function flattenParams(obj, prefix = '', out = []) {
+  if (obj == null || typeof obj !== 'object') {
+    out.push({ path: prefix, value: obj, formable: true });
+    return out;
+  }
+  if (Array.isArray(obj)) {
+    const allPrim = obj.every(x => x == null || (typeof x !== 'object'));
+    if (allPrim) {
+      out.push({ path: prefix, value: obj, formable: false });
+    } else {
+      obj.forEach((v, i) => flattenParams(v, prefix ? `${prefix}.${i}` : `${i}`, out));
+    }
+    return out;
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    // Skip schema metadata in the form — these aren't params the user tweaks.
+    if (!prefix && (k === '$schema' || k === 'title')) {
+      out.push({ path: k, value: v, formable: typeof v !== 'object' || v === null });
+      continue;
+    }
+    const p = prefix ? `${prefix}.${k}` : k;
+    if (v != null && typeof v === 'object') flattenParams(v, p, out);
+    else out.push({ path: p, value: v, formable: true });
+  }
+  return out;
+}
+
+function setByPath(obj, dottedPath, value) {
+  const segs = dottedPath.split('.');
+  let cur = obj;
+  for (let i = 0; i < segs.length - 1; i++) {
+    const s = segs[i];
+    if (cur[s] == null || typeof cur[s] !== 'object') cur[s] = {};
+    cur = cur[s];
+  }
+  cur[segs[segs.length - 1]] = value;
+}
+
+// Walk the parsed spec tree to build path → step-usage. The step preview
+// already resolves `${params.x.y}` references in action args/text/hint, so
+// we just scan those strings for the same pattern.
+function buildParamUseMap(tree) {
+  const map = new Map();
+  const re = /\bparams\.([a-zA-Z0-9_$][a-zA-Z0-9_$.]*)/g;
+  function scanText(text, sink) {
+    if (typeof text !== 'string') return;
+    let m;
+    while ((m = re.exec(text)) !== null) sink.add(m[1]);
+  }
+  function visit(steps, depth = 0) {
+    for (let i = 0; i < (steps || []).length; i++) {
+      const step = steps[i];
+      const stepNum = depth === 0 ? i + 1 : null;
+      const refs = new Set();
+      for (const a of (step.actions || [])) {
+        scanText(a.text, refs);
+        scanText(a.hint, refs);
+        for (const arg of (a.args || [])) scanText(String(arg), refs);
+      }
+      for (const r of refs) {
+        if (!map.has(r)) map.set(r, []);
+        map.get(r).push({ stepNum: stepNum || i + 1, stepTitle: step.title });
+      }
+      if (step.children) visit(step.children, depth + 1);
+    }
+  }
+  for (const tc of (tree?.tests || [])) visit(tc.steps);
+  return map;
+}
+
+// ── History tab ──
+// Each row pairs with a hidden expansion row underneath that lazily embeds
+// the Midscene report in an iframe. The report is themed to match SAPTest
+// via the `?theme=…` param (see reportPreviewUrl + strip-branding.js).
+function renderHistoryTab(caseId, runs) {
+  const wrap = h('div', { class: 'card' });
+  const headChildren = [
+    h('h2', {}, t('history.title')),
+    h('span', { class: 'muted small' }, t('detail.runs.count', { n: runs.length })),
+  ];
+  if (runs.length > 0 && hasPerm('cases:delete')) {
+    headChildren.push(h('button', {
+      class: 'btn danger sm',
+      style: { marginLeft: 'auto' },
+      onClick: () => clearAllHistory(caseId, runs.length),
+    }, t('history.clearAll')));
+  }
+  wrap.appendChild(h('div', { class: 'card-head' }, ...headChildren));
+  if (runs.length === 0) {
+    wrap.appendChild(h('div', { class: 'muted' }, t('history.empty')));
+    return wrap;
+  }
+
+  const tbody = h('tbody', {});
+  let openRow = null;
+
+  runs.forEach(r => {
+    const ok = r.status === 'passed';
+    const hasReport = !!r.report?.url;
+
+    const expand = h('tr', { class: 'history-expand', style: { display: 'none' } },
+      h('td', { colspan: '5', class: 'history-expand-cell' }),
+    );
+
+    const previewBtn = hasReport ? h('button', {
+      class: 'btn sm',
+      type: 'button',
+    }, t('history.preview')) : null;
+
+    if (previewBtn) {
+      previewBtn.addEventListener('click', () => {
+        const cell = expand.firstElementChild;
+        if (openRow === expand) {
+          expand.style.display = 'none';
+          openRow = null;
+          previewBtn.textContent = t('history.preview');
+          return;
+        }
+        // Collapse any other open row before opening this one.
+        if (openRow) {
+          openRow.style.display = 'none';
+          const prevBtn = openRow.previousElementSibling?.querySelector('[data-preview-btn]');
+          if (prevBtn) prevBtn.textContent = t('history.preview');
+        }
+        // Lazy-mount the iframe so closed rows don't fetch reports.
+        if (!cell.firstChild) {
+          cell.appendChild(h('div', { class: 'history-report-frame' },
+            h('iframe', {
+              src: reportPreviewUrl(r.report.url),
+              loading: 'lazy',
+              title: r.report.name || 'report',
+            }),
+          ));
+        }
+        expand.style.display = '';
+        openRow = expand;
+        previewBtn.textContent = t('history.previewHide');
+      });
+      previewBtn.setAttribute('data-preview-btn', '1');
+    }
+
+    const row = h('tr', {},
+      h('td', {}, fmtDate(r.startedAt)),
+      h('td', {},
+        h('span', { class: 'tag ' + (ok ? 'ok' : 'err') },
+          ok ? t('history.status.passed') : t('history.status.failed')),
+      ),
+      h('td', {}, r.startedBy ? '@' + r.startedBy : '—'),
+      h('td', { class: 'mono' }, fmtMs(r.durationMs)),
+      h('td', { class: 'actions' },
+        previewBtn || h('span', { class: 'muted small' }, t('history.noReport')),
+        ' ',
+        hasReport && h('a', {
+          class: 'btn sm ghost', href: reportPreviewUrl(r.report.url), target: '_blank',
+        }, t('history.openReport')),
+        ' ',
+        h('a', {
+          class: 'btn sm ghost',
+          href: '#/cases/' + encodeURIComponent(caseId) + '/runs/' + encodeURIComponent(r.runId),
+          style: { borderBottom: 'none' },
+        }, t('history.replayBtn')),
+        ' ',
+        hasPerm('cases:delete') && h('button', {
+          class: 'btn danger sm',
+          onClick: () => deleteRun(caseId, r.runId),
+        }, t('history.delete')),
+      ),
+    );
+
+    tbody.appendChild(row);
+    tbody.appendChild(expand);
+  });
+
+  wrap.appendChild(h('table', { class: 'tbl history-tbl' },
+    h('thead', {}, h('tr', {},
+      h('th', {}, t('history.col.when')),
+      h('th', {}, t('history.col.status')),
+      h('th', {}, t('history.col.who')),
+      h('th', {}, t('history.col.duration')),
+      h('th', { class: 'actions' }, t('history.col.actions')),
+    )),
+    tbody,
+  ));
+  return wrap;
+}
+
+async function deleteRun(caseId, runId) {
+  if (!confirm(t('history.confirmDelete'))) return;
+  try {
+    await api.del('/api/cases/' + encodeURIComponent(caseId) + '/runs/' + encodeURIComponent(runId));
+    toast(t('history.deleted'), 'ok');
+    render();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function clearAllHistory(caseId, n) {
+  if (!confirm(t('history.confirmClearAll', { id: caseId, n }))) return;
+  try {
+    const r = await api.del('/api/cases/' + encodeURIComponent(caseId) + '/runs');
+    toast(t('history.clearedAll', { n: r.deleted }), 'ok');
+    render();
+  } catch (e) { toast(e.message, 'err'); }
+}
 
 // ───────── View: Generate (AI) ─────────
 VIEWS.generate = async () => {

@@ -1,0 +1,12 @@
+{
+  "$schema": "DEMO Test 8 — PSL_CT_B2P_PE_GUI_FI line item reports additional fields (Row 12): FB03L change layout to expose Reference Key 1 + 2",
+  "title": "DEMO 8 · FB03L Reference Key 1/2 Layout",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "FB03L",
+  "filter": {
+    "fiscalYear":     "2026",
+    "companyCode":    "8540",
+    "documentNumber": "1700000299"
+  },
+  "layoutFields": ["Reference Key 1", "Reference Key 2"]
+}

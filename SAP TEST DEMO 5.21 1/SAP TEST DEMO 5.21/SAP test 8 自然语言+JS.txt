@@ -1,0 +1,37 @@
+PSL_CT_B2P_PE_GUI_FI line item reports additional fields (Row 12)
+
+自然语言；
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FB03L，点击execute。
+2. 在fiscal year输入2026，在company code输入8540，在document number输入1700000299，点击continue
+3. 点击change layout图标 xpath=//*[@id="_MB_VARIANT117"]
+4.点击右边栏目column set下面的搜索，在search term输入Reference Key，点击ok，点击×，点击向左的箭头，点击Reference Key 2，点击向左的箭头，点击对勾
+5. 将页面滑到最右边，如果能同时看到reference key 1和reference key 2 测试用例即成功
+JS：
+
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "FB03L" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("fiscal year", { value: "2026" });
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("document number", { value: "1700000299" });
+  await agent.aiTap("点击continue");
+  await agent.aiTap("点击change layout图标", { xpath: "//*[@id=\"_MB_VARIANT117\"]" });
+  await agent.aiTap("点击右边栏目column set下面的搜索");
+  await agent.aiInput("search term", { value: "Reference Key" });
+  await agent.aiTap("点击ok");
+  await agent.aiTap("点击×");
+  await agent.aiTap("点击向左的箭头");
+  await agent.aiTap("点击Reference Key 2");
+  await agent.aiTap("点击向左的箭头");
+  await agent.aiTap("点击对勾");
+  await agent.aiAct("按住底部的横向滚动条的滑块，拖到最右端");
+  await agent.aiAssert("如果能同时看到reference key 1和reference key 2 测试用例即成功");
+}
+
+
+

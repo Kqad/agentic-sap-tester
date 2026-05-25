@@ -1,0 +1,38 @@
+BP_IT_B2P_GUI_AuC Asset Master Data Creation-VendorTool （Row 21/22）
+Create single asset master data from transaction AS01
+
+自然语言：
+1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入AS01，点击execute。
+2. 在company code输入8540，在asset class输入A3200000，点击master data。
+3. 在description第一行输入ai test，点击save，在cost center输入C854100263，在plant输入8543，点击save，返回sap主页
+4. 进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存，在左上角矩形输入框输入AS03，点击execute。
+5. 点击master data，如果界面显示AC3200000则测试成功
+
+JS：
+async function run(agent) {
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "AS01" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiInput("company code", { value: "8540" });
+  await agent.aiInput("asset class", { value: "A3200000" });
+  await agent.aiTap("点击master data");
+  await agent.aiInput("description第一行", { value: "ai test" });
+  await agent.aiTap("点击save");
+  await agent.aiInput("cost center", { value: "C854100263" });
+  await agent.aiInput("plant", { value: "8543" });
+  await agent.aiTap("点击save");
+  await agent.aiTap("返回sap主页");
+  await agent.aiTap("进入 Menu");
+  await agent.aiTap("点击setting");
+  await agent.aiTap("点击visualization");
+  await agent.aiTap("启用show Ok code field");
+  await agent.aiTap("保存");
+  await agent.aiInput("左上角矩形", { value: "AS03" });
+  await agent.aiTap("点击 Execute 按钮执行查询");
+  await agent.aiTap("点击master data");
+  await agent.aiAssert("如果界面显示AC3200000则测试成功");
+}

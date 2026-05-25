@@ -1,0 +1,12 @@
+{
+  "$schema": "DEMO Test 3 — Manage Accounts payable Reports & Analytics Row 19 (Fiori Aging Analysis via /n/UI2/FLP)",
+  "title": "DEMO 3 · Fiori Aging Analysis Export",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "/n/UI2/FLP",
+  "appName": "Aging Analysis",
+  "filter": {
+    "companyCode": "8540"
+  },
+  "exportButtonXPath": "/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]",
+  "searchIconXPath": "//*[@id=\"sf\"]/span"
+}

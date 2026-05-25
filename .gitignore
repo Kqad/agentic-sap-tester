@@ -5,9 +5,12 @@ node_modules/
 playwright-report/
 test-results/
 midscene_run/
+run-history/
 
 .DS_Store
 *.log
 
 # Web console runtime data (users, jwt secret, audit log)
 server/data/
+
+*.mp4

@@ -1,0 +1,26 @@
+{
+  "$schema": "Parameters for gl-line-item-fields.spec.ts — PSL_CT_B2P_PE_GUI_FI line item reports additional fields",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCodes": {
+    "lineItemBrowser": "FAGLL03H",
+    "documentDisplay": "FB03L"
+  },
+  "faglFilter": {
+    "companyCode": "8540",
+    "glAccount": "5010100000",
+    "postingDateFrom": "01.12.2025",
+    "postingDateTo": "31.12.2025",
+    "allItems": true
+  },
+  "fb03Filter": {
+    "companyCode": "8540",
+    "fiscalYear": "2026",
+    "ledger": "0L",
+    "documentNumber": "1700000299"
+  },
+  "layoutFields": {
+    "step1": ["Operational Division"],
+    "step2": ["Document Header Text", "Ref.key (header) 1", "Ref.key (header) 2"],
+    "step3": ["Document Header Text", "Reference Key 1", "Reference Key 2"]
+  }
+}
