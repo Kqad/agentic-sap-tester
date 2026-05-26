@@ -1,0 +1,137 @@
+midsceneVersion: 1.8.0
+cacheId: saptest-js-b9c06614-b7b5-4130-8535-41d67fad7f1f-808f86164797
+caches:
+  - type: plan
+    prompt: 将整个网页向下滚动到最底部，让原本在下方被裁掉的内容显示出来。不要点击任何按钮或表格行，不要切换页面，不要拖动横向滚动条。
+    yamlWorkflow: |
+      tasks:
+        - name: 将整个网页向下滚动到最底部，让原本在下方被裁掉的内容显示出来。不要点击任何按钮或表格行，不要切换页面，不要拖动横向滚动条。
+          flow:
+            - aiScroll: ''
+              scrollType: scrollToBottom
+  - type: plan
+    prompt: 将整个网页向右横向滚动到最右边，让原本在右侧被裁掉的内容显示出来。不要点击任何按钮或表格行，不要切换页面，不要拖动纵向滚动条。
+    yamlWorkflow: |
+      tasks:
+        - name: 将整个网页向右横向滚动到最右边，让原本在右侧被裁掉的内容显示出来。不要点击任何按钮或表格行，不要切换页面，不要拖动纵向滚动条。
+          flow:
+            - aiScroll: ''
+              direction: right
+              scrollType: singleAction
+              distance: 20000
+              locate: 页面主体内容区域
+            - aiScroll: ''
+              direction: right
+              scrollType: singleAction
+              distance: 20000
+              locate: 页面主体内容区域
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 左上角矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: document number
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: company code
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[3]/span[1]/label[1]/span[normalize-space()="Company Code"]
+  - type: locate
+    prompt: fiscal year
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[5]/span[1]/label[1]/span[normalize-space()="Fiscal Year"]
+  - type: locate
+    prompt: 点击continue
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Continue Emphasized"]
+  - type: locate
+    prompt: 点击change layout图标
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[3]/div[1]/div[1]/table[1]/thead[1]/tr[2]/th[1]/div[1]/div[1]/div[1]/span[16]/div[1]/div[normalize-space()="Press Enter to trigger an action and Arrow Down to open the menu."]
+  - type: locate
+    prompt: 点击右边栏目column set下面的搜索
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[3]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/table[1]/thead[1]/tr[3]/th[1]/div[1]/div[1]/div[1]/span[1]/div[1]
+  - type: locate
+    prompt: search term
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[2]/section[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: 点击ok
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[2]/footer[1]/div[1]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="OK"]
+  - type: locate
+    prompt: 点击×
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[2]/header[1]/div[4]/button[1]
+  - type: locate
+    prompt: 点击向左的箭头
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[3]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[1]
+  - type: locate
+    prompt: 点击Reference Key 2
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[3]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/table[1]/tbody[2]/tr[2]/td[2]/div[1]/div[1]/table[1]/tbody[2]/tr[1]/td[1]/div[1]/span[1]/span[1]
+  - type: locate
+    prompt: 点击向左的箭头
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[3]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[1]
+  - type: locate
+    prompt: 点击对勾
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/footer[1]/div[1]/div[1]/div[1]/div[1]/span[2]/div[1]
+  - type: locate
+    prompt: 页面主体内容区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[3]/div[1]/div[1]/table[1]/tbody[2]/tr[2]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[11]/div[1]/span[1]/span[normalize-space()="Sensor conduct. CST4, L380, MB7000"]
+  - type: locate
+    prompt: 页面主体内容区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[3]/div[1]/div[1]/table[1]/tbody[2]/tr[2]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[11]/div[1]/span[1]/span[normalize-space()="Sensor conduct. CST4, L380, MB7000"]

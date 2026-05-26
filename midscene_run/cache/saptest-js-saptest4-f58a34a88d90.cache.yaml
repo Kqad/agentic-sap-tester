@@ -1,0 +1,336 @@
+midsceneVersion: 1.8.0
+cacheId: saptest-js-2400a0e6-e883-4023-b3be-20d5cae360db-03353bcaac16
+caches:
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动直到滑块停在滚动条的最底端，让对应方向最末端的内容显示出来。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动直到滑块停在滚动条的最底端，让对应方向最末端的内容显示出来。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换
+            tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiScroll: ''
+              scrollType: scrollToBottom
+              locate: 表格内容区域
+            - aiDragAndDrop: ''
+              from: 滚动条滑块
+              to: 滚动条底部区域
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的 30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的
+            30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 表格右侧纵向滚动条上的滑块
+              to: 滚动条轨道向下约 35% 的位置
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的 30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的
+            30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条上的滑块
+              to: 滚动条轨道下方约 30%-40% 处
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的 30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的
+            30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条上的滑块
+              to: 滚动条轨道下方约 35% 处
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动直到滑块停在滚动条的最底端，让对应方向最末端的内容显示出来。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动直到滑块停在滚动条的最底端，让对应方向最末端的内容显示出来。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换
+            tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条上的滑块
+              to: 纵向滚动条的最底端
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的 30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的
+            30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条的滑块
+              to: 滚动条轨道下方约 35% 处
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的 30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的
+            30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 纵向滚动条滑块
+              to: 滚动条轨道下方 30%-40% 处
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的 30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的
+            30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条上的滑块
+              to: 滚动条轨道下方约 35% 处
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的 30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动大约滚动条长度的
+            30%-40%，让更多内容进入视野。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条上的滑块
+              to: 滚动条轨道下方约 35% 处
+  - type: plan
+    prompt: 在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动直到滑块停在滚动条的最底端，让对应方向最末端的内容显示出来。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换 tab，不要使用鼠标滚轮。只做一次拖拽动作。
+    yamlWorkflow: |
+      tasks:
+        - name: >-
+            在当前页面/表格区域找到右侧那条纵向滚动条（灰色细长条，端点通常有箭头按钮）。用鼠标左键按住滚动条上的滑块（不要点轨道、不要点箭头按钮），向下拖动直到滑块停在滚动条的最底端，让对应方向最末端的内容显示出来。不要点击表格内的按钮或行，不要点击页面上的其它链接，不要切换
+            tab，不要使用鼠标滚轮。只做一次拖拽动作。
+          flow:
+            - aiDragAndDrop: ''
+              from: 纵向滚动条上的滑块
+              to: 纵向滚动条的最底端
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 左上角矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: company code
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[6]/span[1]/label[1]/span[normalize-space()="Company Code"]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 表格内容区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[normalize-space()="5.424,80-"]
+  - type: locate
+    prompt: 滚动条滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[2]/div[1]
+  - type: locate
+    prompt: 滚动条底部区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
+  - type: locate
+    prompt: 表格右侧纵向滚动条上的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[2]/div[1]
+  - type: locate
+    prompt: 滚动条轨道向下约 35% 的位置
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条上的滑块
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[2]/div[1]
+  - type: locate
+    prompt: 滚动条轨道下方约 30%-40% 处
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条上的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 滚动条轨道下方约 35% 处
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条上的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 纵向滚动条的最底端
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[2]
+  - type: locate
+    prompt: 右侧纵向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 滚动条轨道下方约 35% 处
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 纵向滚动条滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 滚动条轨道下方 30%-40% 处
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条上的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 滚动条轨道下方约 35% 处
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条上的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 滚动条轨道下方约 35% 处
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 返回主页
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[2]/span[1]
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击右下角execute
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 点击add apps
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/section[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[2]/div[3]/button[1]/span[1]/span[2]/bdi[normalize-space()="Add Apps"]
+  - type: locate
+    prompt: 搜索输入框
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[1]/header[1]/div[3]/a[1]/span[normalize-space()=""]
+  - type: locate
+    prompt: 点击搜索
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[1]/header[1]/div[2]/div[1]/div[1]/div[1]/div[3]/button[1]/span[1]/span[1]
+  - type: locate
+    prompt: 点击新出现的第一个Manage Supplier Line Items
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/section[1]/div[1]/section[2]/div[1]/section[2]/div[1]/div[1]/ul[1]/li[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/a[1]/div[1]/div[1]/span[1]/span[1]/span[1]
+  - type: locate
+    prompt: company code
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[6]/span[1]/label[1]/span[normalize-space()="Company Code"]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 纵向滚动条上的滑块
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[2]/div[1]
+  - type: locate
+    prompt: 纵向滚动条的最底端
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]

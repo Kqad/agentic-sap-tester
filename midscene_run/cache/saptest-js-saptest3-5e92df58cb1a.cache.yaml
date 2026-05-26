@@ -1,0 +1,113 @@
+midsceneVersion: 1.8.0
+cacheId: saptest-js-464cc170-a7cd-4007-a402-c5032b92971e-398a6c602c96
+caches:
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击右下角execute
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 在新页面点击放大镜图标
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[normalize-space()="My HomeAccounts PayableMoreGeneral Ledger AccountingPUR Basic"]
+  - type: locate
+    prompt: the main content area
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/section[1]/div[1]/div[2]/div[1]/div[2]/div[normalize-space()="PagesMoreGroupInvoice verification and postingAccounts PayableClosing and reportingAccounts PayableSupplier ManagementAccounts PayableGL AccountingGeneral Ledger AccountingStandard AppsPUR Basic"]
+  - type: locate
+    prompt: the main content area
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/section[1]/div[1]/div[3]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/figure[normalize-space()="Nothing here yet?You can add your favorite apps to this section.Add AppsAdd Apps"]
+  - type: locate
+    prompt: 整个页面内容区域
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/section[1]/div[normalize-space()="To-DosMoreGroup1 min. agoRefreshTasks (0)Situations (0)MoreYou do not have any new situations.When you do, you'll see them here.CardCard ContentPagesMoreGroupInvoice verification and postingAccounts PayableClosing and reportingAccounts PayableSupplier ManagementAccounts PayableGL AccountingGeneral Ledger AccountingStandard AppsPUR BasicAppsMoreGroupAdd AppsAdd Apps from App FinderFavoritesMost UsedRecently UsedMoreNothing here yet?You can add your favorite apps to this section.Add AppsAdd AppsInsightsMoreAdd TilesAdd from Favorites AppNothing here yet?You can add your preferred tiles and cards to this section.Add Insights"]
+  - type: locate
+    prompt: 顶部导航栏中的 Accounts Payable 标签
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[3]/div[1]/div[1]/span[normalize-space()="Accounts Payable"]
+  - type: locate
+    prompt: 页面主体内容区域
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/section[1]/div[normalize-space()="Invoice verification and postingManage Invoice Verification & Posting With OrderMon­i­tor Pur­chase Order Items...OverdueDis­play Pur­chase OrderCre­ate Sup­plier Down Pay­ment RequestsDis­play Pur­chas­ing Doc­u­ments by Sup­plierDis­play Pur­chas­ing Doc­u­ments by Mate­r­ialDis­play Mate­r­ialMM03Dis­play Sched­ul­ing Agree­mentCall MIRO - Change Sta­tusDis­play Sup­plier InvoiceAdvancedManage Invoice Verification & Posting Without OrderCre­ate Sup­plier InvoiceCre­ate Sup­plier Down Pay­ment RequestsEnter Recur­ring EntryChange Recur­ring EntryDis­play Changes of Recur­ring EntryCarry Out Recur­ring EntriesProcess Batch Input Ses­sion"]
+  - type: locate
+    prompt: the main content area
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/section[1]/div[1]/div[2]/div[normalize-space()="Manage Invoice Verification & Posting Without OrderCre­ate Sup­plier InvoiceCre­ate Sup­plier Down Pay­ment RequestsEnter Recur­ring EntryChange Recur­ring EntryDis­play Changes of Recur­ring EntryCarry Out Recur­ring EntriesProcess Batch Input Ses­sion"]
+  - type: locate
+    prompt: the main content area
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/section[1]/div[1]/div[2]/div[normalize-space()="Manage Invoice Verification & Posting Without OrderCre­ate Sup­plier InvoiceCre­ate Sup­plier Down Pay­ment RequestsEnter Recur­ring EntryChange Recur­ring EntryDis­play Changes of Recur­ring EntryCarry Out Recur­ring EntriesProcess Batch Input Ses­sion"]
+  - type: locate
+    prompt: “Monitor Purchase Order Items”磁贴
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/section[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/a[1]/div[2]/div[1]/div[1]/div[normalize-space()="8,33K"]
+  - type: locate
+    prompt: “Display Supplier Invoice - Advanced”磁贴
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[normalize-space()="To start, set the relevant filters and choose "Go"."]
+  - type: locate
+    prompt: “Go”按钮
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/article[1]/div[1]/div[1]/section[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[11]/div[1]/div[2]/div[1]/button[2]/span[normalize-space()="Adapt Filters (2)"]
+  - type: locate
+    prompt: “Cancel”按钮
+    cache:
+      xpaths:
+        - /html/body/div[1]/div[2]/footer[1]/div[1]/button[2]/span[1]/span[1]/bdi[normalize-space()="Cancel"]
+  - type: locate
+    prompt: 左上角的 Bosch Logo 或返回按钮以回到主页
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[1]/header[1]/div[1]/a[2]/img[1]
+  - type: locate
+    prompt: Accounts Payable 页签
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[3]/div[1]/div[2]
+  - type: locate
+    prompt: “Display Purchasing Documents by Supplier”磁贴
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/section[1]/div[1]/div[1]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]/div[1]/a[1]/div[2]/div[1]/div[1]

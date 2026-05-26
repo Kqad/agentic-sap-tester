@@ -1,10 +1,11 @@
 node_modules/
-.env
 .env.local
 
 playwright-report/
 test-results/
-midscene_run/
+midscene_run/report/
+midscene_run/log/
+midscene_run/output/
 run-history/
 
 .DS_Store
