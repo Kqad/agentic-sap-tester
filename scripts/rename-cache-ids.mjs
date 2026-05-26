@@ -2,7 +2,8 @@
 // to match the current cache-id.js hash function.
 //
 // Hash function history (most recent first):
-//   v4b (current): sha1(caseId + runtimeOnlyApiGuide + tcodeValues.join("|"))
+//   v4c (current): same as v4b but also drops sleep steps and uses sequential index
+//   v4b:           sha1(caseId + runtimeOnlyApiGuide + tcodeValues.join("|"))
 //   v4a:           sha1(caseId + valueStrippedApiGuide + tcodeValues.join("|"))
 //   v3b:           sha1(caseId + apiGuide + tcodeValues.join("|"))
 //   v3a:           sha1(caseId + apiGuide + firstTCodeValue)
@@ -90,6 +91,18 @@ function normalizeApiGuideV4b(apiGuide) {
   if (!apiGuide || !Array.isArray(apiGuide.steps)) return null;
   return { steps: apiGuide.steps.map((s) => ({ order: s.order, midsceneApi: s.midsceneApi, xpath: s.xpath, exampleCode: stripValueLiterals(s.exampleCode) })) };
 }
+// v4c: also drops sleep steps and replaces `order` with sequential `index`.
+function isSleepStepHelper(s) {
+  return /^\s*await\s+sleep\s*\(/.test(s?.exampleCode || '');
+}
+function normalizeApiGuideV4c(apiGuide) {
+  if (!apiGuide || !Array.isArray(apiGuide.steps)) return null;
+  return {
+    steps: apiGuide.steps
+      .filter((s) => !isSleepStepHelper(s))
+      .map((s, i) => ({ index: i, midsceneApi: s.midsceneApi, xpath: s.xpath, exampleCode: stripValueLiterals(s.exampleCode) })),
+  };
+}
 function v4aHash(caseObj) {
   return createHash('sha1')
     .update(String(caseObj.id))
@@ -101,6 +114,13 @@ function v4bHash(caseObj) {
   return createHash('sha1')
     .update(String(caseObj.id))
     .update(JSON.stringify(normalizeApiGuideV4b(caseObj.apiGuide)))
+    .update(effectiveTCode(caseObj))
+    .digest('hex').slice(0, 12);
+}
+function v4cHash(caseObj) {
+  return createHash('sha1')
+    .update(String(caseObj.id))
+    .update(JSON.stringify(normalizeApiGuideV4c(caseObj.apiGuide)))
     .update(effectiveTCode(caseObj))
     .digest('hex').slice(0, 12);
 }
@@ -121,7 +141,8 @@ for (const f of caseFiles) {
   const h3b = v3bHash(caseObj);
   const h4a = v4aHash(caseObj);
   const h4b = v4bHash(caseObj);
-  const currentName = `saptest-js-${id}-${h4b}.cache.yaml`;
+  const h4c = v4cHash(caseObj);
+  const currentName = `saptest-js-${id}-${h4c}.cache.yaml`;
 
   if (cacheFiles.has(currentName)) {
     alreadyMigrated++;
@@ -130,8 +151,8 @@ for (const f of caseFiles) {
   }
 
   let source = null;
-  for (const oldHash of [h4a, h3b, h3a, h2, h1]) {
-    if (oldHash === h4b) continue;
+  for (const oldHash of [h4b, h4a, h3b, h3a, h2, h1]) {
+    if (oldHash === h4c) continue;
     const name = `saptest-js-${id}-${oldHash}.cache.yaml`;
     if (cacheFiles.has(name)) { source = name; break; }
   }

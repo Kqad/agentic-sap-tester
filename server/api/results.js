@@ -66,7 +66,7 @@ router.get('/', async (_req, res) => {
 // Recent runs across all cases — drives the dashboard's "recent activity"
 // panel after the dedicated Results view was removed.
 router.get('/recent', async (req, res) => {
-  const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 10));
+  const limit = Math.min(500, Math.max(1, Number(req.query.limit) || 10));
   await fs.mkdir(RUNS_DIR, { recursive: true });
   const entries = await fs.readdir(RUNS_DIR, { withFileTypes: true });
   const runs = [];

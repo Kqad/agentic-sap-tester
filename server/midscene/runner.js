@@ -143,8 +143,11 @@ async function dispatchStep(agent, step, ctx) {
     ctx.log(`  …step ${step.order} has no exampleCode, skipping`);
     return undefined;
   }
-  const fn = new AsyncFunction('agent', code);
-  return await fn(agent);
+  // `sleep` is a helpers.js import in *this* module, not a global, so it's
+  // not visible inside AsyncFunction's compiled scope. Inject it explicitly
+  // alongside `agent` so wait steps like `await sleep(5000);` work.
+  const fn = new AsyncFunction('agent', 'sleep', code);
+  return await fn(agent, sleep);
 }
 
 // ── Main entry ────────────────────────────────────────────────────────

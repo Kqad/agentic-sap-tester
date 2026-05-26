@@ -115,7 +115,7 @@ export const SCROLL_RECOVERY_DIRECTIONS = ['right'];
 // text mentions Execute (= SAP query submission), bump to EXECUTE_DELAY for
 // the server round-trip. Before each aiQuery, sleep QUERY_PRE_DELAY so the
 // freshly-rendered table has time to fully paint before we read cells.
-export const STEP_DELAY_MS = 3000;
+export const STEP_DELAY_MS = 1000;
 export const EXECUTE_DELAY_MS = 7000;
 export const QUERY_PRE_DELAY_MS = 5000;
 

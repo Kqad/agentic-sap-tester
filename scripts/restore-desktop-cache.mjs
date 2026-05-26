@@ -39,9 +39,16 @@ function stripValueLiterals(code) {
   if (!code) return code;
   return code.replace(/(\{\s*value\s*:\s*)(['"`])([\s\S]*?)\2(\s*\})/g, '$1$2$2$4');
 }
+function isSleepStep(s) {
+  return /^\s*await\s+sleep\s*\(/.test(s?.exampleCode || '');
+}
 function normalizeApiGuide(apiGuide) {
   if (!apiGuide || !Array.isArray(apiGuide.steps)) return null;
-  return { steps: apiGuide.steps.map((s) => ({ order: s.order, midsceneApi: s.midsceneApi, xpath: s.xpath, exampleCode: stripValueLiterals(s.exampleCode) })) };
+  return {
+    steps: apiGuide.steps
+      .filter((s) => !isSleepStep(s))
+      .map((s, i) => ({ index: i, midsceneApi: s.midsceneApi, xpath: s.xpath, exampleCode: stripValueLiterals(s.exampleCode) })),
+  };
 }
 function v3bHash(caseObj) {
   return createHash('sha1')

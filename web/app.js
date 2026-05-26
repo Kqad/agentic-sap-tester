@@ -67,6 +67,7 @@ const I18N = {
     'cases.col.spec': '关联 Spec',
     'cases.col.modified': '修改时间',
     'cases.col.size': '体积',
+    'cases.col.lastRun': 'Last run',
     'cases.col.actions': '操作',
     'cases.jsonError': 'JSON 错误: ',
     'cases.txPrefix': 'TX ',
@@ -330,6 +331,7 @@ const I18N = {
     'cases.col.spec': 'Linked spec',
     'cases.col.modified': 'Modified',
     'cases.col.size': 'Size',
+    'cases.col.lastRun': 'Last run',
     'cases.col.actions': 'Actions',
     'cases.jsonError': 'JSON error: ',
     'cases.txPrefix': 'TX ',
@@ -993,7 +995,30 @@ function openReportModal(report) {
 // review past runs — all in one place.
 VIEWS.cases = async () => {
   const wrap = h('div', { class: 'grid' });
-  const casesRes = await api.get('/api/cases');
+  // Fetch cases + recent runs in parallel; recent runs feed the per-case
+  // "Last run" status column. Limit 500 covers ~25 runs per case for 20 cases.
+  const [casesRes, recentRes] = await Promise.all([
+    api.get('/api/cases'),
+    api.get('/api/results/recent?limit=500').catch(() => ({ runs: [] })),
+  ]);
+
+  // Map caseId → most recent run (recent endpoint already sorts desc).
+  const lastRunByCase = new Map();
+  for (const r of recentRes.runs || []) {
+    if (r.caseId && !lastRunByCase.has(r.caseId)) lastRunByCase.set(r.caseId, r);
+  }
+
+  // Sort: saptest1-8 first (in numeric order), then everything else by id.
+  const saptestRank = (id) => {
+    const m = /^saptest([1-8])$/.exec(id);
+    return m ? Number(m[1]) : Infinity;
+  };
+  casesRes.cases.sort((a, b) => {
+    const ra = saptestRank(a.id);
+    const rb = saptestRank(b.id);
+    if (ra !== rb) return ra - rb;
+    return a.id.localeCompare(b.id);
+  });
 
   const openDetail = (id) => go('cases/' + encodeURIComponent(id));
 
@@ -1014,9 +1039,19 @@ VIEWS.cases = async () => {
             h('th', {}, t('cases.col.spec')),
             h('th', {}, t('cases.col.modified')),
             h('th', {}, t('cases.col.size')),
+            h('th', {}, t('cases.col.lastRun')),
             h('th', { class: 'actions' }, t('cases.col.actions')),
           )),
           h('tbody', {}, casesRes.cases.map(c => {
+            const lastRun = lastRunByCase.get(c.id);
+            let lastRunCell;
+            if (!lastRun) {
+              lastRunCell = h('span', { class: 'tag', style: { background: '#eee', color: '#666' } }, 'Not run');
+            } else if (lastRun.status === 'passed') {
+              lastRunCell = h('span', { class: 'tag ok', title: fmtRel(lastRun.finishedAt || lastRun.startedAt) }, 'Pass');
+            } else {
+              lastRunCell = h('span', { class: 'tag err', title: fmtRel(lastRun.finishedAt || lastRun.startedAt) }, 'Fail');
+            }
             const row = h('tr', { dataset: { caseId: c.id } },
               h('td', {}, h('span', { class: 'mono' }, c.id)),
               h('td', {},
@@ -1035,18 +1070,9 @@ VIEWS.cases = async () => {
               ),
               h('td', {}, fmtRel(c.modifiedAt)),
               h('td', {}, fmtBytes(c.bytes)),
+              h('td', {}, lastRunCell),
               h('td', { class: 'actions' },
                 h('button', { class: 'btn sm', onClick: (e) => { e.stopPropagation(); openDetail(c.id); } }, t('cases.openDetail')),
-                ' ',
-                // Gen API only shows when a case has NO apiGuide yet. Existing
-                // imported / stable cases (the 8 SAP TEST ones + anything with
-                // a working apiGuide + cache) don't need this — Run JS already
-                // works on them as-is.
-                hasPerm('cases:write') && !c.summary?.hasApiGuide && h('button', {
-                  class: 'btn sm',
-                  title: 'This case has no apiGuide. Generate one from naturalLanguage (LLM call).',
-                  onClick: (e) => { e.stopPropagation(); generateApiGuide(c.id); },
-                }, 'Gen API'),
                 ' ',
                 hasPerm('runs:execute') && h('button', {
                   class: 'btn sm',
@@ -2117,13 +2143,14 @@ function renderParamsTab(caseData, stepsTree) {
     editor.appendChild(mkField('Transaction code', txInp));
     editor.appendChild(mkField('Description', descTa));
     editor.appendChild(mkField(
-      'Natural language (Midscene input)',
+      'Natural language',
       nlTa,
       parsed.apiGuide?.steps?.length
         ? 'Editing this does NOT invalidate the cache — values are input content, not structure. ' +
           'Same goes for editing apiGuide value defaults via Gen API or raw JSON: only locator / ' +
-          'step structure / step order changes invalidate. Exception: the T Code value (e.g. ' +
-          'S_ALR_87011990) IS in the hash, because changing it lands you on a different SAP screen.'
+          'step structure changes invalidate. Sleep / wait steps are also ignored — pure timing, ' +
+          'always reusable. Exception: the T Code value (e.g. S_ALR_87011990) IS in the hash, ' +
+          'because changing it lands you on a different SAP screen.'
         : 'After saving, click "Gen API" (or fill in apiGuide) and then "Run JS" to record a cache.',
     ));
     wrap.appendChild(editor);
@@ -2588,7 +2615,7 @@ function renderMidsceneJsTab(caseData, runs) {
         h('summary', { class: 'muted' }, 'Console tail (' + latest.logTail.length + ' lines)'),
         h('pre', {
           class: 'code-block',
-          style: { maxHeight: '300px', overflow: 'auto', fontSize: '12px', marginTop: '6px' },
+          style: { overflowX: 'auto', fontSize: '12px', marginTop: '6px', whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
         }, latest.logTail.map((l) => (typeof l === 'string' ? l : l.line)).join('\n')),
       ));
     }
@@ -3244,7 +3271,10 @@ async function openJsRunModal(caseId, cacheMode) {
   const headedChk = h('input', { type: 'checkbox', checked: true });
   const consoleEl = h('pre', {
     class: 'code-block',
-    style: { maxHeight: '200px', overflow: 'auto', margin: 0, fontSize: '12px' },
+    // No maxHeight — let the box grow with content so users never lose log
+    // lines off-screen. overflowX:auto keeps very long single lines from
+    // breaking the modal width.
+    style: { minHeight: '120px', overflowX: 'auto', margin: 0, fontSize: '12px', whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
   }, '(idle)');
   const statusEl = h('div', { class: 'muted', style: { minHeight: '20px' } },
     cacheMode === 'read' ? 'Will replay using existing cache (read-write).' : 'Will record fresh cache (write-only).');

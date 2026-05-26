@@ -63,24 +63,36 @@ function stripValueLiteralsFromExampleCode(code) {
   if (!code) return code;
   return code.replace(/(\{\s*value\s*:\s*)(['"`])([\s\S]*?)\2(\s*\})/g, '$1$2$2$4');
 }
-// Reduce apiGuide to ONLY the fields that influence runtime cache matching:
-// step order (execution sequence), midsceneApi (dispatcher branch), xpath
-// (aiTap xpath override), and exampleCode with values stripped (locator
-// strings passed to agent.aiInput/aiTap/etc). Descriptive fields — title,
-// naturalLanguageInstruction, reason, plus top-level summary/assumptions/
-// markdown/warnings — are stripped because the cache YAML only matches by
-// locator prompt, not by these strings. This means clicking Gen API and
-// getting LLM-rephrased titles/instructions doesn't rotate the hash if the
-// locator strings come back the same.
+// Sleep steps (`await sleep(3000);`) are pure timing — no UI element, not
+// recorded in cache YAML. Adding / removing / changing the duration of a
+// sleep step must not invalidate cache.
+function isSleepStep(step) {
+  return /^\s*await\s+sleep\s*\(/.test(step?.exampleCode || '');
+}
+// Reduce apiGuide to ONLY the fields that influence runtime cache matching.
+// Per remaining (non-sleep) step we keep:
+//   - sequential index (replaces `order`, so inserting/removing a sleep step
+//     doesn't shift other steps' visible position in the hash)
+//   - midsceneApi (dispatcher branch)
+//   - xpath (aiTap xpath override)
+//   - exampleCode with values stripped (locator strings passed to
+//     agent.aiInput/aiTap/etc)
+// Descriptive fields — title, naturalLanguageInstruction, reason, plus
+// top-level summary/assumptions/markdown/warnings — are stripped because the
+// cache YAML only matches by locator prompt, not by these strings. This
+// means Gen API re-rolling titles/instructions doesn't rotate the hash if
+// the locator strings come back the same.
 function normalizeApiGuideForHash(apiGuide) {
   if (!apiGuide || !Array.isArray(apiGuide.steps)) return null;
   return {
-    steps: apiGuide.steps.map((s) => ({
-      order: s.order,
-      midsceneApi: s.midsceneApi,
-      xpath: s.xpath,
-      exampleCode: stripValueLiteralsFromExampleCode(s.exampleCode),
-    })),
+    steps: apiGuide.steps
+      .filter((s) => !isSleepStep(s))
+      .map((s, i) => ({
+        index: i,
+        midsceneApi: s.midsceneApi,
+        xpath: s.xpath,
+        exampleCode: stripValueLiteralsFromExampleCode(s.exampleCode),
+      })),
   };
 }
 
