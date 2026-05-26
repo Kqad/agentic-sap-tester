@@ -1,0 +1,269 @@
+{
+  "$schema": "SAP TEST 4 — consolidated from Desktop SQLite + original SAP test 4 自然语言+JS.txt",
+  "title": "SAP TEST 4",
+  "description": "BP_IT_B2P_FIORI_Report Supplier Balances and Line Items （Row 6/7)",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "FBL1N",
+  "naturalLanguage": "1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FBL1N，点击execute，company code输入8540，点击execute，滑动到最底下，查找最底下的local crcy的值记录为A2。\n2.返回主页，进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存， 在 矩形输入框  输入 /n/UI2/FLP，点击右下角execute\n3. 点击add apps，搜索Manage Supplier Line Items，点击搜索，等4s，点击新出现的第一个Manage Supplier Line Items，company code输入8540， 点击execute\n4. 滑动到最底下，查找最底下的local crcy的值记录为A1\n5. A1和A2 相等则测试用例执行成功,不成功，则失败。\n",
+  "jsSource": "async function run(agent) {\r\n  await agent.aiTap(\"进入 Menu\");\r\n  await agent.aiTap(\"点击setting\");\r\n  await agent.aiTap(\"点击visualization\");\r\n  await agent.aiTap(\"启用show Ok code field\");\r\n  await agent.aiTap(\"保存\");\r\n  await agent.aiInput(\"左上角矩形\", { value: \"FBL1N\" });\r\n  await agent.aiTap(\"点击 Execute 按钮执行查询\");\r\n  await agent.aiInput(\"company code\", { value: \"8540\" });\r\n  await agent.aiTap(\"点击 Execute 按钮执行查询\");\r\n  await agent.aiAct(\"按住右侧的纵向滚动条的滑块，拖到最底端\");\r\n  const result = await agent.aiQuery(\"string, 查找最底下的local crcy的值记录为A2\");\r\n  await agent.aiTap(\"返回主页\");\r\n  await agent.aiTap(\"进入 Menu\");\r\n  await agent.aiTap(\"点击setting\");\r\n  await agent.aiTap(\"点击visualization\");\r\n  await agent.aiTap(\"启用show Ok code field\");\r\n  await agent.aiTap(\"保存\");\r\n  await agent.aiInput(\"矩形\", { value: \"/n/UI2/FLP\" });\r\n  await agent.aiTap(\"点击右下角execute\");\r\n  await agent.aiTap(\"点击add apps\");\r\n  await agent.aiInput(\"搜索输入框\", { value: \"Manage Supplier Line Items\" });\r\n  await agent.aiTap(\"点击搜索\");\r\n  await sleep(4000);\r\n  await agent.aiTap(\"点击新出现的第一个Manage Supplier Line Items\");\r\n  await agent.aiInput(\"company code\", { value: \"8540\" });\r\n  await agent.aiTap(\"点击 Execute 按钮执行查询\");\r\n  await agent.aiAct(\"按住右侧的纵向滚动条的滑块，拖到最底端\");\r\n  const result = await agent.aiQuery(\"string, 查找最底下的local crcy的值记录为A1\");\r\n  await agent.aiAssert(\"比较变量 A1 和 A2 是否相等\");\r\n  await agent.aiAssert(\"如果 A1 和 A2 相等，则判定测试用例执行成功；否则判定失败\");\r\n}",
+  "apiGuide": {
+    "summary": "SAP TEST 4",
+    "assumptions": [
+      "从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");"
+      },
+      {
+        "order": 2,
+        "title": "点击setting",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击setting",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击setting\");"
+      },
+      {
+        "order": 3,
+        "title": "点击visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击visualization",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击visualization\");"
+      },
+      {
+        "order": 4,
+        "title": "启用show Ok code field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用show Ok code field",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"启用show Ok code field\");"
+      },
+      {
+        "order": 5,
+        "title": "保存",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"保存\");"
+      },
+      {
+        "order": 6,
+        "title": "在左上角矩形输入框输入FBL1N",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在左上角矩形输入框输入FBL1N",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"FBL1N\" });"
+      },
+      {
+        "order": 7,
+        "title": "点击 Execute 按钮执行查询",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Execute 按钮执行查询",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Execute 按钮执行查询\");"
+      },
+      {
+        "order": 8,
+        "title": "在 company code 字段 输入 8540",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 company code 字段 输入 8540",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"company code\", { value: \"8540\" });"
+      },
+      {
+        "order": 9,
+        "title": "点击 Execute 按钮执行查询",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Execute 按钮执行查询",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Execute 按钮执行查询\");"
+      },
+      {
+        "order": 10,
+        "title": "滑动到最底下",
+        "midsceneApi": "agent.aiScroll()",
+        "naturalLanguageInstruction": "滑动到最底下",
+        "reason": "滚动或横向移动界面,适合滚动 API。",
+        "exampleCode": "await agent.aiAct(\"按住右侧的纵向滚动条的滑块,拖到最底端\");"
+      },
+      {
+        "order": 11,
+        "title": "查找最底下的local crcy的值记录为A2",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "查找最底下的local crcy的值记录为A2",
+        "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
+        "exampleCode": "const result = await agent.aiQuery(\"string, 查找最底下的local crcy的值记录为A2\");"
+      },
+      {
+        "order": 12,
+        "title": "返回主页",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "返回主页",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"返回主页\");"
+      },
+      {
+        "order": 13,
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");"
+      },
+      {
+        "order": 14,
+        "title": "点击setting",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击setting",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击setting\");"
+      },
+      {
+        "order": 15,
+        "title": "点击visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击visualization",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击visualization\");"
+      },
+      {
+        "order": 16,
+        "title": "启用show Ok code field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用show Ok code field",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"启用show Ok code field\");"
+      },
+      {
+        "order": 17,
+        "title": "保存",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"保存\");"
+      },
+      {
+        "order": 18,
+        "title": "在 矩形输入框 输入 /n/UI2/FLP",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 矩形输入框 输入 /n/UI2/FLP",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"矩形\", { value: \"/n/UI2/FLP\" });"
+      },
+      {
+        "order": 19,
+        "title": "点击右下角execute",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击右下角execute",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击右下角execute\");"
+      },
+      {
+        "order": 20,
+        "title": "点击add apps",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击add apps",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击add apps\");"
+      },
+      {
+        "order": 21,
+        "title": "搜索Manage Supplier Line Items",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "搜索Manage Supplier Line Items",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"搜索输入框\", { value: \"Manage Supplier Line Items\" });"
+      },
+      {
+        "order": 22,
+        "title": "点击搜索",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击搜索",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击搜索\");"
+      },
+      {
+        "order": 23,
+        "title": "等4s",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "等4s",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await sleep(4000);"
+      },
+      {
+        "order": 24,
+        "title": "点击新出现的第一个Manage Supplier Lin...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击新出现的第一个Manage Supplier Line Items",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击新出现的第一个Manage Supplier Line Items\");"
+      },
+      {
+        "order": 25,
+        "title": "在 company code 字段 输入 8540",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 company code 字段 输入 8540",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"company code\", { value: \"8540\" });"
+      },
+      {
+        "order": 26,
+        "title": "点击 Execute 按钮执行查询",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Execute 按钮执行查询",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Execute 按钮执行查询\");"
+      },
+      {
+        "order": 27,
+        "title": "滑动到最底下",
+        "midsceneApi": "agent.aiScroll()",
+        "naturalLanguageInstruction": "滑动到最底下",
+        "reason": "滚动或横向移动界面,适合滚动 API。",
+        "exampleCode": "await agent.aiAct(\"按住右侧的纵向滚动条的滑块,拖到最底端\");"
+      },
+      {
+        "order": 28,
+        "title": "查找最底下的local crcy的值记录为A1",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "查找最底下的local crcy的值记录为A1",
+        "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
+        "exampleCode": "const result = await agent.aiQuery(\"string, 查找最底下的local crcy的值记录为A1\");"
+      },
+      {
+        "order": 29,
+        "title": "如果变量 A1 和 A2 相等，则测试用例执行成功，否则...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "如果变量 A1 和 A2 相等，则测试用例执行成功，否则失败",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"如果变量 A1 和 A2 相等，则测试用例执行成功，否则失败\");"
+      }
+    ],
+    "recommendedYamlSnippet": "",
+    "docReferences": [],
+    "warnings": [
+      "已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。",
+      "本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+    ],
+    "markdown": "## SAP TEST 4\n\n### 前提假设\n- 从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。\n\n### API 步骤\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - 指令: 进入 Menu\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"进入 Menu\");`\n2. 点击setting\n   - API: `agent.aiTap()`\n   - 指令: 点击setting\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击setting\");`\n3. 点击visualization\n   - API: `agent.aiTap()`\n   - 指令: 点击visualization\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击visualization\");`\n4. 启用show Ok code field\n   - API: `agent.aiTap()`\n   - 指令: 启用show Ok code field\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"启用show Ok code field\");`\n5. 保存\n   - API: `agent.aiTap()`\n   - 指令: 保存\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"保存\");`\n6. 在左上角矩形输入框输入FBL1N\n   - API: `agent.aiInput()`\n   - 指令: 在左上角矩形输入框输入FBL1N\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"左上角矩形\", { value: \"FBL1N\" });`\n7. 点击 Execute 按钮执行查询\n   - API: `agent.aiTap()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击 Execute 按钮执行查询\");`\n8. 在 company code 字段 输入 8540\n   - API: `agent.aiInput()`\n   - 指令: 在 company code 字段 输入 8540\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"company code\", { value: \"8540\" });`\n9. 点击 Execute 按钮执行查询\n   - API: `agent.aiTap()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击 Execute 按钮执行查询\");`\n10. 滑动到最底下\n   - API: `agent.aiScroll()`\n   - 指令: 滑动到最底下\n   - 原因: 滚动或横向移动界面,适合滚动 API。\n   - 示例: `await agent.aiAct(\"按住右侧的纵向滚动条的滑块,拖到最底端\");`\n11. 查找最底下的local crcy的值记录为A2\n   - API: `agent.aiQuery()`\n   - 指令: 查找最底下的local crcy的值记录为A2\n   - 原因: 从 SAP 查询结果/表格列提取值,适合数据提取 API。\n   - 示例: `const result = await agent.aiQuery(\"string, 查找最底下的local crcy的值记录为A2\");`\n12. 返回主页\n   - API: `agent.aiTap()`\n   - 指令: 返回主页\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"返回主页\");`\n13. 进入 Menu\n   - API: `agent.aiTap()`\n   - 指令: 进入 Menu\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"进入 Menu\");`\n14. 点击setting\n   - API: `agent.aiTap()`\n   - 指令: 点击setting\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击setting\");`\n15. 点击visualization\n   - API: `agent.aiTap()`\n   - 指令: 点击visualization\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击visualization\");`\n16. 启用show Ok code field\n   - API: `agent.aiTap()`\n   - 指令: 启用show Ok code field\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"启用show Ok code field\");`\n17. 保存\n   - API: `agent.aiTap()`\n   - 指令: 保存\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"保存\");`\n18. 在 矩形输入框 输入 /n/UI2/FLP\n   - API: `agent.aiInput()`\n   - 指令: 在 矩形输入框 输入 /n/UI2/FLP\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"矩形\", { value: \"/n/UI2/FLP\" });`\n19. 点击右下角execute\n   - API: `agent.aiTap()`\n   - 指令: 点击右下角execute\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击右下角execute\");`\n20. 点击add apps\n   - API: `agent.aiTap()`\n   - 指令: 点击add apps\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击add apps\");`\n21. 搜索Manage Supplier Line Items\n   - API: `agent.aiInput()`\n   - 指令: 搜索Manage Supplier Line Items\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"搜索输入框\", { value: \"Manage Supplier Line Items\" });`\n22. 点击搜索\n   - API: `agent.aiTap()`\n   - 指令: 点击搜索\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击搜索\");`\n23. 等4s\n   - API: `agent.aiTap()`\n   - 指令: 等4s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(4000);`\n24. 点击新出现的第一个Manage Supplier Lin...\n   - API: `agent.aiTap()`\n   - 指令: 点击新出现的第一个Manage Supplier Line Items\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击新出现的第一个Manage Supplier Line Items\");`\n25. 在 company code 字段 输入 8540\n   - API: `agent.aiInput()`\n   - 指令: 在 company code 字段 输入 8540\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"company code\", { value: \"8540\" });`\n26. 点击 Execute 按钮执行查询\n   - API: `agent.aiTap()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击 Execute 按钮执行查询\");`\n27. 滑动到最底下\n   - API: `agent.aiScroll()`\n   - 指令: 滑动到最底下\n   - 原因: 滚动或横向移动界面,适合滚动 API。\n   - 示例: `await agent.aiAct(\"按住右侧的纵向滚动条的滑块,拖到最底端\");`\n28. 查找最底下的local crcy的值记录为A1\n   - API: `agent.aiQuery()`\n   - 指令: 查找最底下的local crcy的值记录为A1\n   - 原因: 从 SAP 查询结果/表格列提取值,适合数据提取 API。\n   - 示例: `const result = await agent.aiQuery(\"string, 查找最底下的local crcy的值记录为A1\");`\n29. 如果变量 A1 和 A2 相等，则测试用例执行成功，否则...\n   - API: `agent.aiAssert()`\n   - 指令: 如果变量 A1 和 A2 相等，则测试用例执行成功，否则失败\n   - 原因: 结果校验或变量比较,适合断言 API。\n   - 示例: `await agent.aiAssert(\"如果变量 A1 和 A2 相等，则测试用例执行成功，否则失败\");`\n\n### 注意事项\n- 已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。\n- 本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+  },
+  "apiGuideNaturalLanguage": "1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FBL1N，点击execute，company code输入8540，点击execute，滑动到最底下，查找最底下的local crcy的值记录为A2。\n2.返回主页，进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存， 在 矩形输入框  输入 /n/UI2/FLP，点击右下角execute\n3. 点击add apps，搜索Manage Supplier Line Items，点击搜索，等4s，点击新出现的第一个Manage Supplier Line Items，company code输入8540， 点击execute\n4. 滑动到最底下，查找最底下的local crcy的值记录为A1\n5. A1和A2 相等则测试用例执行成功,不成功，则失败。\n",
+  "yamlScript": "",
+  "tags": [],
+  "source": {
+    "desktop": true,
+    "desktopCaseId": "2400a0e6-e883-4023-b3be-20d5cae360db",
+    "consolidatedAt": "2026-05-25T10:40:49.342Z",
+    "txtSource": "SAP TEST DEMO 5.21 1/SAP TEST DEMO 5.21/SAP test 4 自然语言+JS.txt"
+  },
+  "params": {
+    "8": "8540",
+    "21": "Manage"
+  }
+}

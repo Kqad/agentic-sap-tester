@@ -54,11 +54,17 @@ async function listCases() {
 
 function summarize(p) {
   if (!p || typeof p !== 'object') return null;
+  const guide = p.apiGuide;
+  const apiStepCount =
+    guide && Array.isArray(guide.steps) ? guide.steps.length : 0;
   return {
     title: p.title || p.$schema || null,
     transactionCode: p.transactionCode || null,
     favoritesEntry: p.favoritesEntry || null,
     sapUrl: p.sapUrl || null,
+    hasApiGuide: apiStepCount > 0,
+    apiStepCount,
+    desktopImport: !!p?.source?.desktop,
   };
 }
 

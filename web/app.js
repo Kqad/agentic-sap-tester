@@ -1038,6 +1038,34 @@ VIEWS.cases = async () => {
               h('td', { class: 'actions' },
                 h('button', { class: 'btn sm', onClick: (e) => { e.stopPropagation(); openDetail(c.id); } }, t('cases.openDetail')),
                 ' ',
+                // Gen API only shows when a case has NO apiGuide yet. Existing
+                // imported / stable cases (the 8 SAP TEST ones + anything with
+                // a working apiGuide + cache) don't need this — Run JS already
+                // works on them as-is.
+                hasPerm('cases:write') && !c.summary?.hasApiGuide && h('button', {
+                  class: 'btn sm',
+                  title: 'This case has no apiGuide. Generate one from naturalLanguage (LLM call).',
+                  onClick: (e) => { e.stopPropagation(); generateApiGuide(c.id); },
+                }, 'Gen API'),
+                ' ',
+                hasPerm('runs:execute') && h('button', {
+                  class: 'btn sm',
+                  disabled: !c.summary?.hasApiGuide,
+                  title: c.summary?.hasApiGuide
+                    ? `Run apiGuide (${c.summary.apiStepCount} steps) headed, write cache`
+                    : 'No apiGuide on this case — click "Gen API" first',
+                  onClick: (e) => { e.stopPropagation(); openJsRunModal(c.id, 'write'); },
+                }, 'Run JS'),
+                ' ',
+                hasPerm('runs:execute') && h('button', {
+                  class: 'btn sm',
+                  disabled: !c.summary?.hasApiGuide,
+                  title: c.summary?.hasApiGuide
+                    ? 'Replay using midscene_run/cache (read-write strategy)'
+                    : 'No apiGuide on this case',
+                  onClick: (e) => { e.stopPropagation(); openJsRunModal(c.id, 'read'); },
+                }, 'Run JS w/ Cache'),
+                ' ',
                 hasPerm('cases:delete') && h('button', {
                   class: 'btn danger sm',
                   onClick: (e) => { e.stopPropagation(); deleteCase(c.id); },
@@ -1688,8 +1716,16 @@ VIEWS.caseDetail = async (route) => {
   }
   const specName = caseId + '.spec.ts';
   const specRelPath = 'e2e/' + specName;
+  // Midscene-shape cases (saptest1-8) have apiGuide but no spec.ts file, so
+  // skip the spec/steps GET to silence the noisy 404 spam in DevTools console.
+  const isMidsceneShapeCase = !!(
+    caseData.parsed && typeof caseData.parsed === 'object' &&
+    ('naturalLanguage' in caseData.parsed || 'apiGuide' in caseData.parsed || 'jsSource' in caseData.parsed)
+  );
   const [stepsTree, runsList] = await Promise.all([
-    api.get('/api/cases/_specs/' + encodeURIComponent(specName) + '/steps').catch(() => null),
+    isMidsceneShapeCase
+      ? Promise.resolve(null)
+      : api.get('/api/cases/_specs/' + encodeURIComponent(specName) + '/steps').catch(() => null),
     hasPerm('results:read') ? api.get('/api/cases/' + encodeURIComponent(caseId) + '/runs').catch(() => ({ runs: [] })) : Promise.resolve({ runs: [] }),
   ]);
   const hasSpec = !!stepsTree;
@@ -1736,9 +1772,11 @@ VIEWS.caseDetail = async (route) => {
   );
 
   // ── Tabs ──
+  // Steps & Run is always enabled now: no-spec cases (Midscene JS) get a
+  // dedicated apiGuide-aware view instead of the Playwright spec runner.
   const tabBar = h('div', { class: 'tabs' },
     tabLink('params',  t('detail.tabs.params'),  'cases/' + encodeURIComponent(caseId)),
-    tabLink('run',     t('detail.tabs.run'),     'cases/' + encodeURIComponent(caseId) + '/run', !hasSpec),
+    tabLink('run',     t('detail.tabs.run'),     'cases/' + encodeURIComponent(caseId) + '/run'),
     tabLink('history', t('detail.tabs.history'), 'cases/' + encodeURIComponent(caseId) + '/history'),
   );
   function tabLink(id, label, target, disabled) {
@@ -1761,7 +1799,10 @@ VIEWS.caseDetail = async (route) => {
     }
     if (!replayRunId || replayRun) {
       if (!hasSpec) {
-        body.appendChild(h('div', { class: 'card' }, h('div', { class: 'muted' }, t('cases.noSpec'))));
+        // Midscene JS case (no Playwright spec). Render an apiGuide-aware
+        // panel instead of just "no spec": last-run summary + report link
+        // + step list + Run buttons.
+        body.appendChild(renderMidsceneJsTab(caseData, runsList.runs || []));
       } else {
         const panel = await createRunPanel({
           specPath: specRelPath,
@@ -1807,6 +1848,140 @@ function renderRunChip(run, caseId) {
   return wrap;
 }
 
+// ── NL ↔ params value sync ──
+// NL 文本里通常会内嵌输入值（"company code输入8540"），Auto Parameters 编辑器
+// 又把同一个值单独列出来 — 两边其实是同一份"输入框内容"的两种视图。这个函数
+// 在 save 时把改动从一侧传播到另一侧：
+//   - 只改了 params → 在 NL 里把旧值就地替换成新值
+//   - 只改了 NL    → 用 locator 作锚点从新 NL 里抓出新值，回填 params
+//   - 两边都改了   → 不动（尊重用户的显式编辑）
+// 注意：apiGuide 不进 hash 之外的字段无影响；values 改了 cache 也不会失效。
+function collectAiInputStepsForSync(apiGuide) {
+  const out = [];
+  for (const s of apiGuide?.steps ?? []) {
+    const api = String(s.midsceneApi || '').toLowerCase();
+    if (!api.includes('aiinput')) continue;
+    const m = /aiInput\s*\(\s*(['"`])([\s\S]*?)\1\s*,\s*\{\s*value\s*:\s*(['"`])([\s\S]*?)\3\s*\}\s*\)/.exec(s.exampleCode || '');
+    if (!m) continue;
+    out.push({
+      order: s.order,
+      locator: m[2],
+      defaultValue: m[4],
+      instruction: s.naturalLanguageInstruction || '',
+    });
+  }
+  // Sort by step order so forward replacement scans NL left-to-right and
+  // disambiguates duplicate values across multiple aiInput steps.
+  out.sort((a, b) => Number(a.order) - Number(b.order));
+  return out;
+}
+
+// Find the longest prefix of `locator` that actually appears in `nl`. Handles
+// cases where the apiGuide locator is "左上角矩形" but NL writes "左上角矩形输入框".
+function findAnchorInNL(nl, locator) {
+  if (!nl || !locator) return -1;
+  let anchor = locator;
+  while (anchor.length >= 2) {
+    const i = nl.indexOf(anchor);
+    if (i >= 0) return i + anchor.length;
+    anchor = anchor.slice(0, -1);
+  }
+  return -1;
+}
+
+// After the locator anchor in NL, skip an optional suffix ("输入框", "字段" …)
+// and a connector ("输入", ":", "=", " "), then capture the value up to the
+// next terminator. Terminators include CJK comma/period, ASCII comma/semi,
+// newline, and ASCII whitespace — but NOT ASCII '.', because real values
+// often contain it ("30.04.2026", "S_ALR_87011990", file extensions, ...).
+// If a value is followed by an ASCII period sentence ender ("8540."), the
+// period will be captured as part of the value; the user can clean it up.
+function extractValueAfterAnchor(nl, anchorEnd) {
+  let rest = nl.slice(anchorEnd);
+  rest = rest.replace(/^(输入框|输入栏|字段|栏目|栏|框|处|input|field|box)+/i, '');
+  rest = rest.replace(/^[\s　]*(输入为|输入|为|=|：|:|=)?[\s　]*/, '');
+  const m = rest.match(/^([^,，。\n;；、\t ]+?)(?=[,，。\n;；、\t ]|$)/);
+  if (!m) return null;
+  const captured = m[1].trim();
+  return captured || null;
+}
+
+function syncNlAndParams({ oldNL, newNL, oldParams, newParams, apiGuide }) {
+  const steps = collectAiInputStepsForSync(apiGuide);
+  if (!steps.length) {
+    console.log('[sync] skipped (no aiInput steps in apiGuide)');
+    return { nl: newNL ?? '', params: newParams ?? {} };
+  }
+
+  const nlChanged = (oldNL ?? '') !== (newNL ?? '');
+  const paramsChanged = JSON.stringify(oldParams ?? {}) !== JSON.stringify(newParams ?? {});
+  console.log('[sync] entry — nlChanged:', nlChanged, 'paramsChanged:', paramsChanged, 'aiInputSteps:', steps.length);
+
+  // Forward: param 改了 → NL 跟着改
+  // 完全用 locator 锚点定位 NL 里每个 step 的 value 位置，把当前在那里的
+  // value（不管和 oldParams 是否一致）替换成新值。不依赖 "oldV 必须在 NL 里
+  // 找得到"，避免 params 和 NL 之前就不一致时无法 sync。
+  if (paramsChanged && !nlChanged) {
+    let nl = newNL ?? '';
+    let cursor = 0;
+    const replaced = [];
+    const misses = [];
+    for (const s of steps) {
+      const anchorRel = findAnchorInNL(nl.slice(cursor), s.locator);
+      if (anchorRel < 0) {
+        misses.push(`step ${s.order} (locator "${s.locator}" not in NL)`);
+        continue;
+      }
+      const currentValue = extractValueAfterAnchor(nl.slice(cursor), anchorRel);
+      if (!currentValue) {
+        misses.push(`step ${s.order} (no value after "${s.locator}")`);
+        cursor += anchorRel;
+        continue;
+      }
+      const valueAbsStart = nl.indexOf(currentValue, cursor + anchorRel);
+      const newEff = (newParams?.[s.order] ?? s.defaultValue) || '';
+      const oldEff = (oldParams?.[s.order] ?? s.defaultValue) || '';
+      if (oldEff !== newEff && currentValue !== newEff && valueAbsStart >= 0) {
+        nl = nl.slice(0, valueAbsStart) + newEff + nl.slice(valueAbsStart + currentValue.length);
+        cursor = valueAbsStart + newEff.length;
+        replaced.push(`step ${s.order}: "${currentValue}" → "${newEff}"`);
+      } else {
+        cursor = (valueAbsStart >= 0 ? valueAbsStart : cursor + anchorRel) + currentValue.length;
+      }
+    }
+    if (replaced.length) console.log('[sync] param→NL:', replaced.join(' · '));
+    else console.log('[sync] param→NL: no replacements (misses:', misses.length ? misses.join(' · ') : 'none', ')');
+    return { nl, params: newParams ?? {} };
+  }
+
+  // Reverse: NL 改了 → params 跟着改
+  if (nlChanged && !paramsChanged) {
+    const next = { ...(newParams ?? {}) };
+    const extracted = [];
+    const misses = [];
+    let cursor = 0;
+    for (const s of steps) {
+      const effectiveOld = (oldParams?.[s.order] ?? s.defaultValue) || '';
+      const anchorRel = findAnchorInNL((newNL ?? '').slice(cursor), s.locator);
+      if (anchorRel < 0) { misses.push(`step ${s.order} (locator "${s.locator}" not in NL)`); continue; }
+      const v = extractValueAfterAnchor((newNL ?? '').slice(cursor), anchorRel);
+      if (!v) { misses.push(`step ${s.order} (no value after "${s.locator}")`); cursor += anchorRel; continue; }
+      cursor += anchorRel + v.length;
+      if (v === effectiveOld) continue;
+      if (v === s.defaultValue) delete next[String(s.order)];
+      else next[String(s.order)] = v;
+      extracted.push(`step ${s.order}: "${effectiveOld}" → "${v}"`);
+    }
+    if (extracted.length) console.log('[sync] NL→param:', extracted.join(' · '));
+    else console.log('[sync] NL→param: no changes detected (misses:', misses.length ? misses.join(' · ') : 'none', ')');
+    return { nl: newNL ?? '', params: next };
+  }
+
+  if (nlChanged && paramsChanged) console.log('[sync] both NL and params changed — leaving both as-is');
+  else console.log('[sync] neither changed — no-op');
+  return { nl: newNL ?? '', params: newParams ?? {} };
+}
+
 // ── Parameters tab ──
 // Renders a flat field-by-field form when the JSON is "simple" (objects with
 // primitive leaves). Reverse-maps each ${params.xxx} reference found in the
@@ -1824,6 +1999,10 @@ function renderParamsTab(caseData, stepsTree) {
     ? caseData.parsed : null;
   const leaves = parsed ? flattenParams(parsed) : [];
   const isFormable = parsed && leaves.length > 0 && leaves.every(l => l.formable);
+  // Midscene-shape cases have a non-formable apiGuide.steps[]/source{} blob.
+  // Render dedicated editors for the human-editable fields above the raw JSON.
+  const isMidsceneShape =
+    parsed && ('naturalLanguage' in parsed || 'apiGuide' in parsed || 'jsSource' in parsed);
   const usageByPath = stepsTree ? buildParamUseMap(stepsTree) : new Map();
 
   const dirtyFlag = h('span', { class: 'muted small', style: { marginLeft: 'auto', opacity: '0' } }, t('params.unsaved'));
@@ -1832,6 +2011,8 @@ function renderParamsTab(caseData, stepsTree) {
 
   // Track input state so save can collect current values without re-querying DOM.
   const inputs = [];
+  // Midscene-mode editors. Populated below when isMidsceneShape.
+  let midsceneInputs = null;
 
   // Track whether the user has edited anything since load — drives the
   // "unsaved" hint and prevents accidentally overwriting from a stale form.
@@ -1840,6 +2021,266 @@ function renderParamsTab(caseData, stepsTree) {
     if (dirty) return;
     dirty = true;
     dirtyFlag.style.opacity = '1';
+  }
+
+  // ── Midscene editor (title / sapUrl / transactionCode / description /
+  //    naturalLanguage) + read-only API guide step list + read-only JS
+  //    source. Always rendered for Midscene-shape cases so the user can edit
+  //    naturalLanguage without diving into raw JSON.
+  // Holds per-aiInput-step value-override inputs so the bottom saveBtn can
+  // fold them back into caseObj.params on save. Populated below.
+  let paramOverrideInputs = null;
+  if (isMidsceneShape) {
+    const canWrite = hasPerm('cases:write');
+    const mkField = (label, control, hint) => h('div', { class: 'field', style: { marginBottom: '12px' } },
+      h('span', {}, label),
+      control,
+      hint && h('div', { class: 'muted small', style: { marginTop: '2px' } }, hint),
+    );
+
+    // Toolbar at the top of the Parameters tab — mirrors the original Desktop
+    // saptest UI layout (Run JS / Run JS w/ Cache / Save / Delete sitting
+    // right above the editor). Save delegates to the bottom saveBtn click
+    // handler so we don't duplicate the fold-and-persist logic.
+    const stepCount = parsed.apiGuide?.steps?.length ?? 0;
+    const topRunJsBtn = h('button', {
+      class: 'btn primary',
+      disabled: !hasPerm('runs:execute') || !stepCount,
+      title: stepCount ? 'Run JS — write-only cache (record fresh element locations)' : 'apiGuide is empty — generate it first',
+      onClick: () => openJsRunModal(caseData.id, 'write'),
+    }, 'Run JS');
+    const topRunJsCacheBtn = h('button', {
+      class: 'btn',
+      disabled: !hasPerm('runs:execute') || !stepCount,
+      title: stepCount ? 'Run JS — read-write cache (replay existing locations, ~5× faster)' : 'apiGuide is empty — generate it first',
+      onClick: () => openJsRunModal(caseData.id, 'read'),
+    }, 'Run JS w/ Cache');
+    const topGenApiBtn = h('button', {
+      class: 'btn',
+      disabled: !canWrite,
+      title: stepCount
+        ? 'Re-generate apiGuide from naturalLanguage (LLM call · falls back to local rules if LLM is unreachable). ⚠ apiGuide changes invalidate the cache.'
+        : 'Generate apiGuide from naturalLanguage (LLM call · falls back to local rules if LLM is unreachable)',
+      onClick: async () => {
+        // The server-side /api-guide endpoint reads the case's
+        // naturalLanguage from disk, not from the request body, so any
+        // unsaved edits in the textarea would be ignored and Re-Gen would
+        // produce the SAME apiGuide as before (then render() would refresh
+        // the textarea, making it look like the edit "reverted"). Persist
+        // the current Midscene-shape fields first, then regen.
+        if (midsceneInputs) {
+          const next = JSON.parse(JSON.stringify(parsed));
+          next.title           = midsceneInputs.titleInp.value;
+          next.sapUrl          = midsceneInputs.urlInp.value;
+          next.transactionCode = midsceneInputs.txInp.value || null;
+          next.description     = midsceneInputs.descTa.value;
+          next.naturalLanguage = midsceneInputs.nlTa.value;
+          try {
+            await api.put('/api/cases/' + encodeURIComponent(caseData.id), next);
+          } catch (e) {
+            toast('Save before Gen API failed: ' + e.message, 'err');
+            return;
+          }
+        }
+        await generateApiGuide(caseData.id);
+      },
+    }, stepCount ? 'Re-Gen API' : 'Gen API');
+    const topSaveBtn = h('button', {
+      class: 'btn',
+      disabled: !canWrite,
+      title: 'Save title / sapUrl / NL / per-step value overrides',
+      onClick: () => saveBtn.click(),
+    }, t('params.save'));
+    const topDeleteBtn = h('button', {
+      class: 'btn danger',
+      disabled: !hasPerm('cases:delete'),
+      onClick: () => deleteCase(caseData.id),
+    }, t('cases.delete'));
+    wrap.appendChild(h('div', {
+      class: 'row',
+      style: { gap: '8px', marginBottom: '12px', flexWrap: 'wrap' },
+    }, topRunJsBtn, topRunJsCacheBtn, topGenApiBtn, h('span', { class: 'spacer' }), topSaveBtn, topDeleteBtn));
+
+    const titleInp = h('input', { value: parsed.title ?? '', disabled: !canWrite });
+    const urlInp   = h('input', { value: parsed.sapUrl ?? '', disabled: !canWrite });
+    const txInp    = h('input', { value: parsed.transactionCode ?? '', disabled: !canWrite, placeholder: 'optional, e.g. S_ALR_87011990 or AS01' });
+    const descTa   = h('textarea', { style: { minHeight: '60px' }, disabled: !canWrite }, parsed.description ?? '');
+    const nlTa     = h('textarea', { style: { minHeight: '260px', fontFamily: 'inherit' }, disabled: !canWrite }, parsed.naturalLanguage ?? '');
+
+    [titleInp, urlInp, txInp, descTa, nlTa].forEach((el) => el.addEventListener('input', markDirty));
+
+    midsceneInputs = { titleInp, urlInp, txInp, descTa, nlTa };
+
+    const editor = h('div', {});
+    editor.appendChild(mkField('Title', titleInp));
+    editor.appendChild(mkField('Target URL (sapUrl)', urlInp));
+    editor.appendChild(mkField('Transaction code', txInp));
+    editor.appendChild(mkField('Description', descTa));
+    editor.appendChild(mkField(
+      'Natural language (Midscene input)',
+      nlTa,
+      parsed.apiGuide?.steps?.length
+        ? 'Editing this does NOT invalidate the cache — values are input content, not structure. ' +
+          'Same goes for editing apiGuide value defaults via Gen API or raw JSON: only locator / ' +
+          'step structure / step order changes invalidate. Exception: the T Code value (e.g. ' +
+          'S_ALR_87011990) IS in the hash, because changing it lands you on a different SAP screen.'
+        : 'After saving, click "Gen API" (or fill in apiGuide) and then "Run JS" to record a cache.',
+    ));
+    wrap.appendChild(editor);
+
+    // Auto Parameters — list every apiGuide aiInput step with its current
+    // value, sourced from caseObj.params[step.order] if set, otherwise from
+    // exampleCode's literal "{ value: \"...\" }". Editing only updates
+    // caseObj.params; apiGuide stays byte-identical so cacheId is stable for
+    // non-tcode fields and the recorded element location keeps replaying
+    // from cache. EXCEPTION: tcode steps (locator matches 矩形 / TC框 /
+    // T-Code) feed their value into the hash too, because tcode determines
+    // which SAP screen we land on — changing it makes every other recorded
+    // xpath stale. The TCode field below is tagged so users can see this.
+    if (parsed.apiGuide?.steps?.length) {
+      const existingParams = (parsed.params && typeof parsed.params === 'object' && !Array.isArray(parsed.params))
+        ? parsed.params : {};
+      const inputSteps = [];
+      for (const s of parsed.apiGuide.steps) {
+        const api = String(s.midsceneApi || '').toLowerCase();
+        if (!api.includes('aiinput')) continue;
+        const m = /aiInput\s*\(\s*(['"`])([\s\S]*?)\1\s*,\s*\{\s*value\s*:\s*(['"`])([\s\S]*?)\3\s*\}\s*\)/.exec(s.exampleCode || '');
+        if (!m) continue;
+        const orderKey = String(s.order);
+        inputSteps.push({
+          order: s.order,
+          locator: m[2],
+          defaultValue: m[4],
+          paramValue: orderKey in existingParams ? String(existingParams[orderKey] ?? '') : null,
+        });
+      }
+
+      if (inputSteps.length) {
+        paramOverrideInputs = [];
+        const paramCard = h('details', { open: true, style: { marginBottom: '12px' } },
+          h('summary', { class: 'muted' },
+            'Parameters · ' + inputSteps.length + ' aiInput step' + (inputSteps.length === 1 ? '' : 's') +
+            ' (editable — non-tcode values don\'t invalidate cache; tcode does)'),
+        );
+        const grid = h('div', { class: 'param-grid', style: { marginTop: '8px' } });
+        const isTCodeLocator = (loc) => /矩形|TC\s*框|T[-\s]?Code|事务码/i.test(loc || '');
+        for (const it of inputSteps) {
+          const initial = it.paramValue !== null ? it.paramValue : it.defaultValue;
+          const inp = h('input', {
+            value: initial,
+            disabled: !canWrite,
+            placeholder: it.defaultValue,
+          });
+          inp.addEventListener('input', markDirty);
+          paramOverrideInputs.push({
+            order: it.order,
+            input: inp,
+            defaultValue: it.defaultValue,
+          });
+          // Display-only rename: SAP's transaction-code box gets called
+          // "矩形" / "左上角矩形" in the LLM-generated locator (rectangle in
+          // top-left), but in the Parameters UI we surface it as "T Code"
+          // — what users actually call it. apiGuide stays byte-identical
+          // (cacheId stable, runner still passes the original locator to
+          // agent.aiInput).
+          const displayLocator = it.locator
+            .replace(/左上角矩形/g, 'T Code')
+            .replace(/矩形/g, 'T Code');
+          const tcodeFlag = isTCodeLocator(it.locator)
+            ? h('span', {
+                class: 'mono small',
+                title: 'Changing this value rotates cacheId — cache must be re-recorded after save.',
+                style: { marginLeft: '8px', padding: '1px 6px', background: '#fff4d6', color: '#7a5800', borderRadius: '3px', fontSize: '11px' },
+              }, '⚠ tcode · invalidates cache')
+            : null;
+          grid.appendChild(h('div', { class: 'param-field' },
+            h('div', { class: 'param-field-head' },
+              h('label', { class: 'param-path mono' }, 'Step ' + it.order + ' · ' + displayLocator),
+              tcodeFlag,
+              dirtyFlag,
+            ),
+            inp,
+            h('span', { class: 'param-usage muted' },
+              'aiInput default: ', h('code', {}, it.defaultValue || '(empty)'),
+            ),
+          ));
+        }
+        paramCard.appendChild(grid);
+        wrap.appendChild(paramCard);
+      }
+    }
+
+    // Read-only: JS assembled from apiGuide steps. This is the script the
+    // runner actually evals per-step (or that Desktop used to display under
+    // "生成的 JS" before each run).
+    if (parsed.apiGuide?.steps?.length) {
+      const generatedJs =
+        '// Auto-assembled from apiGuide.steps[].exampleCode\n' +
+        '// Title: ' + (parsed.title ?? '') + '\n' +
+        '// Target URL: ' + (parsed.sapUrl ?? '') + '\n\n' +
+        'async function run(agent) {\n' +
+        parsed.apiGuide.steps.map((s) => {
+          const reason = s.reason ? `  // ${String(s.reason).split('\n')[0]}\n` : '';
+          return `  // Step ${s.order}: ${s.title ?? ''}\n${reason}  ${(s.exampleCode ?? '').trim()}`;
+        }).join('\n\n') +
+        '\n}\n';
+
+      wrap.appendChild(h('details', { open: true, style: { marginBottom: '10px' } },
+        h('summary', { class: 'muted' },
+          '生成的 JS (from apiGuide · ' + parsed.apiGuide.steps.length + ' steps, ' +
+          generatedJs.length + ' chars)'),
+        h('pre', {
+          class: 'code-block',
+          style: { maxHeight: '320px', overflow: 'auto', fontSize: '12px', margin: '6px 0 0 0' },
+        }, generatedJs),
+      ));
+    }
+
+    // Read-only: API guide step list. Label shows the API the runner ACTUALLY
+    // calls (parsed from exampleCode), not the midsceneApi classification —
+    // which sometimes diverges for "拖到最X端" type scroll steps that get
+    // rewritten to aiAct. A small "planned: aiScroll" tag is shown when they
+    // differ so you can still see the LLM's original intent.
+    if (parsed.apiGuide?.steps?.length) {
+      const stepsList = h('ol', {
+        class: 'mono',
+        style: { fontSize: '12px', maxHeight: '300px', overflow: 'auto', paddingLeft: '24px', margin: '6px 0 0 0' },
+      }, ...parsed.apiGuide.steps.map((s) => {
+        const actual = displayApiFromStep(s);
+        const planned = plannedApiTagIfDifferent(s);
+        return h('li', {
+          style: { marginBottom: '3px' },
+          title: planned ? `Runner evals exampleCode → agent.${actual}(). LLM tagged this ${planned} but exampleCode was rewritten.` : '',
+        },
+          h('strong', {}, actual + ': '),
+          h('span', {}, s.title || s.naturalLanguageInstruction || ''),
+          planned && h('span', {
+            class: 'muted small',
+            style: { marginLeft: '6px', opacity: 0.65 },
+          }, '· planned ' + planned),
+        );
+      }));
+      wrap.appendChild(h('details', { style: { marginBottom: '10px' } },
+        h('summary', { class: 'muted' },
+          'API guide steps · ' + parsed.apiGuide.steps.length +
+          ' (read-only — labels show what runner actually calls; "planned" = LLM classification)'),
+        stepsList,
+      ));
+    }
+
+    // Read-only: ORIGINAL JS source — the user's hand-written code from
+    // SAP TEST DEMO 5.21/SAP test N 自然语言+JS.txt (with aiAct(...拖滑块)
+    // calls). Differs from "生成的 JS" above which is the LLM-derived version.
+    if (typeof parsed.jsSource === 'string' && parsed.jsSource.trim()) {
+      wrap.appendChild(h('details', { style: { marginBottom: '10px' } },
+        h('summary', { class: 'muted' },
+          '原版 JS (从 .txt 1:1 拷贝, ' + parsed.jsSource.length + ' chars, read-only)'),
+        h('pre', {
+          class: 'code-block',
+          style: { maxHeight: '260px', overflow: 'auto', fontSize: '12px', margin: '6px 0 0 0' },
+        }, parsed.jsSource),
+      ));
+    }
   }
 
   if (isFormable) {
@@ -1899,7 +2340,14 @@ function renderParamsTab(caseData, stepsTree) {
     errEl.textContent = '';
     let nextParsed;
     const rawVisible = rawWrap.style.display !== 'none';
-    if (rawVisible || !isFormable) {
+    if (rawVisible) {
+      try { nextParsed = JSON.parse(rawTa.value); }
+      catch (e) { errEl.textContent = t('params.parseError') + e.message; return; }
+    } else if (midsceneInputs) {
+      // Midscene-mode: fold the friendly editor values into the parsed JSON
+      // skeleton, preserving apiGuide / source / tags / yamlScript etc.
+      nextParsed = JSON.parse(JSON.stringify(parsed));
+    } else if (!isFormable) {
       try { nextParsed = JSON.parse(rawTa.value); }
       catch (e) { errEl.textContent = t('params.parseError') + e.message; return; }
     } else {
@@ -1914,11 +2362,76 @@ function renderParamsTab(caseData, stepsTree) {
         setByPath(nextParsed, path, v);
       }
     }
+
+    // For Midscene-shape cases, the friendly editor (title/sapUrl/NL/etc)
+    // and the Auto Parameters editor are ALWAYS the source of truth for
+    // those fields — even when the user has the Raw JSON view open. Without
+    // this overlay, editing NL in the textarea while raw view is visible
+    // gets silently dropped: save would write back rawTa's old text and the
+    // post-save render() would show the user's edit "reverted".
+    if (midsceneInputs) {
+      nextParsed.title           = midsceneInputs.titleInp.value;
+      nextParsed.sapUrl          = midsceneInputs.urlInp.value;
+      nextParsed.transactionCode = midsceneInputs.txInp.value || null;
+      nextParsed.description     = midsceneInputs.descTa.value;
+      nextParsed.naturalLanguage = midsceneInputs.nlTa.value;
+    }
+    if (paramOverrideInputs && paramOverrideInputs.length) {
+      const nextParams = {};
+      for (const it of paramOverrideInputs) {
+        const v = it.input.value;
+        if (v !== '' && v !== it.defaultValue) nextParams[String(it.order)] = v;
+      }
+      if (Object.keys(nextParams).length) {
+        nextParsed.params = nextParams;
+      } else if ('params' in nextParsed) {
+        delete nextParsed.params;
+      }
+    }
+
+    // NL ↔ params 双向同步 — 只对有 apiGuide 的 Midscene-shape case 生效。
+    // 改了一侧就把值传播到另一侧；两侧都改了就尊重用户原始输入。
+    if (midsceneInputs && parsed?.apiGuide?.steps?.length) {
+      const synced = syncNlAndParams({
+        oldNL: parsed.naturalLanguage ?? '',
+        newNL: nextParsed.naturalLanguage ?? '',
+        oldParams: (parsed.params && typeof parsed.params === 'object' && !Array.isArray(parsed.params)) ? parsed.params : {},
+        newParams: (nextParsed.params && typeof nextParsed.params === 'object' && !Array.isArray(nextParsed.params)) ? nextParsed.params : {},
+        apiGuide: parsed.apiGuide,
+      });
+      nextParsed.naturalLanguage = synced.nl;
+      if (synced.params && Object.keys(synced.params).length) {
+        nextParsed.params = synced.params;
+      } else if ('params' in nextParsed) {
+        delete nextParsed.params;
+      }
+    }
+
+    // Diagnostic — open DevTools console to see what's actually being PUT.
+    // Remove once the "save reverts" bug stops reproducing.
     try {
-      await api.put('/api/cases/' + encodeURIComponent(caseData.id), nextParsed);
+      const nlPreview = (nextParsed.naturalLanguage || '').slice(0, 120).replace(/\n/g, ' ⏎ ');
+      console.log('[saveBtn] PUT', caseData.id, '— title:', nextParsed.title, '— NL len:', (nextParsed.naturalLanguage || '').length, '— NL head:', nlPreview);
+      console.log('[saveBtn] midsceneInputs.nlTa.value head:', midsceneInputs ? midsceneInputs.nlTa.value.slice(0, 120) : '(no midsceneInputs)');
+    } catch (e) { console.warn('[saveBtn] diag log failed', e); }
+
+    try {
+      const putRes = await api.put('/api/cases/' + encodeURIComponent(caseData.id), nextParsed);
+      console.log('[saveBtn] PUT response:', putRes);
       toast(t('params.saved'), 'ok');
       dirty = false;
       dirtyFlag.style.opacity = '0';
+
+      // Verify the server actually persisted what we sent.
+      try {
+        const verify = await api.get('/api/cases/' + encodeURIComponent(caseData.id));
+        const persistedNlHead = (verify.parsed?.naturalLanguage || '').slice(0, 120).replace(/\n/g, ' ⏎ ');
+        console.log('[saveBtn] GET-after-PUT NL head:', persistedNlHead);
+        if ((verify.parsed?.naturalLanguage || '') !== (nextParsed.naturalLanguage || '')) {
+          console.warn('[saveBtn] MISMATCH — server returned different NL than we sent!');
+        }
+      } catch (e) { console.warn('[saveBtn] verify GET failed', e); }
+
       // Refresh the page so the saved values flow into the spec preview too.
       render();
     } catch (e) { errEl.textContent = e.message; }
@@ -1997,6 +2510,243 @@ function buildParamUseMap(tree) {
   }
   for (const tc of (tree?.tests || [])) visit(tc.steps);
   return map;
+}
+
+// ── Steps & Run tab for Midscene JS cases (no spec.ts) ──
+// Shows: latest run summary (status + error + report iframe), the apiGuide
+// step list, and Run JS / Run JS w/ Cache buttons that drive the same
+// /api/midscene-js/cases/:id/run pipeline as the Cases table.
+function renderMidsceneJsTab(caseData, runs) {
+  const wrap = h('div', { class: 'grid' });
+  const parsed = caseData?.parsed ?? {};
+  const apiGuide = parsed.apiGuide;
+  const caseId = caseData?.id;
+  const stepCount = apiGuide?.steps?.length ?? 0;
+  const latest = runs?.[0] || null;
+  const canRun = hasPerm('runs:execute');
+
+  // ── Card 1: Latest run summary (only if we have one)
+  if (latest) {
+    const ok = latest.status === 'passed';
+    const hasReport = !!latest.report?.url;
+    const card = h('div', { class: 'card' });
+    card.appendChild(h('div', { class: 'card-head' },
+      h('h2', {}, 'Latest run'),
+      h('span', { class: 'tag ' + (ok ? 'ok' : 'err'), style: { marginLeft: '8px' } },
+        ok ? 'passed' : 'failed'),
+      h('span', { class: 'muted small', style: { marginLeft: '8px' } },
+        fmtDate(latest.startedAt) + ' · ' + fmtMs(latest.durationMs) +
+        (latest.startedBy ? ' · @' + latest.startedBy : '')),
+    ));
+    if (latest.errorMessage) {
+      card.appendChild(h('div', {
+        class: 'mono',
+        style: {
+          background: '#fff1f1', color: '#7a0010',
+          border: '1px solid #ffd0d0', borderRadius: '6px',
+          padding: '8px 10px', fontSize: '13px', whiteSpace: 'pre-wrap',
+          margin: '8px 0',
+        },
+      }, latest.errorMessage));
+    }
+    // Variables / Assertions / Downloads — surface the runSummary block the
+    // runner now writes to each record. Helps you see e.g. "A1 = 12,345.00,
+    // A2 = 12,345.00, comparison passed" without opening the report.
+    const rs = latest.runSummary;
+    if (rs && (Object.keys(rs.variables ?? {}).length || rs.assertions?.length || rs.downloads?.length)) {
+      const sumCard = h('div', { style: { margin: '8px 0', borderTop: '1px solid #eee', paddingTop: '8px' } });
+      const varEntries = Object.entries(rs.variables ?? {});
+      if (varEntries.length) {
+        sumCard.appendChild(h('div', { style: { marginBottom: '6px' } },
+          h('strong', {}, 'Captured variables: '),
+          h('span', { class: 'mono', style: { fontSize: '12px' } },
+            varEntries.map(([k, v]) => `${k} = ${String(v).slice(0, 80)}`).join(' · ')),
+        ));
+      }
+      if (rs.assertions?.length) {
+        const list = h('ul', { style: { margin: '4px 0 6px 18px', padding: 0, fontSize: '13px' } },
+          ...rs.assertions.map((a) => {
+            const op = a.operator ?? (a.equal ? '==' : '!=');
+            const passed = a.passed ?? a.equal;
+            return h('li', { class: 'mono', style: { color: passed ? '#0a7a0a' : '#7a0010' } },
+              (passed ? '✓ ' : '✗ ') + a.left + '=' + a.leftValue + ' ' + op + ' ' + a.right + '=' + a.rightValue);
+          }),
+        );
+        sumCard.appendChild(h('div', {}, h('strong', {}, 'Comparisons:'), list));
+      }
+      if (rs.downloads?.length) {
+        const list = h('ul', { style: { margin: '4px 0 6px 18px', padding: 0, fontSize: '13px' } },
+          ...rs.downloads.map((d) => h('li', { class: 'mono' },
+            d.fileName + ' (' + fmtBytes(d.sizeBytes) + ') · ' + d.filePath)),
+        );
+        sumCard.appendChild(h('div', {}, h('strong', {}, 'Downloads:'), list));
+      }
+      card.appendChild(sumCard);
+    }
+    if (latest.logTail?.length) {
+      card.appendChild(h('details', { style: { margin: '8px 0' } },
+        h('summary', { class: 'muted' }, 'Console tail (' + latest.logTail.length + ' lines)'),
+        h('pre', {
+          class: 'code-block',
+          style: { maxHeight: '300px', overflow: 'auto', fontSize: '12px', marginTop: '6px' },
+        }, latest.logTail.map((l) => (typeof l === 'string' ? l : l.line)).join('\n')),
+      ));
+    }
+    if (hasReport) {
+      card.appendChild(h('div', { class: 'row', style: { gap: '8px', marginTop: '8px' } },
+        h('a', { class: 'btn primary sm', href: reportPreviewUrl(latest.report.url), target: '_blank' },
+          'Open Midscene report ↗'),
+        h('a', { class: 'btn sm ghost', href: '#/cases/' + encodeURIComponent(caseId) + '/history' },
+          'Open History tab'),
+      ));
+      // Inline replay
+      card.appendChild(h('details', { style: { marginTop: '10px' } },
+        h('summary', { class: 'muted' }, 'Replay inline'),
+        h('div', { class: 'history-report-frame', style: { marginTop: '6px' } },
+          h('iframe', {
+            src: reportPreviewUrl(latest.report.url),
+            loading: 'lazy',
+            title: latest.report.name || 'report',
+            style: { width: '100%', height: '560px', border: '1px solid #ddd', borderRadius: '6px' },
+          }),
+        ),
+      ));
+    } else {
+      card.appendChild(h('div', { class: 'muted small', style: { marginTop: '8px' } },
+        'No Midscene report — the run failed before Midscene wrote one (typically: ' +
+        'browser launch error or missing MIDSCENE_MODEL_NAME in .env).'));
+    }
+    wrap.appendChild(card);
+  }
+
+  // ── Card 2: Run controls + step list
+  const runCard = h('div', { class: 'card' });
+  runCard.appendChild(h('div', { class: 'card-head' },
+    h('h2', {}, 'API guide steps'),
+    h('span', { class: 'muted small', style: { marginLeft: '8px' } },
+      stepCount ? stepCount + ' steps' : 'no apiGuide yet'),
+  ));
+
+  if (canRun) {
+    runCard.appendChild(h('div', { class: 'row', style: { gap: '8px', marginBottom: '10px' } },
+      h('button', {
+        class: 'btn primary',
+        disabled: !stepCount,
+        onClick: () => openJsRunModal(caseId, 'write'),
+      }, 'Run JS (write cache)'),
+      h('button', {
+        class: 'btn',
+        disabled: !stepCount,
+        onClick: () => openJsRunModal(caseId, 'read'),
+      }, 'Run JS w/ Cache (replay)'),
+      // Gen API only when the case has no apiGuide. Existing cases with
+      // apiGuide + cache don't need to "generate" anything.
+      hasPerm('cases:write') && !stepCount && h('button', {
+        class: 'btn ghost sm',
+        onClick: () => generateApiGuide(caseId),
+        title: 'This case has no apiGuide. Generate one from naturalLanguage (LLM call).',
+      }, 'Gen API'),
+    ));
+  }
+
+  if (!stepCount) {
+    runCard.appendChild(h('div', { class: 'muted' },
+      'This case has no apiGuide. Add one by editing the case JSON (Parameters tab) ' +
+      'or, once Gen API is wired up, click the Gen API button.'));
+  } else {
+    runCard.appendChild(h('ol', {
+      class: 'mono',
+      style: { fontSize: '12px', maxHeight: '420px', overflow: 'auto', paddingLeft: '24px', margin: 0 },
+    }, ...apiGuide.steps.map((s) => {
+      const actual = displayApiFromStep(s);
+      const planned = plannedApiTagIfDifferent(s);
+      return h('li', {
+        style: { marginBottom: '4px' },
+        title: planned ? `Runner evals exampleCode → agent.${actual}(). Step's midsceneApi field labels it ${planned}, but exampleCode was rewritten.` : '',
+      },
+        h('strong', {}, actual + ': '),
+        h('span', {}, s.title || s.naturalLanguageInstruction || ''),
+        planned && h('span', {
+          class: 'muted small',
+          style: { marginLeft: '6px', opacity: 0.65 },
+        }, '· planned ' + planned),
+        s.xpath && h('div', { class: 'muted small', style: { marginLeft: '8px' } }, 'xpath: ' + s.xpath),
+      );
+    })));
+  }
+  wrap.appendChild(runCard);
+
+  // ── Card 3: per-case cache files (list + delete). Lazy-loaded.
+  if (caseId) {
+    const cacheCard = h('div', { class: 'card' });
+    cacheCard.appendChild(h('div', { class: 'card-head' },
+      h('h2', {}, 'Cache files'),
+      h('span', { class: 'muted small', style: { marginLeft: '8px' } },
+        'midscene_run/cache/saptest-js-' + caseId.slice(0, 8) + '-…'),
+    ));
+    const cacheBody = h('div', { class: 'muted' }, 'Loading…');
+    cacheCard.appendChild(cacheBody);
+    wrap.appendChild(cacheCard);
+    loadCachePanel(caseId, cacheBody);
+  }
+
+  return wrap;
+}
+
+async function loadCachePanel(caseId, mountEl) {
+  let data;
+  try {
+    data = await api.get('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/cache');
+  } catch (e) {
+    mountEl.textContent = 'Failed to load cache list: ' + e.message;
+    return;
+  }
+  mountEl.innerHTML = '';
+  if (!data.files.length) {
+    mountEl.appendChild(h('div', { class: 'muted' },
+      'No cache files for this case. The next "Run JS" will record one to ' +
+      (data.currentCacheId ? 'saptest-js-' + data.currentCacheId.split('-').pop() + '.cache.yaml' : 'a new cacheId.')));
+    return;
+  }
+  const table = h('table', { class: 'tbl' },
+    h('thead', {}, h('tr', {},
+      h('th', {}, 'File'),
+      h('th', {}, 'Hash tail'),
+      h('th', {}, 'Size'),
+      h('th', {}, 'Modified'),
+      h('th', { class: 'actions' }, ''),
+    )),
+    h('tbody', {}, ...data.files.map((f) => {
+      const hashTail = f.cacheId.replace(/^saptest-js-.+?-/, '');
+      const row = h('tr', {},
+        h('td', { class: 'mono', style: { fontSize: '12px' } },
+          h('span', {}, f.name),
+          f.isCurrent && h('span', {
+            class: 'tag info',
+            style: { marginLeft: '6px', fontSize: '10px' },
+          }, 'CURRENT'),
+        ),
+        h('td', { class: 'mono', style: { fontSize: '12px' } }, hashTail),
+        h('td', { class: 'mono' }, fmtBytes(f.bytes)),
+        h('td', {}, fmtRel(f.modifiedAt)),
+        h('td', { class: 'actions' },
+          hasPerm('runs:execute') && h('button', {
+            class: 'btn danger sm',
+            onClick: async () => {
+              if (!confirm('Delete cache file "' + f.name + '"?')) return;
+              try {
+                await api.del('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/cache/' + encodeURIComponent(f.name));
+                toast('Cache file deleted', 'ok');
+                loadCachePanel(caseId, mountEl);
+              } catch (e) { toast(e.message, 'err'); }
+            },
+          }, 'Delete'),
+        ),
+      );
+      return row;
+    })),
+  );
+  mountEl.appendChild(table);
 }
 
 // ── History tab ──
@@ -2085,11 +2835,37 @@ function renderHistoryTab(caseId, runs) {
           class: 'btn sm ghost', href: reportPreviewUrl(r.report.url), target: '_blank',
         }, t('history.openReport')),
         ' ',
-        h('a', {
-          class: 'btn sm ghost',
-          href: '#/cases/' + encodeURIComponent(caseId) + '/runs/' + encodeURIComponent(r.runId),
-          style: { borderBottom: 'none' },
-        }, t('history.replayBtn')),
+        // Midscene JS runs (spec === null) get an in-process Rerun button that
+        // re-executes via /api/midscene-js/runs/:runId/rerun, preserving the
+        // original cacheMode + headed setting. Playwright runs keep their
+        // existing "view steps" deep-link behavior.
+        r.spec === null && r.mode === 'javascript' && hasPerm('runs:execute')
+          ? h('button', {
+              class: 'btn sm primary',
+              title: 'Re-run this case via Midscene JS (' + (r.useCache ? 'cached' : 'no cache') + ', ' + (r.headed ? 'headed' : 'headless') + ')',
+              onClick: async (ev) => {
+                ev.preventDefault();
+                const btn = ev.currentTarget;
+                btn.disabled = true; btn.textContent = 'rerunning…';
+                try {
+                  const out = await api.post('/api/midscene-js/runs/' + encodeURIComponent(r.runId) + '/rerun', {});
+                  toast(
+                    'Rerun ' + (out.run?.status ?? 'finished') + ' · ' + fmtMs(out.run?.durationMs ?? 0),
+                    out.ok ? 'ok' : 'err',
+                    4500,
+                  );
+                  render();
+                } catch (e) {
+                  toast(e.message, 'err');
+                  btn.disabled = false; btn.textContent = 'Rerun';
+                }
+              },
+            }, 'Rerun')
+          : h('a', {
+              class: 'btn sm ghost',
+              href: '#/cases/' + encodeURIComponent(caseId) + '/runs/' + encodeURIComponent(r.runId),
+              style: { borderBottom: 'none' },
+            }, t('history.replayBtn')),
         ' ',
         hasPerm('cases:delete') && h('button', {
           class: 'btn danger sm',
@@ -2433,3 +3209,278 @@ function stripBase(e) {
   const { ts, action, user, ip, ua, ...rest } = e;
   return rest;
 }
+
+// ──────────────────────────────────────────────────────────────────────────
+// Midscene JS pipeline UI (Generate API / Run JS / Run JS w/ Cache + active
+// runs badge). Talks to /api/midscene-js/* — see server/api/midscene-js.js.
+// ──────────────────────────────────────────────────────────────────────────
+
+async function generateApiGuide(caseId) {
+  toast('Generating API guide (本地规则拆分)…', 'info', 4000);
+  try {
+    const r = await api.post('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/api-guide');
+    const n = r?.apiGuide?.steps?.length ?? 0;
+    const w = r?.apiGuide?.warnings?.length ?? 0;
+    toast(`apiGuide saved · ${n} steps · ${w} warning${w === 1 ? '' : 's'}`, 'ok', 5000);
+    render();
+  } catch (e) {
+    toast(e.message, 'err', 7000);
+  }
+}
+
+async function openJsRunModal(caseId, cacheMode) {
+  let detail;
+  try {
+    detail = await api.get('/api/cases/' + encodeURIComponent(caseId));
+  } catch (e) {
+    return toast(e.message, 'err');
+  }
+  const parsed = detail.parsed ?? {};
+  const apiGuide = parsed.apiGuide;
+  if (!apiGuide?.steps?.length) {
+    return toast('Case has no apiGuide. Click "Gen API" first.', 'warn');
+  }
+
+  const headedChk = h('input', { type: 'checkbox', checked: true });
+  const consoleEl = h('pre', {
+    class: 'code-block',
+    style: { maxHeight: '200px', overflow: 'auto', margin: 0, fontSize: '12px' },
+  }, '(idle)');
+  const statusEl = h('div', { class: 'muted', style: { minHeight: '20px' } },
+    cacheMode === 'read' ? 'Will replay using existing cache (read-write).' : 'Will record fresh cache (write-only).');
+  const startBtn = h('button', { class: 'btn primary' },
+    cacheMode === 'read' ? 'Start (cached)' : 'Start (no cache)');
+  const abortBtn = h('button', { class: 'btn danger', disabled: true, title: 'Abort the in-flight run (closes browser handles)' }, 'Abort');
+  const reportLinkBox = h('div', { class: 'muted', style: { minHeight: '20px' } });
+
+  const stepsList = h('ol', { class: 'mono', style: { fontSize: '12px', maxHeight: '320px', overflow: 'auto', paddingLeft: '20px' } },
+    ...apiGuide.steps.map((s) => {
+      const actual = displayApiFromStep(s);
+      const planned = plannedApiTagIfDifferent(s);
+      return h('li', {
+        dataset: { stepOrder: String(s.order) },
+        title: planned ? `Runner evals exampleCode, which calls agent.${actual}(). LLM classified this as ${planned} but the exampleCode was rewritten.` : '',
+      },
+        h('strong', {}, actual + ': '),
+        h('span', {}, s.title || s.naturalLanguageInstruction || ''),
+        planned && h('span', {
+          class: 'muted small',
+          style: { marginLeft: '6px', opacity: 0.65 },
+        }, '· planned ' + planned),
+      );
+    }),
+  );
+
+  const m = modal({
+    title: 'JS run · ' + (parsed.title ?? caseId) + ' · cache=' + cacheMode,
+    wide: true,
+    body: h('div', {},
+      h('div', { class: 'field' },
+        h('span', {}, 'Run options'),
+        h('label', { class: 'row', style: { gap: '6px' } }, headedChk, h('span', {}, 'headed (show browser window)')),
+      ),
+      h('div', { class: 'field' }, h('span', {}, 'API guide steps (' + apiGuide.steps.length + ')'), stepsList),
+      h('div', { class: 'field' }, h('span', {}, 'Status'), statusEl),
+      h('div', { class: 'field' }, h('span', {}, 'Console (tail)'), consoleEl),
+      reportLinkBox,
+    ),
+    footer: h('div', { class: 'row', style: { marginLeft: 'auto', gap: '8px' } }, abortBtn, startBtn),
+  });
+
+  let activeRunId = null;
+  abortBtn.addEventListener('click', async () => {
+    if (!activeRunId) return;
+    abortBtn.disabled = true;
+    abortBtn.textContent = 'Aborting…';
+    try {
+      await api.post('/api/midscene-js/runs/' + encodeURIComponent(activeRunId) + '/abort');
+      toast('Abort signal sent', 'warn');
+    } catch (e) {
+      toast(e.message, 'err');
+      abortBtn.disabled = false;
+      abortBtn.textContent = 'Abort';
+    }
+  });
+
+  startBtn.addEventListener('click', async () => {
+    startBtn.disabled = true;
+    abortBtn.disabled = true;
+    abortBtn.textContent = 'Abort';
+    statusEl.textContent = 'Launching browser…';
+    consoleEl.textContent = '';
+    activeRunId = null;
+
+    let lastLogIdx = 0;
+    const pollHandle = setInterval(async () => {
+      try {
+        const r = await api.get('/api/midscene-js/runs/active');
+        const mine = r.active.find((a) => a.caseId === caseId);
+        if (!mine) return;
+        activeRunId = mine.runId;
+        abortBtn.disabled = false;
+        const step = mine.currentStep;
+        statusEl.textContent =
+          'Running — step ' + (step?.order ?? '?') + '/' + mine.totalSteps +
+          (step ? ` (${step.api}: ${truncForStatus(step.title, 50)})` : '') +
+          '  · ' + Math.round(mine.elapsedMs / 100) / 10 + 's elapsed';
+        // Highlight current step
+        for (const li of stepsList.children) {
+          li.style.background = li.dataset.stepOrder === String(step?.order ?? -1) ? 'rgba(80,140,255,0.18)' : '';
+        }
+        // Pull new log lines from logTail (server keeps last 200; we dedupe by idx)
+        const fresh = mine.logTail.slice(lastLogIdx);
+        if (fresh.length) {
+          consoleEl.textContent += (consoleEl.textContent ? '\n' : '') + fresh.map((l) => l.line).join('\n');
+          consoleEl.scrollTop = consoleEl.scrollHeight;
+          lastLogIdx = mine.logTail.length;
+        }
+      } catch { /* ignore poll errors */ }
+    }, 1500);
+
+    try {
+      const r = await api.post(
+        '/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/run?cache=' + encodeURIComponent(cacheMode),
+        { headed: headedChk.checked },
+      );
+      clearInterval(pollHandle);
+      const run = r.run;
+      statusEl.textContent =
+        (run.status === 'passed' ? 'PASSED ✓' : 'FAILED ✗') +
+        ' · ' + Math.round(run.durationMs / 100) / 10 + 's · ' +
+        (run.errorMessage || '');
+      // Append final logs
+      consoleEl.textContent = (run.logTail ?? []).map((l) => l.line).join('\n');
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+      if (run.report?.url) {
+        reportLinkBox.appendChild(h('a', {
+          href: run.report.url, target: '_blank',
+          style: { color: 'var(--accent)' },
+        }, 'Open Midscene report ↗'));
+      }
+      toast(run.status === 'passed' ? 'Run passed' : 'Run failed', run.status === 'passed' ? 'ok' : 'err');
+    } catch (e) {
+      clearInterval(pollHandle);
+      statusEl.textContent = 'ERROR: ' + e.message;
+      toast(e.message, 'err');
+    } finally {
+      startBtn.disabled = false;
+      startBtn.textContent = 'Run again';
+      abortBtn.disabled = true;
+      abortBtn.textContent = 'Abort';
+      activeRunId = null;
+    }
+  });
+}
+
+function truncForStatus(s, n) {
+  if (!s) return '';
+  return s.length <= n ? s : s.slice(0, n) + '…';
+}
+
+// What the runner ACTUALLY calls when it evals step.exampleCode. Distinct
+// from step.midsceneApi (the LLM's classification label). For "最X端" scroll
+// instructions, the LLM tags them aiScroll but Desktop's
+// formatAiScrollExampleCode rewrites exampleCode to agent.aiAct(...拖滑块)
+// because nontrivial scroll on SAP tables doesn't respond to plain aiScroll.
+// The runner evals exampleCode → aiAct is what hits the browser.
+function displayApiFromStep(step) {
+  const code = String(step?.exampleCode ?? '');
+  const m = code.match(/\bagent\.(ai[A-Za-z]+|recordToReport)\b/);
+  if (m) return m[1];
+  if (/^\s*await\s+sleep\(/.test(code)) return 'sleep';
+  if (/openNewTab\(/.test(code)) return 'openNewTab';
+  return String(step?.midsceneApi ?? '').replace(/^agent\.|\(\)$/g, '') || 'aiTap';
+}
+
+// Returns the planned (label) name only if it differs from the actual.
+// Use when you want to disclose the LLM's classification next to the truth.
+function plannedApiTagIfDifferent(step) {
+  const actual = displayApiFromStep(step);
+  const planned = String(step?.midsceneApi ?? '').replace(/^agent\.|\(\)$/g, '');
+  return planned && planned !== actual ? planned : '';
+}
+
+// ── Active-runs badge in the bottom-right corner. Auto-shows when at least
+// one Midscene JS run is in flight, hidden otherwise. Polls every 2s.
+function ensureActiveBadge() {
+  let badge = document.getElementById('midscene-active-badge');
+  if (!badge) {
+    badge = h('div', {
+      id: 'midscene-active-badge',
+      style: {
+        position: 'fixed', bottom: '14px', right: '14px', zIndex: 9000,
+        background: '#111', color: '#fff', padding: '8px 12px',
+        borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 14px rgba(0,0,0,0.35)',
+        display: 'none', maxWidth: '420px',
+      },
+    });
+    document.body.appendChild(badge);
+  }
+  return badge;
+}
+
+async function pollActiveRuns() {
+  const badge = ensureActiveBadge();
+  try {
+    const r = await api.get('/api/midscene-js/runs/active');
+    if (!r.active.length) {
+      badge.style.display = 'none';
+      return;
+    }
+    badge.style.display = '';
+    badge.innerHTML = '';
+    badge.appendChild(h('div', { style: { fontWeight: 'bold', marginBottom: '4px' } },
+      `${r.active.length} Midscene JS run${r.active.length > 1 ? 's' : ''} active`));
+    for (const a of r.active) {
+      const step = a.currentStep;
+      const elapsedS = Math.round(a.elapsedMs / 100) / 10;
+      const abortBtn = h('button', {
+        style: {
+          background: a.aborted ? '#555' : '#b3261e',
+          color: '#fff', border: 0, borderRadius: '4px',
+          padding: '2px 8px', fontSize: '11px',
+          cursor: a.aborted ? 'default' : 'pointer',
+        },
+        disabled: !!a.aborted,
+      }, a.aborted ? 'aborting…' : 'Abort');
+      abortBtn.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        abortBtn.disabled = true;
+        abortBtn.textContent = 'aborting…';
+        try {
+          await api.post('/api/midscene-js/runs/' + encodeURIComponent(a.runId) + '/abort');
+          toast('Abort signal sent for ' + (a.caseTitle || a.caseId), 'warn');
+        } catch (e) {
+          toast(e.message, 'err');
+          abortBtn.disabled = false;
+          abortBtn.textContent = 'Abort';
+        }
+      });
+      badge.appendChild(h('div', { style: { marginTop: '4px', borderTop: '1px solid #333', paddingTop: '4px' } },
+        h('div', { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
+          h('span', { style: { flex: 1 } }, (a.caseTitle || a.caseId) + ' · ' + elapsedS + 's'),
+          abortBtn,
+        ),
+        h('div', { style: { opacity: 0.75 } },
+          step ? `step ${step.order}/${a.totalSteps} · ${step.api}: ${truncForStatus(step.title, 38)}`
+               : '(launching…)'),
+      ));
+    }
+  } catch { /* swallow; badge stays as last state */ }
+}
+
+function startActiveRunsPoller() {
+  if (window.__midsceneActivePollerStarted) return;
+  window.__midsceneActivePollerStarted = true;
+  pollActiveRuns();
+  setInterval(pollActiveRuns, 2000);
+}
+
+// Kick the poller off when the SPA boots (after auth/render lifecycle is up).
+// The auth gate hides the SPA until logged in; until then the badge stays
+// hidden because the /api/midscene-js/runs/active endpoint requires auth.
+window.addEventListener('load', () => {
+  setTimeout(startActiveRunsPoller, 600);
+});
+
+

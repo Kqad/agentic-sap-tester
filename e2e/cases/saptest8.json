@@ -1,0 +1,209 @@
+{
+  "$schema": "SAP TEST 8 — consolidated from Desktop SQLite + original SAP test 8 自然语言+JS.txt",
+  "title": "SAP TEST 8",
+  "description": "PSL_CT_B2P_PE_GUI_FI line item reports additional fields (Row 12)",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "FB03L",
+  "naturalLanguage": "1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FB03L，点击execute。\n2. 在fiscal year输入2026，在company code输入8540，在document number输入1700000299，点击continue\n3. 点击change layout图标 xpath=//*[@id=\"_MB_VARIANT117\"]\n4.点击右边栏目column set下面的搜索，在search term输入Reference Key，点击ok，点击×，点击向左的箭头，点击Reference Key 2，点击向左的箭头，点击对勾\n5. 将页面滑到最右边，如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功\n",
+  "jsSource": "async function run(agent) {\r\n  await agent.aiTap(\"进入 Menu\");\r\n  await agent.aiTap(\"点击setting\");\r\n  await agent.aiTap(\"点击visualization\");\r\n  await agent.aiTap(\"启用show Ok code field\");\r\n  await agent.aiTap(\"保存\");\r\n  await agent.aiInput(\"左上角矩形\", { value: \"FB03L\" });\r\n  await agent.aiTap(\"点击 Execute 按钮执行查询\");\r\n  await agent.aiInput(\"fiscal year\", { value: \"2026\" });\r\n  await agent.aiInput(\"company code\", { value: \"8540\" });\r\n  await agent.aiInput(\"document number\", { value: \"1700000299\" });\r\n  await agent.aiTap(\"点击continue\");\r\n  await agent.aiTap(\"点击change layout图标\", { xpath: \"//*[@id=\\\"_MB_VARIANT117\\\"]\" });\r\n  await agent.aiTap(\"点击右边栏目column set下面的搜索\");\r\n  await agent.aiInput(\"search term\", { value: \"Reference Key\" });\r\n  await agent.aiTap(\"点击ok\");\r\n  await agent.aiTap(\"点击×\");\r\n  await agent.aiTap(\"点击向左的箭头\");\r\n  await agent.aiTap(\"点击Reference Key 2\");\r\n  await agent.aiTap(\"点击向左的箭头\");\r\n  await agent.aiTap(\"点击对勾\");\r\n  await agent.aiAct(\"按住底部的横向滚动条的滑块，拖到最右端\");\r\n  await agent.aiAssert(\"如果能同时看到reference key 1和reference key 2 测试用例即成功\");\r\n}",
+  "apiGuide": {
+    "summary": "SAP TEST 8",
+    "assumptions": [
+      "从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");"
+      },
+      {
+        "order": 2,
+        "title": "点击setting",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击setting",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击setting\");"
+      },
+      {
+        "order": 3,
+        "title": "点击visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击visualization",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击visualization\");"
+      },
+      {
+        "order": 4,
+        "title": "启用show Ok code field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用show Ok code field",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"启用show Ok code field\");"
+      },
+      {
+        "order": 5,
+        "title": "保存",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"保存\");"
+      },
+      {
+        "order": 6,
+        "title": "在左上角矩形输入框输入FB03L",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在左上角矩形输入框输入FB03L",
+        "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"FB03L\" });"
+      },
+      {
+        "order": 7,
+        "title": "点击 Execute 按钮执行查询",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Execute 按钮执行查询",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Execute 按钮执行查询\");"
+      },
+      {
+        "order": 8,
+        "title": "在fiscal year输入2026",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在fiscal year输入2026",
+        "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"fiscal year\", { value: \"2026\" });"
+      },
+      {
+        "order": 9,
+        "title": "在 company code 字段 输入 8540",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 company code 字段 输入 8540",
+        "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"company code\", { value: \"8540\" });"
+      },
+      {
+        "order": 10,
+        "title": "在document number输入1700000299",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在document number输入1700000299",
+        "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"document number\", { value: \"1700000299\" });"
+      },
+      {
+        "order": 11,
+        "title": "点击continue",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击continue",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击continue\");"
+      },
+      {
+        "order": 12,
+        "title": "点击change layout图标 xpath=//*[...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击change layout图标 xpath=//*[@id=\"_MB_VARIANT117\"]",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击change layout图标\", { xpath: \"//*[@id=\\\"_MB_VARIANT117\\\"]\" });"
+      },
+      {
+        "order": 13,
+        "title": "点击右边栏目column set下面的搜索",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击右边栏目column set下面的搜索",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击右边栏目column set下面的搜索\");"
+      },
+      {
+        "order": 14,
+        "title": "在search term输入Reference Key",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在search term输入Reference Key",
+        "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"search term\", { value: \"Reference Key\" });"
+      },
+      {
+        "order": 15,
+        "title": "点击ok",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击ok",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击ok\");"
+      },
+      {
+        "order": 16,
+        "title": "点击×",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击×",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击×\");"
+      },
+      {
+        "order": 17,
+        "title": "点击向左的箭头",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击向左的箭头",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击向左的箭头\");"
+      },
+      {
+        "order": 18,
+        "title": "点击Reference Key 2",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击Reference Key 2",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击Reference Key 2\");"
+      },
+      {
+        "order": 19,
+        "title": "点击向左的箭头",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击向左的箭头",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击向左的箭头\");"
+      },
+      {
+        "order": 20,
+        "title": "点击对勾",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击对勾",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击对勾\");"
+      },
+      {
+        "order": 21,
+        "title": "将页面滑到最右边",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "将页面滑到最右边",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiAct(\"按住底部的横向滚动条的滑块，拖到最右端\");"
+      },
+      {
+        "order": 22,
+        "title": "如果能同时看到表格栏目里有reference key 1...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功",
+        "reason": "这是结果校验或变量比较，适合使用断言 API 判断测试是否通过。",
+        "exampleCode": "await agent.aiAssert(\"如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功\");"
+      }
+    ],
+    "recommendedYamlSnippet": "web:\n  url: https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\nagent:\n  generateReport: true\ntasks:\n  - name: SAP TEST 8\n    flow:\n      - ai: 进入 Menu\n      - ai: 点击setting\n      - ai: 点击visualization\n      - ai: 启用show Ok code field\n      - ai: 保存\n      - aiInput:\n          locate: 左上角矩形\n          value: FB03L\n      - ai: 点击 Execute 按钮执行查询\n      - aiInput:\n          locate: fiscal year\n          value: \"2026\"\n      - aiInput:\n          locate: company code\n          value: \"8540\"\n      - aiInput:\n          locate: document number\n          value: \"1700000299\"\n      - ai: 点击continue\n      - ai: 点击change layout图标 xpath=//*[@id=\"_MB_VARIANT117\"]\n      - ai: 点击右边栏目column set下面的搜索\n      - aiInput:\n          locate: search term\n          value: Reference Key\n      - ai: 点击ok\n      - ai: 点击×\n      - ai: 点击向左的箭头\n      - ai: 点击Reference Key 2\n      - ai: 点击向左的箭头\n      - ai: 点击对勾\n      - ai: 将页面滑到最右边\n      - aiAssert: 如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功\n",
+    "docReferences": [],
+    "warnings": [
+      "已按配置跳过 LLM，直接使用本地规则生成 API 步骤指南。原因：local-only API guide mode",
+      "本地规则只做关键字拆分，执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+    ],
+    "markdown": "## SAP TEST 8\n\n### 前提假设\n- 从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。\n\n### API 步骤\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - 指令: 进入 Menu\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"进入 Menu\");`\n2. 点击setting\n   - API: `agent.aiTap()`\n   - 指令: 点击setting\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击setting\");`\n3. 点击visualization\n   - API: `agent.aiTap()`\n   - 指令: 点击visualization\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击visualization\");`\n4. 启用show Ok code field\n   - API: `agent.aiTap()`\n   - 指令: 启用show Ok code field\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"启用show Ok code field\");`\n5. 保存\n   - API: `agent.aiTap()`\n   - 指令: 保存\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"保存\");`\n6. 在左上角矩形输入框输入FB03L\n   - API: `agent.aiInput()`\n   - 指令: 在左上角矩形输入框输入FB03L\n   - 原因: 这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。\n   - 示例: `await agent.aiInput(\"左上角矩形\", { value: \"FB03L\" });`\n7. 点击 Execute 按钮执行查询\n   - API: `agent.aiTap()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击 Execute 按钮执行查询\");`\n8. 在fiscal year输入2026\n   - API: `agent.aiInput()`\n   - 指令: 在fiscal year输入2026\n   - 原因: 这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。\n   - 示例: `await agent.aiInput(\"fiscal year\", { value: \"2026\" });`\n9. 在 company code 字段 输入 8540\n   - API: `agent.aiInput()`\n   - 指令: 在 company code 字段 输入 8540\n   - 原因: 这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。\n   - 示例: `await agent.aiInput(\"company code\", { value: \"8540\" });`\n10. 在document number输入1700000299\n   - API: `agent.aiInput()`\n   - 指令: 在document number输入1700000299\n   - 原因: 这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。\n   - 示例: `await agent.aiInput(\"document number\", { value: \"1700000299\" });`\n11. 点击continue\n   - API: `agent.aiTap()`\n   - 指令: 点击continue\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击continue\");`\n12. 点击change layout图标 xpath=//*[...\n   - API: `agent.aiTap()`\n   - 指令: 点击change layout图标 xpath=//*[@id=\"_MB_VARIANT117\"]\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击change layout图标\", { xpath: \"//*[@id=\\\"_MB_VARIANT117\\\"]\" });`\n13. 点击右边栏目column set下面的搜索\n   - API: `agent.aiTap()`\n   - 指令: 点击右边栏目column set下面的搜索\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击右边栏目column set下面的搜索\");`\n14. 在search term输入Reference Key\n   - API: `agent.aiInput()`\n   - 指令: 在search term输入Reference Key\n   - 原因: 这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。\n   - 示例: `await agent.aiInput(\"search term\", { value: \"Reference Key\" });`\n15. 点击ok\n   - API: `agent.aiTap()`\n   - 指令: 点击ok\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击ok\");`\n16. 点击×\n   - API: `agent.aiTap()`\n   - 指令: 点击×\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击×\");`\n17. 点击向左的箭头\n   - API: `agent.aiTap()`\n   - 指令: 点击向左的箭头\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击向左的箭头\");`\n18. 点击Reference Key 2\n   - API: `agent.aiTap()`\n   - 指令: 点击Reference Key 2\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击Reference Key 2\");`\n19. 点击向左的箭头\n   - API: `agent.aiTap()`\n   - 指令: 点击向左的箭头\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击向左的箭头\");`\n20. 点击对勾\n   - API: `agent.aiTap()`\n   - 指令: 点击对勾\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击对勾\");`\n21. 将页面滑到最右边\n   - API: `agent.aiTap()`\n   - 指令: 将页面滑到最右边\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiAct(\"按住底部的横向滚动条的滑块，拖到最右端\");`\n22. 如果能同时看到表格栏目里有reference key 1...\n   - API: `agent.aiAssert()`\n   - 指令: 如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功\n   - 原因: 这是结果校验或变量比较，适合使用断言 API 判断测试是否通过。\n   - 示例: `await agent.aiAssert(\"如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功\");`\n\n### YAML 参考\n```yaml\nweb:\n  url: https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\nagent:\n  generateReport: true\ntasks:\n  - name: SAP TEST 8\n    flow:\n      - ai: 进入 Menu\n      - ai: 点击setting\n      - ai: 点击visualization\n      - ai: 启用show Ok code field\n      - ai: 保存\n      - aiInput:\n          locate: 左上角矩形\n          value: FB03L\n      - ai: 点击 Execute 按钮执行查询\n      - aiInput:\n          locate: fiscal year\n          value: \"2026\"\n      - aiInput:\n          locate: company code\n          value: \"8540\"\n      - aiInput:\n          locate: document number\n          value: \"1700000299\"\n      - ai: 点击continue\n      - ai: 点击change layout图标 xpath=//*[@id=\"_MB_VARIANT117\"]\n      - ai: 点击右边栏目column set下面的搜索\n      - aiInput:\n          locate: search term\n          value: Reference Key\n      - ai: 点击ok\n      - ai: 点击×\n      - ai: 点击向左的箭头\n      - ai: 点击Reference Key 2\n      - ai: 点击向左的箭头\n      - ai: 点击对勾\n      - ai: 将页面滑到最右边\n      - aiAssert: 如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功\n\n```\n\n### 注意事项\n- 已按配置跳过 LLM，直接使用本地规则生成 API 步骤指南。原因：local-only API guide mode\n- 本地规则只做关键字拆分，执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+  },
+  "apiGuideNaturalLanguage": "1.进入 Menu， 点击setting， 点击visualization 并启用show Ok code field,  并保存。在左上角矩形输入框输入FB03L，点击execute。\n2. 在fiscal year输入2026，在company code输入8540，在document number输入1700000299，点击continue\n3. 点击change layout图标 xpath=//*[@id=\"_MB_VARIANT117\"]\n4.点击右边栏目column set下面的搜索，在search term输入Reference Key，点击ok，点击×，点击向左的箭头，点击Reference Key 2，点击向左的箭头，点击对勾\n5. 将页面滑到最右边，如果能同时看到表格栏目里有reference key 1和reference key 2列 测试用例即成功",
+  "yamlScript": "",
+  "tags": [],
+  "source": {
+    "desktop": true,
+    "desktopCaseId": "b9c06614-b7b5-4130-8535-41d67fad7f1f",
+    "consolidatedAt": "2026-05-25T10:40:49.346Z",
+    "txtSource": "SAP TEST DEMO 5.21 1/SAP TEST DEMO 5.21/SAP test 8 自然语言+JS.txt"
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "$schema": "SAP TEST 2 — consolidated from Desktop SQLite + original SAP test 2 自然语言+JS.txt",
+  "title": "SAP TEST 2",
+  "description": "Manage Accounts payable Reports & Analytics Row 20/21 (20: All item / 21: Open Items as key dates)\n\nAccounts payable operational reports and analytics are essential for monitoring and analyzing the financial performance . These reports and analytics provide valuable insights into the efficiency and effectiveness of the AP process, as well as the overall financial health of the organization.",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "S_ALR_87012083",
+  "naturalLanguage": "1.进入 Menu，  点击setting，点击visualization 并启用show Ok code field, 并保存。\n2.在 矩形输入框 输入 S_ALR_87012083，点击右下角execute\n3. company code输入85401，点击execute\n4. 点击menu，点击system，点击list，点击save，点击新跳出来的框里的save，点击spreadsheet，点击continue，点击export to，点击ok \n5.页面底部显示绿色√符号加download xxx文件即为成功",
+  "jsSource": "async function run(agent) {\r\n  await agent.aiTap(\"进入 Menu\");\r\n  await agent.aiTap(\"点击setting\");\r\n  await agent.aiTap(\"点击visualization\");\r\n  await agent.aiTap(\"启用show Ok code field\");\r\n  await agent.aiTap(\"保存\");\r\n  await agent.aiInput(\"矩形\", { value: \"S_ALR_87012083\" });\r\n  await agent.aiTap(\"点击右下角execute\");\r\n  await agent.aiInput(\"company code\", { value: \"8540\" });\r\n  await agent.aiTap(\"点击 Execute 按钮执行查询\");\r\n  await agent.aiTap(\"点击menu\");\r\n  await agent.aiTap(\"点击system\");\r\n  await agent.aiTap(\"点击list\");\r\n  await agent.aiTap(\"点击save\");\r\n  await agent.aiTap(\"点击新跳出来的框里的save\");\r\n  await agent.aiTap(\"点击spreadsheet\");\r\n  await agent.aiTap(\"点击continue\");\r\n  await agent.aiTap(\"点击export to\");\r\n  await agent.aiTap(\"点击ok\");\r\n  await agent.aiAssert(\"页面底部显示绿色√符号加download xxx文件即为成功\");\r\n}",
+  "apiGuide": {
+    "summary": "SAP TEST 2",
+    "assumptions": [
+      "从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");"
+      },
+      {
+        "order": 2,
+        "title": "点击setting",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击setting",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击setting\");"
+      },
+      {
+        "order": 3,
+        "title": "点击visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击visualization",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击visualization\");"
+      },
+      {
+        "order": 4,
+        "title": "启用show Ok code field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用show Ok code field",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"启用show Ok code field\");"
+      },
+      {
+        "order": 5,
+        "title": "保存",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"保存\");"
+      },
+      {
+        "order": 6,
+        "title": "在 矩形输入框 输入 S_ALR_87012083",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 矩形输入框 输入 S_ALR_87012083",
+        "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"矩形\", { value: \"S_ALR_87012083\" });"
+      },
+      {
+        "order": 7,
+        "title": "点击右下角execute",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击右下角execute",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击右下角execute\");"
+      },
+      {
+        "order": 8,
+        "title": "在 company code 字段 输入 8540",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 company code 字段 输入 8540",
+        "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"company code\", { value: \"8540\" });"
+      },
+      {
+        "order": 9,
+        "title": "点击 Execute 按钮执行查询",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Execute 按钮执行查询",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Execute 按钮执行查询\");"
+      },
+      {
+        "order": 10,
+        "title": "点击menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击menu",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击menu\");"
+      },
+      {
+        "order": 11,
+        "title": "点击system",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击system",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击system\");"
+      },
+      {
+        "order": 12,
+        "title": "点击list",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击list",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击list\");"
+      },
+      {
+        "order": 13,
+        "title": "点击save",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击save",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击save\");"
+      },
+      {
+        "order": 14,
+        "title": "点击新跳出来的框里的save",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击新跳出来的框里的save",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击新跳出来的框里的save\");"
+      },
+      {
+        "order": 15,
+        "title": "点击spreadsheet",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击spreadsheet",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击spreadsheet\");"
+      },
+      {
+        "order": 16,
+        "title": "点击continue",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击continue",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击continue\");"
+      },
+      {
+        "order": 17,
+        "title": "点击export to",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击export to",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击export to\");"
+      },
+      {
+        "order": 18,
+        "title": "点击ok",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击ok",
+        "reason": "这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。",
+        "exampleCode": "await agent.aiTap(\"点击ok\");"
+      },
+      {
+        "order": 19,
+        "title": "页面底部显示绿色√符号加download xxx文件即为...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "页面底部显示绿色√符号加download xxx文件即为成功",
+        "reason": "这是结果校验或变量比较，适合使用断言 API 判断测试是否通过。",
+        "exampleCode": "await agent.aiAssert(\"页面底部显示绿色√符号加download xxx文件即为成功\");"
+      }
+    ],
+    "recommendedYamlSnippet": "web:\n  url: https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\nagent:\n  generateReport: true\ntasks:\n  - name: SAP TEST 2\n    flow:\n      - ai: 进入 Menu\n      - ai: 点击setting\n      - ai: 点击visualization\n      - ai: 启用show Ok code field\n      - ai: 保存\n      - aiInput:\n          locate: 矩形\n          value: S_ALR_87012083\n      - ai: 点击右下角execute\n      - aiInput:\n          locate: company code\n          value: \"8540\"\n      - ai: 点击 Execute 按钮执行查询\n      - ai: 点击menu\n      - ai: 点击system\n      - ai: 点击list\n      - ai: 点击save\n      - ai: 点击新跳出来的框里的save\n      - ai: 点击spreadsheet\n      - ai: 点击continue\n      - ai: 点击export to\n      - ai: 点击ok\n      - aiAssert: 页面底部显示绿色√符号加download xxx文件即为成功\n",
+    "docReferences": [],
+    "warnings": [
+      "已按配置跳过 LLM，直接使用本地规则生成 API 步骤指南。原因：local-only API guide mode",
+      "本地规则只做关键字拆分，执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+    ],
+    "markdown": "## SAP TEST 2\n\n### 前提假设\n- 从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。\n\n### API 步骤\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - 指令: 进入 Menu\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"进入 Menu\");`\n2. 点击setting\n   - API: `agent.aiTap()`\n   - 指令: 点击setting\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击setting\");`\n3. 点击visualization\n   - API: `agent.aiTap()`\n   - 指令: 点击visualization\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击visualization\");`\n4. 启用show Ok code field\n   - API: `agent.aiTap()`\n   - 指令: 启用show Ok code field\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"启用show Ok code field\");`\n5. 保存\n   - API: `agent.aiTap()`\n   - 指令: 保存\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"保存\");`\n6. 在 矩形输入框 输入 S_ALR_87012083\n   - API: `agent.aiInput()`\n   - 指令: 在 矩形输入框 输入 S_ALR_87012083\n   - 原因: 这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。\n   - 示例: `await agent.aiInput(\"矩形\", { value: \"S_ALR_87012083\" });`\n7. 点击右下角execute\n   - API: `agent.aiTap()`\n   - 指令: 点击右下角execute\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击右下角execute\");`\n8. 在 company code 字段 输入 8540\n   - API: `agent.aiInput()`\n   - 指令: 在 company code 字段 输入 8540\n   - 原因: 这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。\n   - 示例: `await agent.aiInput(\"company code\", { value: \"8540\" });`\n9. 点击 Execute 按钮执行查询\n   - API: `agent.aiTap()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击 Execute 按钮执行查询\");`\n10. 点击menu\n   - API: `agent.aiTap()`\n   - 指令: 点击menu\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击menu\");`\n11. 点击system\n   - API: `agent.aiTap()`\n   - 指令: 点击system\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击system\");`\n12. 点击list\n   - API: `agent.aiTap()`\n   - 指令: 点击list\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击list\");`\n13. 点击save\n   - API: `agent.aiTap()`\n   - 指令: 点击save\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击save\");`\n14. 点击新跳出来的框里的save\n   - API: `agent.aiTap()`\n   - 指令: 点击新跳出来的框里的save\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击新跳出来的框里的save\");`\n15. 点击spreadsheet\n   - API: `agent.aiTap()`\n   - 指令: 点击spreadsheet\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击spreadsheet\");`\n16. 点击continue\n   - API: `agent.aiTap()`\n   - 指令: 点击continue\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击continue\");`\n17. 点击export to\n   - API: `agent.aiTap()`\n   - 指令: 点击export to\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击export to\");`\n18. 点击ok\n   - API: `agent.aiTap()`\n   - 指令: 点击ok\n   - 原因: 这是点击菜单、按钮或复选框的界面动作，适合使用点击/动作 API。\n   - 示例: `await agent.aiTap(\"点击ok\");`\n19. 页面底部显示绿色√符号加download xxx文件即为...\n   - API: `agent.aiAssert()`\n   - 指令: 页面底部显示绿色√符号加download xxx文件即为成功\n   - 原因: 这是结果校验或变量比较，适合使用断言 API 判断测试是否通过。\n   - 示例: `await agent.aiAssert(\"页面底部显示绿色√符号加download xxx文件即为成功\");`\n\n### YAML 参考\n```yaml\nweb:\n  url: https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\nagent:\n  generateReport: true\ntasks:\n  - name: SAP TEST 2\n    flow:\n      - ai: 进入 Menu\n      - ai: 点击setting\n      - ai: 点击visualization\n      - ai: 启用show Ok code field\n      - ai: 保存\n      - aiInput:\n          locate: 矩形\n          value: S_ALR_87012083\n      - ai: 点击右下角execute\n      - aiInput:\n          locate: company code\n          value: \"8540\"\n      - ai: 点击 Execute 按钮执行查询\n      - ai: 点击menu\n      - ai: 点击system\n      - ai: 点击list\n      - ai: 点击save\n      - ai: 点击新跳出来的框里的save\n      - ai: 点击spreadsheet\n      - ai: 点击continue\n      - ai: 点击export to\n      - ai: 点击ok\n      - aiAssert: 页面底部显示绿色√符号加download xxx文件即为成功\n\n```\n\n### 注意事项\n- 已按配置跳过 LLM，直接使用本地规则生成 API 步骤指南。原因：local-only API guide mode\n- 本地规则只做关键字拆分，执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+  },
+  "apiGuideNaturalLanguage": "1.进入 Menu，  点击setting，点击visualization 并启用show Ok code field, 并保存。\n2.在 矩形输入框 输入 S_ALR_87012083，点击右下角execute\n3. company code输入8540，点击execute\n4. 点击menu，点击system，点击list，点击save，点击新跳出来的框里的save，点击spreadsheet，点击continue，点击export to，点击ok \n5.页面底部显示绿色√符号加download xxx文件即为成功",
+  "yamlScript": "",
+  "tags": [],
+  "source": {
+    "desktop": true,
+    "desktopCaseId": "9b88a948-cac3-42ea-89e2-463ec17060ae",
+    "consolidatedAt": "2026-05-25T10:40:49.340Z",
+    "txtSource": "SAP TEST DEMO 5.21 1/SAP TEST DEMO 5.21/SAP test 2 自然语言+JS.txt"
+  }
+}

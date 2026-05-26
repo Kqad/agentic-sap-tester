@@ -28,6 +28,7 @@ import generateRouter from './api/generate.js';
 import usersRouter from './api/users.js';
 import auditRouter from './api/audit.js';
 import { mountRunRouter, registerRunWebsocket } from './api/run.js';
+import midsceneJsRouter from './api/midscene-js.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -59,6 +60,7 @@ app.use('/api/generate', generateRouter);
 app.use('/api/users',    usersRouter);
 app.use('/api/audit',    auditRouter);
 mountRunRouter(app);
+app.use('/api/midscene-js', midsceneJsRouter);
 
 // Midscene HTML reports. NOTE: anyone with a valid session can read these
 // via the SPA; we don't gate /reports here to keep iframe embedding simple,
