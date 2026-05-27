@@ -978,15 +978,95 @@ function reportPreviewUrl(url) {
   return `${url}${sep}theme=${theme}`;
 }
 
+// Auto-follow the active task-row inside a Midscene report iframe. Injects
+// a highlight stylesheet, then MutationObserver-watches .task-row class
+// changes and scrollIntoView({block:'center'}) the .playing/.selected row.
+// Ported from Desktop\saptest\src\components\replay-report-frame.tsx (just
+// the highlight-follow half — translation logic left out). Same-origin
+// iframe so contentDocument is reachable.
+const ACTIVE_ROW_STYLE_ID = 'saptest-active-row-style';
+const ACTIVE_ROW_STYLE_CSS = `
+.task-row.playing,
+.task-row.selected,
+li.task-row.playing,
+li.task-row.selected {
+  background-color: #facc15 !important;
+  border-left: 6px solid #b45309 !important;
+  box-shadow: 0 4px 14px rgba(202, 138, 4, 0.45) !important;
+  color: #1f2937 !important;
+  scroll-margin-top: 80px;
+  scroll-margin-bottom: 80px;
+  padding-left: 12px !important;
+}
+.task-row.playing *,
+.task-row.selected * {
+  color: #1f2937 !important;
+}
+`;
+
+function attachReportFollowHighlight(iframe) {
+  let observer = null;
+  let rafId = null;
+
+  const scrollActive = () => {
+    rafId = null;
+    const doc = iframe.contentDocument;
+    if (!doc?.body) return;
+    const active = doc.querySelector('.task-row.playing')
+      ?? doc.querySelector('.task-row.selected');
+    if (!active) return;
+    try { active.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    catch { active.scrollIntoView(); }
+  };
+
+  const requestScroll = () => {
+    const win = iframe.contentWindow;
+    if (!win || rafId !== null) return;
+    rafId = win.requestAnimationFrame(scrollActive);
+  };
+
+  const setup = () => {
+    const doc = iframe.contentDocument;
+    if (!doc?.body) return;
+
+    if (!doc.getElementById(ACTIVE_ROW_STYLE_ID)) {
+      const style = doc.createElement('style');
+      style.id = ACTIVE_ROW_STYLE_ID;
+      style.textContent = ACTIVE_ROW_STYLE_CSS;
+      (doc.head ?? doc.body).appendChild(style);
+    }
+
+    if (!observer) {
+      observer = new MutationObserver((records) => {
+        for (const r of records) {
+          if (r.type !== 'attributes' || r.attributeName !== 'class') continue;
+          if (r.target.classList?.contains('task-row')) {
+            requestScroll();
+            return;
+          }
+        }
+      });
+      observer.observe(doc.body, {
+        attributes: true,
+        attributeFilter: ['class'],
+        subtree: true,
+      });
+      requestScroll();
+    }
+  };
+
+  iframe.addEventListener('load', setup);
+  // Cover the case where contentDocument is already ready (cached load).
+  setup();
+}
+
 function openReportModal(report) {
-  modal({
-    title: report.name,
-    wide: true,
-    body: h('iframe', {
-      src: reportPreviewUrl(report.url),
-      style: { width: '100%', height: 'calc(80vh - 110px)', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius-md)', background: 'hsl(var(--background))' },
-    }),
+  const frame = h('iframe', {
+    src: reportPreviewUrl(report.url),
+    style: { width: '100%', height: 'calc(80vh - 110px)', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius-md)', background: 'hsl(var(--background))' },
   });
+  attachReportFollowHighlight(frame);
+  modal({ title: report.name, wide: true, body: frame });
 }
 
 // ───────── View: Test Cases (list) ─────────
@@ -2696,16 +2776,16 @@ function renderMidsceneJsTab(caseData, runs) {
           'Open History tab'),
       ));
       // Inline replay
+      const inlineFrame = h('iframe', {
+        src: reportPreviewUrl(latest.report.url),
+        loading: 'lazy',
+        title: latest.report.name || 'report',
+        style: { width: '100%', height: '560px', border: '1px solid #ddd', borderRadius: '6px' },
+      });
+      attachReportFollowHighlight(inlineFrame);
       card.appendChild(h('details', { style: { marginTop: '10px' } },
         h('summary', { class: 'muted' }, 'Replay inline'),
-        h('div', { class: 'history-report-frame', style: { marginTop: '6px' } },
-          h('iframe', {
-            src: reportPreviewUrl(latest.report.url),
-            loading: 'lazy',
-            title: latest.report.name || 'report',
-            style: { width: '100%', height: '560px', border: '1px solid #ddd', borderRadius: '6px' },
-          }),
-        ),
+        h('div', { class: 'history-report-frame', style: { marginTop: '6px' } }, inlineFrame),
       ));
     } else {
       card.appendChild(h('div', { class: 'muted small', style: { marginTop: '8px' } },
@@ -2901,13 +2981,13 @@ function renderHistoryTab(caseId, runs) {
         }
         // Lazy-mount the iframe so closed rows don't fetch reports.
         if (!cell.firstChild) {
-          cell.appendChild(h('div', { class: 'history-report-frame' },
-            h('iframe', {
-              src: reportPreviewUrl(r.report.url),
-              loading: 'lazy',
-              title: r.report.name || 'report',
-            }),
-          ));
+          const histFrame = h('iframe', {
+            src: reportPreviewUrl(r.report.url),
+            loading: 'lazy',
+            title: r.report.name || 'report',
+          });
+          attachReportFollowHighlight(histFrame);
+          cell.appendChild(h('div', { class: 'history-report-frame' }, histFrame));
         }
         expand.style.display = '';
         openRow = expand;
