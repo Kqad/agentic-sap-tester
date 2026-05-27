@@ -25,7 +25,7 @@ const BLANK_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAA
 
 // Bump this whenever the injected style/script needs to change. Existing
 // reports on disk will be re-themed on the next sweep.
-const THEME_VERSION = '1';
+const THEME_VERSION = '2';
 const THEME_TAG_RE = /\n?<(style|script) data-saptest-themed="\d+">[\s\S]*?<\/\1>/g;
 
 // JS string literals visible in the rendered UI (panel headings, error
@@ -102,11 +102,33 @@ function buildThemeBlock(version) {
       background: hsl(var(--saptest-fg) / 0.15);
       color: hsl(var(--saptest-fg));
     }
+    /* Highlight the currently-playing / selected step row so the user can
+       see at a glance which step is executing. Paired with the inline JS
+       below which scrolls it into view on every class change. */
+    .task-row.playing,
+    .task-row.selected,
+    li.task-row.playing,
+    li.task-row.selected {
+      background-color: #facc15 !important;
+      border-left: 6px solid #b45309 !important;
+      box-shadow: 0 4px 14px rgba(202, 138, 4, 0.45) !important;
+      color: #1f2937 !important;
+      scroll-margin-top: 80px;
+      scroll-margin-bottom: 80px;
+      padding-left: 12px !important;
+    }
+    .task-row.playing *,
+    .task-row.selected * {
+      color: #1f2937 !important;
+    }
   `.replace(/\s+/g, ' ').trim();
 
-  // Script: read `?theme=` from the URL (set by the SAPTest SPA when it
-  // embeds the report) and fall back to prefers-color-scheme. Sets a
-  // data-saptest-theme attribute on <html> so the CSS above can react.
+  // Script: (1) read `?theme=` from the URL (set by the SAPTest SPA when it
+  // embeds the report) and fall back to prefers-color-scheme; (2) follow the
+  // currently-playing step — MutationObserver-watch .task-row class changes
+  // and scrollIntoView({block:'center'}) the .playing/.selected row. Works
+  // in both iframe embed and direct new-tab open since it's inlined into the
+  // report HTML itself.
   const js = `
     (function () {
       try {
@@ -119,6 +141,34 @@ function buildThemeBlock(version) {
       } catch (e) {
         document.documentElement.setAttribute('data-saptest-theme', 'light');
       }
+
+      var rafId = null;
+      function scrollActive() {
+        rafId = null;
+        var active = document.querySelector('.task-row.playing') || document.querySelector('.task-row.selected');
+        if (!active) return;
+        try { active.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+        catch (e) { active.scrollIntoView(); }
+      }
+      function requestScroll() {
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(scrollActive);
+      }
+      function arm() {
+        if (!document.body) { setTimeout(arm, 50); return; }
+        new MutationObserver(function (records) {
+          for (var i = 0; i < records.length; i++) {
+            var r = records[i];
+            if (r.type !== 'attributes' || r.attributeName !== 'class') continue;
+            if (r.target.classList && r.target.classList.contains('task-row')) {
+              requestScroll();
+              return;
+            }
+          }
+        }).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+        requestScroll();
+      }
+      arm();
     })();
   `.replace(/\s+/g, ' ').trim();
 
