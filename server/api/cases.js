@@ -7,10 +7,12 @@
 import express from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import { CASES_DIR, E2E_DIR, RUNS_DIR } from '../paths.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 import { audit } from '../audit.js';
 import { parseSpecSteps } from '../lib/spec-steps.js';
+import { ensureTemplateCacheForCase } from '../midscene/template-cache.js';
 
 const router = express.Router();
 router.use(requireAuth());
@@ -98,7 +100,48 @@ router.put('/:id', requirePermission('cases:write'), async (req, res) => {
   const isNew = !(await fs.access(file).then(() => true).catch(() => false));
   await fs.writeFile(file, JSON.stringify(body, null, 2) + '\n', 'utf8');
   await audit(req, isNew ? 'cases.create' : 'cases.update', { id });
-  res.json({ ok: true, id, isNew });
+
+  // On new-case creation, try to seed the cache from SAPTEST_TEMPLATE_CASE_ID
+  // so the user can run "Run JS w/ Cache" without first recording one. Steps
+  // whose locators match the template (e.g. SAP login / menu navigation) will
+  // hit; the rest fall through to LLM/cache-write as usual.
+  let templateCache = null;
+  if (isNew) {
+    try {
+      const result = ensureTemplateCacheForCase({ id, ...body });
+      templateCache = result;
+      if (result.copied) {
+        await audit(req, 'cases.template-cache.copied', { id, sourcePath: result.sourcePath });
+      }
+    } catch (e) {
+      console.warn(`[cases PUT] template cache seed failed for ${id}: ${e?.message ?? e}`);
+    }
+  }
+
+  res.json({ ok: true, id, isNew, templateCache });
+});
+
+// Template fetch: returns the JSON body of the case pointed to by
+// SAPTEST_TEMPLATE_CASE_ID, so the UI can pre-fill the "new case" modal
+// with sensible defaults (sapUrl, transactionCode skeleton, NL example).
+router.get('/_meta/template', requirePermission('cases:read'), async (_req, res) => {
+  const templateId = (process.env.SAPTEST_TEMPLATE_CASE_ID ?? '').trim();
+  if (!templateId) {
+    return res.json({ templateId: null, parsed: null, reason: 'SAPTEST_TEMPLATE_CASE_ID not set' });
+  }
+  if (!safeId(templateId)) {
+    return res.json({ templateId, parsed: null, reason: 'invalid templateId' });
+  }
+  const file = path.join(CASES_DIR, `${templateId}.json`);
+  if (!existsSync(file)) {
+    return res.json({ templateId, parsed: null, reason: 'template case file not found' });
+  }
+  try {
+    const raw = await fs.readFile(file, 'utf8');
+    res.json({ templateId, parsed: JSON.parse(raw) });
+  } catch (e) {
+    res.json({ templateId, parsed: null, reason: e.message });
+  }
 });
 
 router.delete('/:id', requirePermission('cases:delete'), async (req, res) => {

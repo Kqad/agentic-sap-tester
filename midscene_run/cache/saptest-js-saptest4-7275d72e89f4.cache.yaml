@@ -1,0 +1,169 @@
+midsceneVersion: 1.8.1
+cacheId: saptest-js-saptest4-7275d72e89f4
+caches:
+  - type: plan
+    prompt: 按住右侧的纵向滚动条的滑块,拖到最底端
+    yamlWorkflow: |
+      tasks:
+        - name: 按住右侧的纵向滚动条的滑块,拖到最底端
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条的滑块
+              to: 滚动条底部位置
+  - type: plan
+    prompt: 按住右侧的纵向滚动条的滑块,拖到最底端
+    yamlWorkflow: |
+      tasks:
+        - name: 按住右侧的纵向滚动条的滑块,拖到最底端
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条的滑块
+              to: 右侧纵向滚动条轨道的最底端
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条的滑块
+              to: 右侧纵向滚动条轨道最底端位置
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 左上角矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: company code
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[6]/span[1]/label[1]/span[normalize-space()="Company Code"]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 右侧纵向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[2]/div[1]
+  - type: locate
+    prompt: 滚动条底部位置
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]
+  - type: locate
+    prompt: 点击SAP返回主页
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[2]/span[1]
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 左上角矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击右下角execute
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 点击add apps
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/section[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[2]/div[3]/button[1]/span[1]/span[2]/bdi[normalize-space()="Add Apps"]
+  - type: locate
+    prompt: 搜索输入框
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/header[1]/div[1]/div[1]/div[2]/div[1]/form[1]/input[1]
+  - type: locate
+    prompt: 点击搜索
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/header[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]
+  - type: locate
+    prompt: 点击新出现的第一个Manage Supplier Line Items
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/div[1]/div[3]/div[1]/section[1]/div[1]/div[1]/div[1]/ul[1]/li[1]/div[1]/div[1]/div[1]
+  - type: locate
+    prompt: company code
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[1]/header[1]/div[3]/span[normalize-space()="TB"]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 右侧纵向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[2]
+  - type: locate
+    prompt: 右侧纵向滚动条轨道的最底端
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条轨道最底端位置
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]

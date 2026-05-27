@@ -1,0 +1,83 @@
+midsceneVersion: 1.8.1
+cacheId: saptest-js-saptest3-221479320aed
+caches:
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 左上角矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击右下角execute
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 在新页面点图标 xpath=//*[@id="searchFieldInShell-input-inner"]
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[1]/header[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/input[1]
+  - type: locate
+    prompt: 搜索输入框
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[1]/header[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/input[1]
+  - type: locate
+    prompt: 点结果里的aging analysis模块
+    cache:
+      xpaths:
+        - /html/body/div[1]/div[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/li[1]/div[1]/div[1]/div[2]/span[normalize-space()="Aging Analysis - Payable Amount"]
+  - type: locate
+    prompt: 点击屏幕上部向下展开的图标
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/div[1]/div[2]/section[1]/article[1]/header[1]/div[1]/button[1]/span[1]/span[1]
+  - type: locate
+    prompt: 点击漏斗图标
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/div[1]/div[2]/section[1]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/button[3]/span[1]/span[1]
+  - type: locate
+    prompt: 点击conpany code
+    cache:
+      xpaths:
+        - /html/body/div[1]/div[5]
+  - type: locate
+    prompt: 搜索输入框
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/div[1]/div[2]/section[1]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/*[name()="svg"][normalize-space()="An Interactive Column Chart Amount in Displ.CrcyAging Grid01. < -9002. -90 - -6103. -60 - -3104. -30 - 005. 1 - 3006. 31 - 6007. 61 - 9008. > 90Amount in Displ.Crcy05M10M15M20M25M30M"]
+  - type: locate
+    prompt: 点击ok
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/section[1]/div[1]/div[1]/div[2]/section[1]/article[1]/header[1]/div[2]/section[1]/div[1]/div[1]/div[1]/div[1]/div[6]/div[1]/div[2]/div[1]/button[1]/span[1]/span[1]/bdi[normalize-space()="Go"]
+  - type: locate
+    prompt: 点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]
+    cache:
+      xpaths:
+        - /html/body/div[1]/div[4]

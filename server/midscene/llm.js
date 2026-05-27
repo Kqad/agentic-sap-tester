@@ -549,16 +549,38 @@ function enhanceSegment(segment) {
   return [segment];
 }
 
+// Pull a trailing `xpath=...` out of an instruction. Users write things like
+// "点击漏斗图标 xpath=//*[@id=\"__xmlview2--ssbFacetFilter-add-img\"]" — without
+// this we'd pass the whole string as the locator description to Midscene,
+// which then has to call the vision model to interpret it (and gets confused
+// by the `xpath=` syntax). Extracting xpath separately lets aiTap go via
+// `{ xpath: "..." }` option → DOM lookup, no LLM call at all.
+//
+// We anchor at end-of-string because splitNaturalLanguageSteps has already
+// chopped instructions on , ; 然后 并 boundaries, so within one instruction
+// the xpath always runs to the end.
+export function extractXpathFromInstruction(text) {
+  if (!text) return { instruction: text, xpath: undefined };
+  const m = text.match(/^(.*?)\s*\bxpath\s*=\s*(.+?)\s*$/i);
+  if (!m) return { instruction: text, xpath: undefined };
+  const desc = m[1].trim();
+  // Description shouldn't end up empty — keep a generic fallback so the
+  // locator string passed to Midscene still makes some sense.
+  return { instruction: desc || '元素', xpath: m[2].trim() };
+}
+
 export function buildFallbackApiGuide(input, fallbackReason, docReferences = [], options = {}) {
-  const steps = splitNaturalLanguageSteps(input.naturalLanguage).map((instruction, idx) => {
+  const steps = splitNaturalLanguageSteps(input.naturalLanguage).map((rawInstruction, idx) => {
+    const { instruction, xpath } = extractXpathFromInstruction(rawInstruction);
     const midsceneApi = inferMidsceneApi(instruction);
     return {
       order: idx + 1,
       title: instruction.length > 28 ? instruction.slice(0, 28) + '...' : instruction,
       midsceneApi,
       naturalLanguageInstruction: instruction,
+      xpath,
       reason: reasonForApi(midsceneApi, instruction),
-      exampleCode: exampleCodeForApi(midsceneApi, instruction),
+      exampleCode: exampleCodeForApi(midsceneApi, instruction, xpath),
     };
   });
   const warnings = options.localOnly

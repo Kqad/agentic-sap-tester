@@ -129,7 +129,8 @@ caches:
   - type: locate
     prompt: 点结果里的aging analysis模块
     cache:
-      xpaths: []
+      xpaths:
+        - /html/body/div[1]/div[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/li[1]/div[1]/div[1]/div[2]/span[normalize-space()="Aging Analysis - Payable Amount"]
   - type: locate
     prompt: 点击屏幕上部向下展开的图标
     cache:

@@ -23,6 +23,13 @@
 // description, exampleCode `value: "..."` defaults — all "input content"
 // that doesn't move element xpaths.
 //
+// Per-case opt-in: if caseObj.cacheStrategy === 'first-5-only', the hash
+// uses ONLY the first 5 non-sleep apiGuide steps and ignores TCode. This
+// is the new-case-template default, so the shared pre-TCode Menu/Settings
+// cache survives TCode changes and apiGuide regen for steps 6+. Old cases
+// without this field stay on the full-hash behavior — their cache YAMLs
+// keep matching their existing filenames.
+//
 // Diverges from the Desktop project's buildJavascriptCacheId. Existing cache
 // files were migrated by scripts/rename-cache-ids.mjs (one-shot, idempotent).
 
@@ -82,11 +89,14 @@ function isSleepStep(step) {
 // cache YAML only matches by locator prompt, not by these strings. This
 // means Gen API re-rolling titles/instructions doesn't rotate the hash if
 // the locator strings come back the same.
-function normalizeApiGuideForHash(apiGuide) {
+// `stepLimit`: if finite, slice to the first N non-sleep steps. Used by the
+// per-case `cacheStrategy === 'first-5-only'` opt-in.
+function normalizeApiGuideForHash(apiGuide, stepLimit = Infinity) {
   if (!apiGuide || !Array.isArray(apiGuide.steps)) return null;
   return {
     steps: apiGuide.steps
       .filter((s) => !isSleepStep(s))
+      .slice(0, stepLimit)
       .map((s, i) => ({
         index: i,
         midsceneApi: s.midsceneApi,
@@ -97,13 +107,15 @@ function normalizeApiGuideForHash(apiGuide) {
 }
 
 export function buildJavascriptCacheId(caseObj) {
+  const useFirst5Only = caseObj?.cacheStrategy === 'first-5-only';
+  const stepLimit = useFirst5Only ? 5 : Infinity;
   const hash = createHash('sha1')
     .update(String(caseObj.id))
-    .update(JSON.stringify(normalizeApiGuideForHash(caseObj.apiGuide)))
-    .update(getEffectiveTCodeValue(caseObj))
-    .digest('hex')
-    .slice(0, 12);
-  return `saptest-js-${caseObj.id}-${hash}`;
+    .update(JSON.stringify(normalizeApiGuideForHash(caseObj.apiGuide, stepLimit)));
+  if (!useFirst5Only) {
+    hash.update(getEffectiveTCodeValue(caseObj));
+  }
+  return `saptest-js-${caseObj.id}-${hash.digest('hex').slice(0, 12)}`;
 }
 
 export function resolveCachePath(cacheId) {

@@ -82,21 +82,32 @@ router.post(
         targetUrl: c.sapUrl ?? '',
       });
 
-      // Persist back into the case JSON. Editing apiGuide invalidates the
-      // cacheId hash, so callers should expect to re-record cache by running
-      // once with cache=write afterwards.
+      // Persist back into the case JSON.
+      // - Editing apiGuide does NOT invalidate cacheId under v4c hash (locator
+      //   strings are what matter; default `value: "..."` literals are stripped
+      //   before hashing). Only locator / step structure / tcode changes do.
+      // - Clear `params` overrides: Gen API is the canonical "rebuild from NL"
+      //   action, so the new apiGuide's default values (extracted from NL)
+      //   should win at runtime. Any stale overrides from before this regen
+      //   would otherwise silently shadow the new defaults. Users can re-add
+      //   per-step overrides via the Parameters tab after Gen API.
       const file = path.join(CASES_DIR, `${c.id}.json`);
       const body = JSON.parse(await fs.readFile(file, 'utf8'));
+      const clearedParamKeys = body.params && typeof body.params === 'object' && !Array.isArray(body.params)
+        ? Object.keys(body.params)
+        : [];
       body.apiGuide = guide;
       body.apiGuideNaturalLanguage = c.naturalLanguage;
+      delete body.params;
       await fs.writeFile(file, JSON.stringify(body, null, 2) + '\n', 'utf8');
 
       await audit(req, 'midscene-js.api-guide.generated', {
         caseId: c.id,
         stepCount: guide.steps.length,
         warnings: guide.warnings.length,
+        clearedParamKeys,
       });
-      return res.json({ ok: true, apiGuide: guide });
+      return res.json({ ok: true, apiGuide: guide, clearedParamKeys });
     } catch (err) {
       await audit(req, 'midscene-js.api-guide.error', {
         caseId: c.id,

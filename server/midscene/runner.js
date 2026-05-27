@@ -31,9 +31,10 @@ import {
   attachActiveRunCleanup,
 } from './active-runs.js';
 import {
-  sleep, safeStringify, truncate,
+  sleep, safeStringify, truncate, withTimeout,
   normalizeApiName, normalizeError,
   delayAfterStepMs, QUERY_PRE_DELAY_MS,
+  detectScrollExtreme, SCROLL_DRAG_TIMEOUT_MS, STEP_RETRY_DELAY_MS,
 } from './helpers.js';
 import { captureQueryVariable, tryLocalComparison } from './variables.js';
 import { resolveDynamicInputValue } from './llm.js';
@@ -60,6 +61,42 @@ function extractAiInputArgs(code) {
 const VIEWPORT = { width: 1920, height: 1080 };
 const CHROME_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36';
+
+// ── Scroll-extreme verify helpers ──────────────────────────────────────
+// Ported from Desktop\saptest\src\lib\midscene.ts (captureScrollScreen* +
+// llmConfirmScrollProgress). For "滑/拖 + 最X" aiScroll steps we drag once,
+// then ask aiBoolean whether anything visibly scrolled. Used to short-circuit
+// the runner's retry path so a successful drag doesn't get executed twice.
+async function captureScrollScreenBuffer(page) {
+  try { return await page.screenshot({ type: 'jpeg', quality: 70 }); }
+  catch { return null; }
+}
+
+function bufferSha1(buf) {
+  return buf ? crypto.createHash('sha1').update(buf).digest('hex') : null;
+}
+
+async function llmConfirmScrollProgress(agent, beforeBase64, label, log) {
+  if (typeof agent.aiBoolean !== 'function' || !beforeBase64) return null;
+  try {
+    const result = await withTimeout(
+      agent.aiBoolean({
+        prompt:
+          '附件中的第一张图是拖动/滚动操作之前的页面截图，请把它和当前页面截图作对比，' +
+          '判断页面或表格内容是否发生了明显的滚动位移。仅 tooltip、动画、loading 提示、光标等无关变化不算明显滚动。' +
+          '如果有明显滚动返回 true，否则返回 false。',
+        images: [{ name: 'before-scroll', url: `data:image/jpeg;base64,${beforeBase64}` }],
+      }),
+      SCROLL_DRAG_TIMEOUT_MS,
+      `${label} LLM scroll compare`,
+    );
+    log(`${label} LLM scroll compare = ${Boolean(result)}`);
+    return Boolean(result);
+  } catch (err) {
+    log(`${label} LLM scroll compare failed: ${normalizeError(err)}`);
+    return null;
+  }
+}
 
 // ── Per-API dispatcher ─────────────────────────────────────────────────
 // `agent` is a Midscene PlaywrightAgent. `step` is one apiGuide step. `ctx`
@@ -91,7 +128,16 @@ async function dispatchStep(agent, step, ctx) {
     }
     // 2) Local variable-comparison intercept.
     const cmp = tryLocalComparison(instruction, ctx.variables, ctx.summary);
-    if (cmp.handled) return cmp.result;
+    if (cmp.handled) {
+      // Surface the comparison as a card in the Midscene HTML report so the
+      // step doesn't appear to "vanish" from the timeline. Without this,
+      // locally-handled asserts (e.g. "A1 和 A2 相等") run silently —
+      // passing case but report ends one step short.
+      try {
+        await agent.recordToReport?.('Local assertion', { content: cmp.result });
+      } catch { /* report attachment is best-effort */ }
+      return cmp.result;
+    }
     // 3) Fallback: real AI assertion (slow, costs tokens).
     await agent.aiAssert(instruction);
     return undefined;
@@ -135,6 +181,60 @@ async function dispatchStep(agent, step, ctx) {
     return result;
   }
 
+  // aiScroll "滑到最X端": drag, then aiBoolean-compare before/after to
+  // confirm visible scroll. Retries the drag inside this dispatch layer up
+  // to MAX_DRAG_ATTEMPTS times if aiBoolean says no scroll happened. After
+  // exhausting retries, THROWS so the step is marked failed (no more silent
+  // "passed" when the scroll didn't actually work).
+  //
+  // We intentionally retry inside this layer (instead of letting outer
+  // executeStepWithRecovery retry) so the before-snapshot stays consistent
+  // across attempts — outer retry would re-enter this branch and capture a
+  // fresh "before" each time, hiding cumulative no-progress.
+  if (api === 'aiScroll') {
+    const extreme = detectScrollExtreme(instruction);
+    if (extreme && ctx.page) {
+      const label = `Step ${step.order} scroll-extreme(${extreme})`;
+      const MAX_DRAG_ATTEMPTS = 3;
+      let lastReason = '';
+      for (let attempt = 1; attempt <= MAX_DRAG_ATTEMPTS; attempt += 1) {
+        const before = await captureScrollScreenBuffer(ctx.page);
+        const beforeBase64 = before ? before.toString('base64') : null;
+        const hashBefore = bufferSha1(before);
+
+        const code = (step.exampleCode ?? '').trim();
+        if (code) {
+          const fn = new AsyncFunction('agent', code);
+          await withTimeout(fn(agent), SCROLL_DRAG_TIMEOUT_MS, `${label} drag attempt ${attempt}`);
+        }
+
+        const confirmed = await llmConfirmScrollProgress(agent, beforeBase64, `${label} attempt ${attempt}`, ctx.log);
+        if (confirmed === true) {
+          ctx.log(`${label} confirmed by LLM on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}.`);
+          return undefined;
+        }
+        if (confirmed === null) {
+          // LLM unavailable → fall back to sha1 screenshot hash compare.
+          const after = await captureScrollScreenBuffer(ctx.page);
+          const hashAfter = bufferSha1(after);
+          const changed = !(hashBefore && hashAfter) || hashBefore !== hashAfter;
+          if (changed) {
+            ctx.log(`${label} LLM unavailable, hash compare says scrolled — done (attempt ${attempt}).`);
+            return undefined;
+          }
+          lastReason = 'LLM unavailable + screenshot hash unchanged';
+          ctx.log(`${label} ${lastReason} on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}`);
+        } else {
+          lastReason = 'LLM says no visible scroll';
+          ctx.log(`${label} ${lastReason} on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}`);
+        }
+        if (attempt < MAX_DRAG_ATTEMPTS) await sleep(STEP_RETRY_DELAY_MS);
+      }
+      throw new Error(`${label} failed after ${MAX_DRAG_ATTEMPTS} drag attempts (${lastReason})`);
+    }
+    // Non-extreme aiScroll falls through to the generic eval path below.
+  }
+
   // Everything else (aiTap, aiInput, aiScroll, aiAct, aiHover, …) we eval the
   // apiGuide-supplied exampleCode line as-is. It already handles 2-arg shapes
   // like aiInput("locate", { value: "..." }).
@@ -143,9 +243,25 @@ async function dispatchStep(agent, step, ctx) {
     ctx.log(`  …step ${step.order} has no exampleCode, skipping`);
     return undefined;
   }
+  // Sleep steps: intercept and log explicitly so users can see the wait
+  // happened in Console (tail). Without this, sleep is invisible — Midscene's
+  // HTML report only shows AI operations, and the runner's generic eval path
+  // is silent.
+  const sleepMatch = code.match(/^await\s+sleep\s*\(\s*(\d+(?:\.\d+)?)\s*\)\s*;?\s*$/);
+  if (sleepMatch) {
+    const ms = Math.max(0, Math.round(Number(sleepMatch[1])));
+    ctx.log(`  …sleep ${ms}ms`);
+    // Add a card to the Midscene report so the wait is visible in the timeline.
+    try {
+      await agent.recordToReport?.('Sleep', { content: `Waited ${ms}ms` });
+    } catch { /* best-effort */ }
+    await sleep(ms);
+    return undefined;
+  }
   // `sleep` is a helpers.js import in *this* module, not a global, so it's
   // not visible inside AsyncFunction's compiled scope. Inject it explicitly
-  // alongside `agent` so wait steps like `await sleep(5000);` work.
+  // alongside `agent` so wait steps like `await sleep(5000);` work even when
+  // they're not the whole exampleCode (sequenced with other calls).
   const fn = new AsyncFunction('agent', 'sleep', code);
   return await fn(agent, sleep);
 }
@@ -297,6 +413,7 @@ export async function runJavascript(caseObj, opts = {}) {
       }
     });
     page = await context.newPage();
+    ctx.page = page;
 
     await page.goto(caseObj.sapUrl.trim(), { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});

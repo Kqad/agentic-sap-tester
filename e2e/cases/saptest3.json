@@ -4,7 +4,7 @@
   "description": "Manage Accounts payable Reports & Analytics Row 19 (Open new Fiori App)\n\nAccounts payable operational reports and analytics are essential for monitoring and analyzing the financial performance . These reports and analytics provide valuable insights into the efficiency and effectiveness of the AP process, as well as the overall financial health of the organization.",
   "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
   "transactionCode": "/n/UI2/FLP",
-  "naturalLanguage": "1.进入 Menu，  点击setting，点击visualization ，并启用show Ok code field,  并保存。\n2.在 左上角矩形输入框 输入 /n/UI2/FLP，点击右下角execute\n3.等5s,在新页面点图标 xpath=//*[@id=\"sf\"]/span ,搜索Aging Analysis，点结果里的aging analysis模块，等5s, 点击屏幕上部向下展开的图标，点击漏斗图标，点击conpany code，搜索8540，点击ok\n4. 点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]，查看是否excel下载成功",
+  "naturalLanguage": "1.进入 Menu，  点击setting，点击visualization  ，并启用show Ok code field,   并保存。\n2.在 左上角矩形输入框 输入 /n/UI2/FLP，点击右下角execute\n3.等15s,在新页面点搜索图标 xpath=//*[@id=\"searchFieldInShell-input-inner\"] ,搜索Aging Analysis，点结果里的aging analysis模块，等5s, 点击屏幕上部向下展开的图标，点击漏斗图标 xpath=//*[@id=\"__xmlview2--ssbFacetFilter-add-img\"]，点击conpany code，搜索8540，点击ok\n4. 点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]，查看是否excel下载成功",
   "jsSource": "async function run(agent) {\r\n  await agent.aiTap(\"进入 Menu\");\r\n  await agent.aiTap(\"点击setting\");\r\n  await agent.aiTap(\"点击visualization\");\r\n  await agent.aiTap(\"启用show Ok code field\");\r\n  await agent.aiTap(\"保存\");\r\n  await agent.aiInput(\"矩形\", { value: \"/n/UI2/FLP\" });\r\n  await agent.aiTap(\"点击右下角execute\");\r\n  await agent.aiTap(\"在新页面点图标\", { xpath: \"//*[@id=\\\"sf\\\"]/span\" });\r\n  await agent.aiInput(\"搜索输入框\", { value: \"Aging Analysis\" });\r\n  await agent.aiTap(\"点结果里的aging analysis模块\");\r\n  await agent.aiTap(\"点击屏幕上部向下展开的图标\");\r\n  await agent.aiTap(\"点击漏斗图标\");\r\n  await agent.aiTap(\"点击conpany code\");\r\n  await agent.aiInput(\"搜索输入框\", { value: \"8540\" });\r\n  await agent.aiTap(\"点击ok\");\r\n  await agent.aiTap(\"点图标\", { xpath: \"/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]\" });\r\n  await agent.aiAssert(\"查看是否excel下载成功\");\r\n}",
   "apiGuide": {
     "summary": "SAP TEST 3",
@@ -70,19 +70,20 @@
       },
       {
         "order": 8,
-        "title": "等5s",
+        "title": "等15s",
         "midsceneApi": "agent.aiTap()",
-        "naturalLanguageInstruction": "等5s",
+        "naturalLanguageInstruction": "等15s",
         "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
-        "exampleCode": "await sleep(5000);"
+        "exampleCode": "await sleep(15000);"
       },
       {
         "order": 9,
-        "title": "在新页面点图标 xpath=//*[@id=\"sf\"]/...",
+        "title": "在新页面点搜索图标",
         "midsceneApi": "agent.aiTap()",
-        "naturalLanguageInstruction": "在新页面点图标 xpath=//*[@id=\"sf\"]/span",
+        "naturalLanguageInstruction": "在新页面点搜索图标",
+        "xpath": "//*[@id=\"searchFieldInShell-input-inner\"]",
         "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
-        "exampleCode": "await agent.aiTap(\"在新页面点图标 xpath=//*[@id=\\\"sf\\\"]/span\");"
+        "exampleCode": "await agent.aiTap(\"在新页面点搜索图标\", { xpath: \"//*[@id=\\\"searchFieldInShell-input-inner\\\"]\" });"
       },
       {
         "order": 10,
@@ -121,8 +122,9 @@
         "title": "点击漏斗图标",
         "midsceneApi": "agent.aiTap()",
         "naturalLanguageInstruction": "点击漏斗图标",
+        "xpath": "//*[@id=\"__xmlview2--ssbFacetFilter-add-img\"]",
         "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
-        "exampleCode": "await agent.aiTap(\"点击漏斗图标\");"
+        "exampleCode": "await agent.aiTap(\"点击漏斗图标\", { xpath: \"//*[@id=\\\"__xmlview2--ssbFacetFilter-add-img\\\"]\" });"
       },
       {
         "order": 15,
@@ -150,11 +152,12 @@
       },
       {
         "order": 18,
-        "title": "点图标 xpath=/html/body/div[2]/...",
+        "title": "点图标",
         "midsceneApi": "agent.aiTap()",
-        "naturalLanguageInstruction": "点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]",
+        "naturalLanguageInstruction": "点图标",
+        "xpath": "/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]",
         "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
-        "exampleCode": "await agent.aiTap(\"点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]\");"
+        "exampleCode": "await agent.aiTap(\"点图标\", { xpath: \"/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]\" });"
       },
       {
         "order": 19,
@@ -171,9 +174,9 @@
       "已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。",
       "本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
     ],
-    "markdown": "## SAP TEST 3\n\n### 前提假设\n- 从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。\n\n### API 步骤\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - 指令: 进入 Menu\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"进入 Menu\");`\n2. 点击setting\n   - API: `agent.aiTap()`\n   - 指令: 点击setting\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击setting\");`\n3. 点击visualization\n   - API: `agent.aiTap()`\n   - 指令: 点击visualization\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击visualization\");`\n4. 启用show Ok code field\n   - API: `agent.aiTap()`\n   - 指令: 启用show Ok code field\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"启用show Ok code field\");`\n5. 保存\n   - API: `agent.aiTap()`\n   - 指令: 保存\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"保存\");`\n6. 在 左上角矩形输入框 输入 /n/UI2/FLP\n   - API: `agent.aiInput()`\n   - 指令: 在 左上角矩形输入框 输入 /n/UI2/FLP\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"左上角矩形\", { value: \"/n/UI2/FLP\" });`\n7. 点击右下角execute\n   - API: `agent.aiTap()`\n   - 指令: 点击右下角execute\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击右下角execute\");`\n8. 等5s\n   - API: `agent.aiTap()`\n   - 指令: 等5s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(5000);`\n9. 在新页面点图标 xpath=//*[@id=\"sf\"]/...\n   - API: `agent.aiTap()`\n   - 指令: 在新页面点图标 xpath=//*[@id=\"sf\"]/span\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"在新页面点图标 xpath=//*[@id=\\\"sf\\\"]/span\");`\n10. 搜索Aging Analysis\n   - API: `agent.aiInput()`\n   - 指令: 搜索Aging Analysis\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"搜索输入框\", { value: \"Aging Analysis\" });`\n11. 点结果里的aging analysis模块\n   - API: `agent.aiTap()`\n   - 指令: 点结果里的aging analysis模块\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点结果里的aging analysis模块\");`\n12. 等5s\n   - API: `agent.aiTap()`\n   - 指令: 等5s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(5000);`\n13. 点击屏幕上部向下展开的图标\n   - API: `agent.aiTap()`\n   - 指令: 点击屏幕上部向下展开的图标\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击屏幕上部向下展开的图标\");`\n14. 点击漏斗图标\n   - API: `agent.aiTap()`\n   - 指令: 点击漏斗图标\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击漏斗图标\");`\n15. 点击conpany code\n   - API: `agent.aiTap()`\n   - 指令: 点击conpany code\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击conpany code\");`\n16. 搜索8540\n   - API: `agent.aiInput()`\n   - 指令: 搜索8540\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"搜索输入框\", { value: \"8540\" });`\n17. 点击ok\n   - API: `agent.aiTap()`\n   - 指令: 点击ok\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击ok\");`\n18. 点图标 xpath=/html/body/div[2]/...\n   - API: `agent.aiTap()`\n   - 指令: 点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]\");`\n19. 查看是否excel下载成功\n   - API: `agent.aiAssert()`\n   - 指令: 查看是否excel下载成功\n   - 原因: 结果校验或变量比较,适合断言 API。\n   - 示例: `await agent.aiAssert(\"查看是否excel下载成功\");`\n\n### 注意事项\n- 已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。\n- 本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+    "markdown": "## SAP TEST 3\n\n### 前提假设\n- 从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。\n\n### API 步骤\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - 指令: 进入 Menu\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"进入 Menu\");`\n2. 点击setting\n   - API: `agent.aiTap()`\n   - 指令: 点击setting\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击setting\");`\n3. 点击visualization\n   - API: `agent.aiTap()`\n   - 指令: 点击visualization\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击visualization\");`\n4. 启用show Ok code field\n   - API: `agent.aiTap()`\n   - 指令: 启用show Ok code field\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"启用show Ok code field\");`\n5. 保存\n   - API: `agent.aiTap()`\n   - 指令: 保存\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"保存\");`\n6. 在 左上角矩形输入框 输入 /n/UI2/FLP\n   - API: `agent.aiInput()`\n   - 指令: 在 左上角矩形输入框 输入 /n/UI2/FLP\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"左上角矩形\", { value: \"/n/UI2/FLP\" });`\n7. 点击右下角execute\n   - API: `agent.aiTap()`\n   - 指令: 点击右下角execute\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击右下角execute\");`\n8. 等15s\n   - API: `agent.aiTap()`\n   - 指令: 等15s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(15000);`\n9. 在新页面点搜索图标\n   - API: `agent.aiTap()`\n   - 指令: 在新页面点搜索图标\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"在新页面点搜索图标\", { xpath: \"//*[@id=\\\"searchFieldInShell-input-inner\\\"]\" });`\n10. 搜索Aging Analysis\n   - API: `agent.aiInput()`\n   - 指令: 搜索Aging Analysis\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"搜索输入框\", { value: \"Aging Analysis\" });`\n11. 点结果里的aging analysis模块\n   - API: `agent.aiTap()`\n   - 指令: 点结果里的aging analysis模块\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点结果里的aging analysis模块\");`\n12. 等5s\n   - API: `agent.aiTap()`\n   - 指令: 等5s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(5000);`\n13. 点击屏幕上部向下展开的图标\n   - API: `agent.aiTap()`\n   - 指令: 点击屏幕上部向下展开的图标\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击屏幕上部向下展开的图标\");`\n14. 点击漏斗图标\n   - API: `agent.aiTap()`\n   - 指令: 点击漏斗图标\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击漏斗图标\", { xpath: \"//*[@id=\\\"__xmlview2--ssbFacetFilter-add-img\\\"]\" });`\n15. 点击conpany code\n   - API: `agent.aiTap()`\n   - 指令: 点击conpany code\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击conpany code\");`\n16. 搜索8540\n   - API: `agent.aiInput()`\n   - 指令: 搜索8540\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"搜索输入框\", { value: \"8540\" });`\n17. 点击ok\n   - API: `agent.aiTap()`\n   - 指令: 点击ok\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击ok\");`\n18. 点图标\n   - API: `agent.aiTap()`\n   - 指令: 点图标\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点图标\", { xpath: \"/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]\" });`\n19. 查看是否excel下载成功\n   - API: `agent.aiAssert()`\n   - 指令: 查看是否excel下载成功\n   - 原因: 结果校验或变量比较,适合断言 API。\n   - 示例: `await agent.aiAssert(\"查看是否excel下载成功\");`\n\n### 注意事项\n- 已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。\n- 本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
   },
-  "apiGuideNaturalLanguage": "1.进入 Menu，  点击setting，点击visualization ，并启用show Ok code field,  并保存。\n2.在 左上角矩形输入框 输入 /n/UI2/FLP，点击右下角execute\n3.等5s,在新页面点图标 xpath=//*[@id=\"sf\"]/span ,搜索Aging Analysis，点结果里的aging analysis模块，等5s, 点击屏幕上部向下展开的图标，点击漏斗图标，点击conpany code，搜索8540，点击ok\n4. 点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]，查看是否excel下载成功",
+  "apiGuideNaturalLanguage": "1.进入 Menu，  点击setting，点击visualization  ，并启用show Ok code field,   并保存。\n2.在 左上角矩形输入框 输入 /n/UI2/FLP，点击右下角execute\n3.等15s,在新页面点搜索图标 xpath=//*[@id=\"searchFieldInShell-input-inner\"] ,搜索Aging Analysis，点结果里的aging analysis模块，等5s, 点击屏幕上部向下展开的图标，点击漏斗图标 xpath=//*[@id=\"__xmlview2--ssbFacetFilter-add-img\"]，点击conpany code，搜索8540，点击ok\n4. 点图标 xpath=/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div/div/div/main/div/div/div/div/section/div/div/div[2]/section/article/div/div[2]/div/div/div/div/div[1]/div/button[11]，查看是否excel下载成功",
   "yamlScript": "",
   "tags": [],
   "source": {

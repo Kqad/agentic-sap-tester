@@ -128,6 +128,18 @@ export function delayAfterStepMs(step) {
   return STEP_DELAY_MS;
 }
 
+// Detect "scroll to extreme" intent ("滑/拖 + 最上/最下/最左/最右"). aiScroll
+// steps that match get the verify-once path in runner.js: one drag, one LLM
+// screenshot compare, then return regardless — never retry, never re-drag.
+export function detectScrollExtreme(instruction) {
+  if (!instruction || !/[滑拖]/.test(instruction)) return null;
+  if (/最[下底]/.test(instruction)) return 'bottom';
+  if (/最[上顶]/.test(instruction)) return 'top';
+  if (/最右/.test(instruction)) return 'right';
+  if (/最左/.test(instruction)) return 'left';
+  return null;
+}
+
 export const FULL_PAGE_SCROLL_RECOVERY_STEPS = [
   {
     label: '滑动到底部',

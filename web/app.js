@@ -1116,18 +1116,108 @@ async function viewSpec(name) {
 }
 
 async function editCase(id) {
-  let initial = '{\n  "$schema": "Parameters for new-case.spec.ts",\n  "title": "",\n  "sapUrl": "",\n  "transactionCode": ""\n}\n';
-  let initialId = '';
+  // Edit existing case → keep the raw-JSON modal (advanced edit path).
   if (id) {
     const c = await api.get('/api/cases/' + encodeURIComponent(id));
-    initial = c.raw;
-    initialId = id;
+    return openRawJsonEditor(id, c.raw);
   }
-  const idInput = h('input', { value: initialId, placeholder: t('cases.idPlaceholder'), disabled: !!id });
-  const ta = h('textarea', { style: { minHeight: '380px' } }, initial);
+
+  // New case: prompt only for the id (kebab-case filename), then auto-create
+  // the case server-side with template content + auto-seeded cache, then
+  // navigate to the case detail page where the structured editor (title /
+  // sapUrl / NL / Parameters / generated JS preview / action buttons) takes
+  // over. Matches the Desktop "新建测试用例" experience — no raw JSON modal.
+  let templateBody = null;
+  let templateId = null;
+  try {
+    const tpl = await api.get('/api/cases/_meta/template');
+    if (tpl?.parsed) {
+      templateBody = { ...tpl.parsed };
+      templateBody.title = '';
+      templateBody.description = '';
+      templateBody.transactionCode = '';
+      // first-5-only: cacheId is hashed off the first 5 apiGuide sub-steps
+      // (the shared Menu/Settings sequence), ignoring TCode and steps 6+.
+      // Lets the new case keep its cache when the user fills in real TC or
+      // appends more NL lines. Old cases without this field keep full-hash.
+      templateBody.cacheStrategy = 'first-5-only';
+      templateBody.naturalLanguage =
+        '1.进入 Menu， 点击setting，点击visualization  并启用show Ok code field, 并保存。\n' +
+        '2.在 左上角矩形输入框 输入 xxxx ，点击右下角execute';
+      // Slice apiGuide to the 7 sub-steps the 2 NL lines expand to. Keeps the
+      // cache lineage from the template (saptest1) usable for the new case —
+      // ensureTemplateCacheForCase will copy saptest1's YAML over, and the
+      // first 7 locator entries replay. Step 6 is the TCode input — blank its
+      // default value so the user fills in the real TC via the Parameters tab.
+      if (templateBody.apiGuide?.steps) {
+        const sliced = templateBody.apiGuide.steps.slice(0, 7).map((s) => ({ ...s }));
+        const tcStep = sliced.find((s) => /矩形|TC\s*框|T[-\s]?Code|事务码/i.test(s.exampleCode || ''));
+        if (tcStep) {
+          tcStep.exampleCode = tcStep.exampleCode.replace(
+            /(\{\s*value\s*:\s*)(['"`])[\s\S]*?\2/,
+            '$1$2$2',
+          );
+        }
+        templateBody.apiGuide = { ...templateBody.apiGuide, steps: sliced };
+      }
+      delete templateBody.jsSource;
+      delete templateBody.params;
+      delete templateBody.source;
+      templateId = tpl.templateId;
+      templateBody.$schema = `Cloned from template "${templateId}" — edit fields on the next screen.`;
+    }
+  } catch { /* template fetch is best-effort */ }
+
+  const idInput = h('input', { placeholder: t('cases.idPlaceholder') });
   const err = h('div', { class: 'muted', style: { color: 'var(--err)', minHeight: '18px' } });
   const m = modal({
-    title: id ? t('cases.editTitle') + id : t('cases.newTitle'),
+    title: t('cases.newTitle'),
+    body: h('div', {},
+      h('div', { class: 'field' }, h('span', {}, t('cases.idLabel')), idInput),
+      err,
+      templateId
+        ? h('div', { class: 'muted', style: { fontSize: '12px', color: 'var(--accent)' } },
+            `Will pre-fill from template "${templateId}" (sapUrl / NL / apiGuide) and auto-seed cache. Edit title / NL on the next screen.`)
+        : h('div', { class: 'muted', style: { fontSize: '12px' } },
+            'No template configured (SAPTEST_TEMPLATE_CASE_ID empty) — new case will start blank.'),
+    ),
+    footer: h('div', { class: 'row', style: { marginLeft: 'auto' } },
+      h('button', { class: 'btn primary', onClick: async () => {
+        err.textContent = '';
+        const newId = idInput.value.trim();
+        if (!/^[a-zA-Z0-9_\-]+$/.test(newId)) { err.textContent = t('cases.idBadChars'); return; }
+        const body = templateBody ?? {
+          $schema: 'Parameters for new-case.spec.ts',
+          title: '', sapUrl: '', transactionCode: '',
+        };
+        try {
+          const r = await api.put('/api/cases/' + encodeURIComponent(newId), body);
+          const cacheNote = r?.templateCache?.copied
+            ? ' · template cache seeded'
+            : (r?.templateCache?.reason ? ` · cache seed skipped (${r.templateCache.reason})` : '');
+          toast(t('cases.created') + cacheNote, 'ok', 4000);
+          m.close();
+          // Navigate to detail page — that page has the full structured editor
+          // (title / URL / NL / Parameters / generated JS preview / action bar).
+          go('cases/' + encodeURIComponent(newId));
+        } catch (e) { err.textContent = e.message; }
+      }}, 'Create & open editor')),
+  });
+  // Auto-focus the id input so the user just types and hits enter.
+  setTimeout(() => idInput.focus(), 0);
+  idInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') m.querySelector?.('.btn.primary')?.click();
+  });
+}
+
+// Raw JSON editor — kept for editing existing cases. The new-case flow uses
+// the structured editor on the case detail page instead.
+function openRawJsonEditor(id, initialRaw) {
+  const idInput = h('input', { value: id, disabled: true });
+  const ta = h('textarea', { style: { minHeight: '380px' } }, initialRaw);
+  const err = h('div', { class: 'muted', style: { color: 'var(--err)', minHeight: '18px' } });
+  const m = modal({
+    title: t('cases.editTitle') + id,
     wide: true,
     body: h('div', {},
       h('div', { class: 'field' }, h('span', {}, t('cases.idLabel')), idInput),
@@ -1138,13 +1228,11 @@ async function editCase(id) {
     footer: h('div', { class: 'row', style: { marginLeft: 'auto' } },
       h('button', { class: 'btn primary', onClick: async () => {
         err.textContent = '';
-        const newId = idInput.value.trim();
-        if (!/^[a-zA-Z0-9_\-]+$/.test(newId)) { err.textContent = t('cases.idBadChars'); return; }
         let parsed;
         try { parsed = JSON.parse(ta.value); } catch (e) { err.textContent = t('cases.jsonParseFail') + e.message; return; }
         try {
-          await api.put('/api/cases/' + encodeURIComponent(newId), parsed);
-          toast(id ? t('cases.saved') : t('cases.created'), 'ok');
+          await api.put('/api/cases/' + encodeURIComponent(id), parsed);
+          toast(t('cases.saved'), 'ok');
           m.close();
           render();
         } catch (e) { err.textContent = e.message; }
@@ -1902,17 +1990,18 @@ function collectAiInputStepsForSync(apiGuide) {
   return out;
 }
 
-// Find the longest prefix of `locator` that actually appears in `nl`. Handles
-// cases where the apiGuide locator is "左上角矩形" but NL writes "左上角矩形输入框".
+// Find the full `locator` string in `nl`. Returns the position right after
+// the match, or -1 if not found.
+//
+// We DO NOT truncate the locator and retry — that used to allow loose matches
+// like "搜索输入框" → "搜索", which then mis-anchored to common occurrences of
+// "搜索" elsewhere in NL (e.g. "在新页面点搜索图标" → captured value="图标").
+// Strict full-match means some steps simply won't auto-sync. That's fine —
+// the user can edit the param manually.
 function findAnchorInNL(nl, locator) {
   if (!nl || !locator) return -1;
-  let anchor = locator;
-  while (anchor.length >= 2) {
-    const i = nl.indexOf(anchor);
-    if (i >= 0) return i + anchor.length;
-    anchor = anchor.slice(0, -1);
-  }
-  return -1;
+  const i = nl.indexOf(locator);
+  return i >= 0 ? i + locator.length : -1;
 }
 
 // After the locator anchor in NL, skip an optional suffix ("输入框", "字段" …)
@@ -1943,10 +2032,13 @@ function syncNlAndParams({ oldNL, newNL, oldParams, newParams, apiGuide }) {
   const paramsChanged = JSON.stringify(oldParams ?? {}) !== JSON.stringify(newParams ?? {});
   console.log('[sync] entry — nlChanged:', nlChanged, 'paramsChanged:', paramsChanged, 'aiInputSteps:', steps.length);
 
-  // Forward: param 改了 → NL 跟着改
-  // 完全用 locator 锚点定位 NL 里每个 step 的 value 位置，把当前在那里的
-  // value（不管和 oldParams 是否一致）替换成新值。不依赖 "oldV 必须在 NL 里
-  // 找得到"，避免 params 和 NL 之前就不一致时无法 sync。
+  // Forward: param 改了 → NL 跟着改 (this direction is precise — we know the
+  // old & new value strings exactly, just find/replace in NL).
+  // Reverse (NL → params) is NOT done. NL is free-form text; trying to extract
+  // structured values from it by parsing locator anchors is unreliable. The
+  // canonical truth for param values lives in apiGuide.steps[].exampleCode
+  // (defaults) and in the params object (overrides) — both edited explicitly
+  // through the Parameters editor. Editing NL has no effect on params.
   if (paramsChanged && !nlChanged) {
     let nl = newNL ?? '';
     let cursor = 0;
@@ -1980,30 +2072,8 @@ function syncNlAndParams({ oldNL, newNL, oldParams, newParams, apiGuide }) {
     return { nl, params: newParams ?? {} };
   }
 
-  // Reverse: NL 改了 → params 跟着改
-  if (nlChanged && !paramsChanged) {
-    const next = { ...(newParams ?? {}) };
-    const extracted = [];
-    const misses = [];
-    let cursor = 0;
-    for (const s of steps) {
-      const effectiveOld = (oldParams?.[s.order] ?? s.defaultValue) || '';
-      const anchorRel = findAnchorInNL((newNL ?? '').slice(cursor), s.locator);
-      if (anchorRel < 0) { misses.push(`step ${s.order} (locator "${s.locator}" not in NL)`); continue; }
-      const v = extractValueAfterAnchor((newNL ?? '').slice(cursor), anchorRel);
-      if (!v) { misses.push(`step ${s.order} (no value after "${s.locator}")`); cursor += anchorRel; continue; }
-      cursor += anchorRel + v.length;
-      if (v === effectiveOld) continue;
-      if (v === s.defaultValue) delete next[String(s.order)];
-      else next[String(s.order)] = v;
-      extracted.push(`step ${s.order}: "${effectiveOld}" → "${v}"`);
-    }
-    if (extracted.length) console.log('[sync] NL→param:', extracted.join(' · '));
-    else console.log('[sync] NL→param: no changes detected (misses:', misses.length ? misses.join(' · ') : 'none', ')');
-    return { nl: newNL ?? '', params: next };
-  }
-
-  if (nlChanged && paramsChanged) console.log('[sync] both NL and params changed — leaving both as-is');
+  if (nlChanged && !paramsChanged) console.log('[sync] NL changed only — NL is descriptive, no params auto-update (edit Parameters explicitly if needed)');
+  else if (nlChanged && paramsChanged) console.log('[sync] both NL and params changed — leaving both as-is');
   else console.log('[sync] neither changed — no-op');
   return { nl: newNL ?? '', params: newParams ?? {} };
 }
@@ -2146,11 +2216,10 @@ function renderParamsTab(caseData, stepsTree) {
       'Natural language',
       nlTa,
       parsed.apiGuide?.steps?.length
-        ? 'Editing this does NOT invalidate the cache — values are input content, not structure. ' +
-          'Same goes for editing apiGuide value defaults via Gen API or raw JSON: only locator / ' +
-          'step structure changes invalidate. Sleep / wait steps are also ignored — pure timing, ' +
-          'always reusable. Exception: the T Code value (e.g. S_ALR_87011990) IS in the hash, ' +
-          'because changing it lands you on a different SAP screen.'
+        ? 'NL is descriptive only — editing it does NOT change params (use the Parameters editor ' +
+          'below for that) and does NOT invalidate the cache. apiGuide value defaults / titles / ' +
+          'descriptions are also ignored by the hash; only locator / step structure changes ' +
+          'invalidate. Sleep / wait steps are ignored too. Exception: T Code value IS in the hash.'
         : 'After saving, click "Gen API" (or fill in apiGuide) and then "Run JS" to record a cache.',
     ));
     wrap.appendChild(editor);
@@ -3248,7 +3317,9 @@ async function generateApiGuide(caseId) {
     const r = await api.post('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/api-guide');
     const n = r?.apiGuide?.steps?.length ?? 0;
     const w = r?.apiGuide?.warnings?.length ?? 0;
-    toast(`apiGuide saved · ${n} steps · ${w} warning${w === 1 ? '' : 's'}`, 'ok', 5000);
+    const cleared = Array.isArray(r?.clearedParamKeys) ? r.clearedParamKeys.length : 0;
+    const clearedNote = cleared > 0 ? ` · cleared ${cleared} stale param override${cleared === 1 ? '' : 's'}` : '';
+    toast(`apiGuide saved · ${n} steps · ${w} warning${w === 1 ? '' : 's'}${clearedNote}`, 'ok', 6000);
     render();
   } catch (e) {
     toast(e.message, 'err', 7000);
@@ -3269,13 +3340,37 @@ async function openJsRunModal(caseId, cacheMode) {
   }
 
   const headedChk = h('input', { type: 'checkbox', checked: true });
+  // Capped-height + internal scroll log viewer. Auto-scrolls to bottom on
+  // every textContent update unless the user has scrolled up manually
+  // (we detect "near bottom" before the write; if the user was looking at
+  // earlier output, we leave their scroll position alone).
   const consoleEl = h('pre', {
     class: 'code-block',
-    // No maxHeight — let the box grow with content so users never lose log
-    // lines off-screen. overflowX:auto keeps very long single lines from
-    // breaking the modal width.
-    style: { minHeight: '120px', overflowX: 'auto', margin: 0, fontSize: '12px', whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
+    style: {
+      minHeight: '120px',
+      maxHeight: '60vh',          // ~60% of viewport — fits long logs without pushing footer off-screen
+      overflowY: 'auto',          // scrollable
+      overflowX: 'auto',
+      margin: 0,
+      fontSize: '12px',
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'break-word',
+    },
   }, '(idle)');
+  // Watch textContent assignments / appends and snap to bottom when the user
+  // was already near the bottom. Uses MutationObserver so we don't have to
+  // touch every site that writes to consoleEl.
+  const autoScrollPre = () => {
+    const distFromBottom = consoleEl.scrollHeight - consoleEl.clientHeight - consoleEl.scrollTop;
+    consoleEl.dataset.stickBottom = distFromBottom < 40 ? '1' : '0';
+  };
+  consoleEl.addEventListener('scroll', autoScrollPre);
+  consoleEl.dataset.stickBottom = '1';
+  new MutationObserver(() => {
+    if (consoleEl.dataset.stickBottom === '1') {
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+  }).observe(consoleEl, { childList: true, characterData: true, subtree: true });
   const statusEl = h('div', { class: 'muted', style: { minHeight: '20px' } },
     cacheMode === 'read' ? 'Will replay using existing cache (read-write).' : 'Will record fresh cache (write-only).');
   const startBtn = h('button', { class: 'btn primary' },
