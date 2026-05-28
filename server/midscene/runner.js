@@ -58,6 +58,24 @@ function extractAiInputArgs(code) {
   return { locator: m[2], value: m[4] };
 }
 
+// Detect `aiAct("按住X纵向滚动条的滑块,拖到最顶端|最底端")` shapes baked into
+// older apiGuides (cases imported from desktop predate the aiScroll rewrite
+// in formatAiScrollExampleCode). For those, swap to a deterministic
+// agent.aiScroll({ scrollType: 'scrollToBottom' | 'scrollToTop' }) call so we
+// skip Midscene's aiAct verify-retry loop — which on SAP can mis-classify a
+// long drag as "navigation, not scroll" and burn minutes re-trying with the
+// wrong before-scroll frame.
+function extractVerticalScrollExtremeFromAiAct(code) {
+  if (!code) return null;
+  const m = /aiAct\s*\(\s*(['"`])([\s\S]*?)\1\s*\)/.exec(code);
+  if (!m) return null;
+  const text = m[2];
+  if (!/纵向滚动条/.test(text)) return null;
+  if (/拖到\s*最\s*[底下]/.test(text) || /最底端/.test(text)) return 'scrollToBottom';
+  if (/拖到\s*最\s*[顶上]/.test(text) || /最顶端/.test(text)) return 'scrollToTop';
+  return null;
+}
+
 const VIEWPORT = { width: 1920, height: 1080 };
 const CHROME_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36';
@@ -197,11 +215,18 @@ async function dispatchStep(agent, step, ctx) {
       const label = `Step ${step.order} scroll-extreme(${extreme})`;
       const MAX_DRAG_ATTEMPTS = 3;
       let lastReason = '';
-      for (let attempt = 1; attempt <= MAX_DRAG_ATTEMPTS; attempt += 1) {
-        const before = await captureScrollScreenBuffer(ctx.page);
-        const beforeBase64 = before ? before.toString('base64') : null;
-        const hashBefore = bufferSha1(before);
+      // Capture the "before" snapshot ONCE outside the retry loop. Each
+      // attempt's verifier compares "the very start of this step" against
+      // the current state — so if the first drag already moved the page,
+      // subsequent attempts see the cumulative progress and confirm. If we
+      // re-captured before every attempt, attempt 2's "before-scroll" would
+      // be attempt 1's after-state and you'd see the confusing report where
+      // the "before" frame is already scrolled to the bottom.
+      const before = await captureScrollScreenBuffer(ctx.page);
+      const beforeBase64 = before ? before.toString('base64') : null;
+      const hashBefore = bufferSha1(before);
 
+      for (let attempt = 1; attempt <= MAX_DRAG_ATTEMPTS; attempt += 1) {
         const code = (step.exampleCode ?? '').trim();
         if (code) {
           const fn = new AsyncFunction('agent', code);

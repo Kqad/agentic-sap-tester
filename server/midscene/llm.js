@@ -332,18 +332,33 @@ function isScrollExtremeInstruction(instruction) {
 }
 
 function formatAiScrollExampleCode(instruction) {
-  // For "最X端" type — emit aiAct drag (more reliable on SAP tables).
+  // For "滑到最X端" / "拖到最X端" we want a deterministic scroll, not
+  // aiAct("按住滚动条…拖到最底端"). aiAct triggers Midscene's internal
+  // verify-then-retry: drag → aiBoolean(before vs after) → if 'no scroll'
+  // is detected, retry drag → aiBoolean again. On SAP screens where a big
+  // drag jumps to a different supplier document, the verifier reads it as
+  // "navigation, not scroll" and loops, wasting time and showing confusing
+  // "before-scroll" frames in the report (the second retry's "before" is
+  // already the post-first-drag state).
+  //
+  // Vertical scroll-to-edge: use agent.aiScroll({ scrollType: ... }) —
+  // Midscene executes a native wheel/scroll API call with NO LLM verify
+  // loop. SAP's vertical wheel works reliably for this.
+  // Horizontal scroll-to-edge: SAP tables ignore wheel; fall back to the
+  // aiAct drag (with the verify-retry caveat). MIDSCENE_PLANNING_HINTS in
+  // desktop llm.ts documents this asymmetry.
   if (isScrollExtremeInstruction(instruction)) {
     const edgeMatch = instruction.match(/最([上下左右顶底])/)?.[1];
-    const map = {
-      上: { bar: '右侧的纵向', edge: '最顶端' },
-      顶: { bar: '右侧的纵向', edge: '最顶端' },
-      下: { bar: '右侧的纵向', edge: '最底端' },
-      底: { bar: '右侧的纵向', edge: '最底端' },
+    const verticalEdge = { 上: 'scrollToTop', 顶: 'scrollToTop', 下: 'scrollToBottom', 底: 'scrollToBottom' }[edgeMatch];
+    if (verticalEdge) {
+      return `await agent.aiScroll({ scrollType: ${JSON.stringify(verticalEdge)} });`;
+    }
+    // Horizontal — still need the drag (wheel doesn't move SAP table cols).
+    const horizMap = {
       左: { bar: '底部的横向', edge: '最左端' },
       右: { bar: '底部的横向', edge: '最右端' },
     };
-    const cfg = map[edgeMatch] ?? { bar: '右侧的纵向', edge: '最底端' };
+    const cfg = horizMap[edgeMatch] ?? { bar: '底部的横向', edge: '最右端' };
     return `await agent.aiAct("按住${cfg.bar}滚动条的滑块,拖到${cfg.edge}");`;
   }
   // For non-extreme scroll, just delegate to aiScroll with the instruction.

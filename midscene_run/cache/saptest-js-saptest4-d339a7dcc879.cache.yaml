@@ -1,6 +1,15 @@
 midsceneVersion: 1.8.1
 cacheId: saptest-js-saptest4-d339a7dcc879
 caches:
+  - type: plan
+    prompt: 按住右侧的纵向滚动条的滑块,拖到最底端
+    yamlWorkflow: |
+      tasks:
+        - name: 按住右侧的纵向滚动条的滑块,拖到最底端
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条的滑块
+              to: 右侧纵向滚动条的最底端位置
   - type: locate
     prompt: 进入 Menu
     cache:
@@ -126,3 +135,13 @@ caches:
     cache:
       xpaths:
         - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 右侧纵向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]
+  - type: locate
+    prompt: 右侧纵向滚动条的最底端位置
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]
