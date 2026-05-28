@@ -6,7 +6,11 @@ test-results/
 midscene_run/report/
 midscene_run/log/
 midscene_run/output/
-run-history/
+# run-history/ used to be ignored, but is now tracked so collaborators can
+# see each case's latest passing/failed run + duration / cacheId / errors
+# in the UI without re-running. The HTMLs in midscene_run/report/ stay
+# ignored by default — we force-add only the latest passing report per
+# case via `git add -f` (see commit history for the curated set).
 
 .DS_Store
 *.log

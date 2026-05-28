@@ -1,0 +1,34 @@
+{
+  "runId": "2026-05-25T09-43-03-486-jsrun-1dc80d5b-ab18",
+  "caseId": "1dc80d5b-c457-4429-958c-36eed42a712c",
+  "spec": null,
+  "mode": "javascript",
+  "headed": true,
+  "useCache": false,
+  "cacheStrategy": "write-only",
+  "cacheId": "saptest-js-1dc80d5b-c457-4429-958c-36eed42a712c-dee06f741fb4",
+  "startedAt": "2026-05-25T09:43:03.486Z",
+  "finishedAt": "2026-05-25T09:43:55.605Z",
+  "durationMs": 52119,
+  "exitCode": 1,
+  "status": "failed",
+  "startedBy": "admin",
+  "errorMessage": "page.screenshot: Target page, context or browser has been closed\npage.screenshot: Target page, context or browser has been closed\n    at WebPage.screenshotBase64 (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\web\\dist\\es\\puppeteer\\base-page.mjs:171:43)\n    at commonContextParser (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\core\\dist\\es\\agent\\utils.mjs:29:54)\n    at async PlaywrightAgent.getUIContext (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\core\\dist\\es\\agent\\agent.mjs:105:20)",
+  "report": {
+    "name": "2026-05-25T09-43-03-486-jsrun-1dc80d5b-ab18.html",
+    "url": "/reports/2026-05-25T09-43-03-486-jsrun-1dc80d5b-ab18.html"
+  },
+  "events": [],
+  "logTail": [
+    "Mode: javascript",
+    "Cache id: saptest-js-1dc80d5b-c457-4429-958c-36eed42a712c-dee06f741fb4",
+    "Cache strategy: write-only",
+    "Cache path: C:\\Users\\BOG1SGH\\saptest1\\midscene_run\\cache\\saptest-js-1dc80d5b-c457-4429-958c-36eed42a712c-dee06f741fb4.cache.yaml",
+    "Target URL: https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+    "Steps: 25",
+    "Step 1/25: 进入 Menu (aiTap)",
+    "Step 2/25: 点击setting (aiTap)",
+    "Step 2 FAILED: page.screenshot: Target page, context or browser has been closed\npage.screenshot: Target page, context or browser has been closed\n    at WebPage.screenshotBase64 (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\web\\dist\\es\\puppeteer\\base-page.mjs:171:43)\n    at commonContextParser (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\core\\dist\\es\\agent\\utils.mjs:29:54)\n    at async PlaywrightAgent.getUIContext (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\core\\dist\\es\\agent\\agent.mjs:105:20)",
+    "Error: page.screenshot: Target page, context or browser has been closed\npage.screenshot: Target page, context or browser has been closed\n    at WebPage.screenshotBase64 (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\web\\dist\\es\\puppeteer\\base-page.mjs:171:43)\n    at commonContextParser (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\core\\dist\\es\\agent\\utils.mjs:29:54)\n    at async PlaywrightAgent.getUIContext (C:\\Users\\BOG1SGH\\saptest1\\node_modules\\@midscene\\core\\dist\\es\\agent\\agent.mjs:105:20)"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "runId": "2026-05-25T11-01-31-215-jsrun-saptest4-d0eb",
+  "caseId": "saptest4",
+  "spec": null,
+  "mode": "javascript",
+  "headed": true,
+  "useCache": true,
+  "cacheStrategy": "read-write",
+  "cacheId": "saptest-js-saptest4-294e77b95b07",
+  "startedAt": "2026-05-25T11:01:31.215Z",
+  "finishedAt": "2026-05-25T11:01:35.769Z",
+  "durationMs": 4554,
+  "exitCode": 1,
+  "status": "failed",
+  "startedBy": "admin",
+  "errorMessage": "page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\", waiting until \"domcontentloaded\"\u001b[22m\n",
+  "report": null,
+  "events": [],
+  "runSummary": {
+    "variables": {},
+    "assertions": [],
+    "downloads": []
+  },
+  "logTail": [
+    "Mode: javascript",
+    "Cache id: saptest-js-saptest4-294e77b95b07",
+    "Cache strategy: read-write",
+    "Cache path: C:\\Users\\BOG1SGH\\saptest1\\midscene_run\\cache\\saptest-js-saptest4-294e77b95b07.cache.yaml",
+    "Target URL: https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+    "Steps: 30",
+    "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "",
+    "===== Result Summary =====",
+    "Variables: (none)",
+    "Comparisons: (none)",
+    "Downloads: (none)",
+    "Status: failed",
+    "Failure reason: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "===== End Summary ====="
+  ]
+}

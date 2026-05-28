@@ -1,0 +1,52 @@
+{
+  "runId": "2026-05-26T03-06-56-572-jsrun-saptest1-dcfe",
+  "caseId": "saptest1",
+  "spec": null,
+  "mode": "javascript",
+  "headed": true,
+  "useCache": true,
+  "cacheStrategy": "read-write",
+  "cacheId": "saptest-js-saptest1-f281b87b7cc5",
+  "startedAt": "2026-05-26T03:06:56.572Z",
+  "finishedAt": "2026-05-26T03:07:49.341Z",
+  "durationMs": 52769,
+  "exitCode": 1,
+  "status": "failed",
+  "startedBy": "admin",
+  "errorMessage": "Aborted by user",
+  "report": {
+    "name": "2026-05-26T03-06-56-572-jsrun-saptest1-dcfe.html",
+    "url": "/reports/2026-05-26T03-06-56-572-jsrun-saptest1-dcfe.html"
+  },
+  "events": [],
+  "runSummary": {
+    "variables": {},
+    "assertions": [],
+    "downloads": []
+  },
+  "logTail": [
+    "Mode: javascript",
+    "Cache id: saptest-js-saptest1-f281b87b7cc5",
+    "Cache strategy: read-write",
+    "Cache path: C:\\Users\\BOG1SGH\\saptest1\\midscene_run\\cache\\saptest-js-saptest1-f281b87b7cc5.cache.yaml",
+    "Target URL: https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+    "Steps: 28",
+    "Step 1/28: 进入 Menu (aiTap)",
+    "Step 2/28: 点击setting (aiTap)",
+    "Step 3/28: 点击visualization (aiTap)",
+    "Step 4/28: 启用show Ok code field (aiTap)",
+    "Step 5/28: 保存 (aiTap)",
+    "Step 6/28: 在 矩形输入框 输入 S_ALR_87011990 (aiInput)",
+    "Step 7/28: 点击右下角execute (aiTap)",
+    "  …waiting 5000ms (Execute-class step, server query in flight)",
+    "Error: Aborted by user",
+    "",
+    "===== Result Summary =====",
+    "Variables: (none)",
+    "Comparisons: (none)",
+    "Downloads: (none)",
+    "Status: failed",
+    "Failure reason: Aborted by user",
+    "===== End Summary ====="
+  ]
+}
