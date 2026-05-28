@@ -6,11 +6,13 @@ test-results/
 midscene_run/report/
 midscene_run/log/
 midscene_run/output/
-# run-history/ used to be ignored, but is now tracked so collaborators can
-# see each case's latest passing/failed run + duration / cacheId / errors
-# in the UI without re-running. The HTMLs in midscene_run/report/ stay
-# ignored by default — we force-add only the latest passing report per
-# case via `git add -f` (see commit history for the curated set).
+# run-history/ and midscene_run/report/ both stay ignored by default to
+# keep the repo lean. For each case we force-add exactly ONE run JSON +
+# ONE HTML report (the latest passing one) via `git add -f`. Local runs
+# keep accumulating in these folders but stay out of git automatically.
+# To refresh a case's tracked pair: `git rm` the old one and `git add -f`
+# the new one.
+run-history/
 
 .DS_Store
 *.log
