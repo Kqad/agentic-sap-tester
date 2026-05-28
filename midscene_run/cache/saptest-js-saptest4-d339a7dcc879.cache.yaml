@@ -1,46 +1,6 @@
 midsceneVersion: 1.8.1
 cacheId: saptest-js-saptest4-d339a7dcc879
 caches:
-  - type: plan
-    prompt: 按住右侧的纵向滚动条的滑块,拖到最底端
-    yamlWorkflow: |
-      tasks:
-        - name: 按住右侧的纵向滚动条的滑块,拖到最底端
-          flow:
-            - aiScroll: ''
-              scrollType: scrollToBottom
-              locate: 页面主要内容区域
-            - aiDragAndDrop: ''
-              from: 右侧纵向滚动条的滑块（当前位于中上部）
-              to: 右侧纵向滚动条的底部位置
-  - type: plan
-    prompt: 按住右侧的纵向滚动条的滑块,拖到最底端
-    yamlWorkflow: |
-      tasks:
-        - name: 按住右侧的纵向滚动条的滑块,拖到最底端
-          flow:
-            - aiDragAndDrop: ''
-              from: 右侧纵向滚动条的滑块
-              to: 右侧纵向滚动条的最底端位置
-  - type: plan
-    prompt: 将整个网页向下滚动到最底部，让原本在下方被裁掉的内容显示出来。不要点击任何按钮或表格行，不要切换页面，不要拖动横向滚动条。
-    yamlWorkflow: |
-      tasks:
-        - name: 将整个网页向下滚动到最底部，让原本在下方被裁掉的内容显示出来。不要点击任何按钮或表格行，不要切换页面，不要拖动横向滚动条。
-          flow:
-            - aiScroll: ''
-              scrollType: scrollToBottom
-              direction: down
-              locate: 页面主体内容区域
-  - type: plan
-    prompt: 按住右侧的纵向滚动条的滑块,拖到最底端
-    yamlWorkflow: |
-      tasks:
-        - name: 按住右侧的纵向滚动条的滑块,拖到最底端
-          flow:
-            - aiDragAndDrop: ''
-              from: 右侧纵向滚动条的滑块
-              to: 滚动条最底端位置
   - type: locate
     prompt: 进入 Menu
     cache:
@@ -91,26 +51,6 @@ caches:
     cache:
       xpaths:
         - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[normalize-space()="EUR"]
-  - type: locate
-    prompt: 右侧纵向滚动条的滑块（当前位于中上部）
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[normalize-space()="Supplier4001020028 Company Code8540 NameBosch Industriekessel GmbH CityGunzenhausenStG/L AcctDocumentNoReferenceTypeDoc. DateSPstng DateNet Due DtAmount in Doc. Curr.CrcyAmount in Local CrcyLCurrCost CtrOffsetAcctTxTextPBk4412110000170000086170193379RE11.02.202523.12.202529.03.2025 1.394,20-EUR 51.684,67-THB9080110000V0HCDI/Module Plug-In Switch4412110000170000105070192872RE24.01.202530.12.202520.03.2025 145,40-EUR 5.383,78-THB9080110000V0HCDI/PO 45350012594412110000170000105161609358RE18.07.202530.12.202517.08.2025 5.424,80-EUR 200.865,70-THB9080110000V0HCDI/PO 45350012604412110000170000105261613554RE20.10.202530.12.202519.11.2025 5.361,50-EUR 198.521,87-THB9080110000V0HCDI/PO 45350012364412110000170000105370199814RE05.11.202530.12.202502.01.2026 1.565,28-EUR 57.958,09-THB9080110000V0HCDI/PO 4535001262441211000017000011201000166KG19.12.202531.12.202522.12.2025 210.224,09EUR 7.883.739,73THB6010309900V0HCDI/CN ACCORD CLAUSE DISTRIBUTION AGREEMENT 2024*Account 4001020028 189.499,46EUR 7.118.342,57THB Supplier4001020043 Company Code8540 NameBosch Technology Licensing CityGerlingenStG/L AcctDocumentNoReferenceTypeDoc. DateSPstng DateNet Due DtAmount in Doc. Curr.CrcyAmount in Local CrcyLCurrCost CtrOffsetAcctTxTextPBk441211000052000082557137851084ZK31.03.202531.10.202501.09.2025 1.268,10EUR 48.219,00THB9830300000V0RBLF/MA CREDIT NOTE FOR INV 7137851063&7137850800*Account 4001020043 1.268,10EUR 48.219,00THB"]
-  - type: locate
-    prompt: 右侧纵向滚动条的底部位置
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[1]
-  - type: locate
-    prompt: 右侧纵向滚动条的滑块
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/div[2]/div[1]
-  - type: locate
-    prompt: 右侧纵向滚动条的最底端位置
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]
   - type: locate
     prompt: 点击SAP返回主页
     cache:
@@ -186,13 +126,3 @@ caches:
     cache:
       xpaths:
         - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
-  - type: locate
-    prompt: 右侧纵向滚动条的滑块
-    cache:
-      xpaths:
-        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]
-  - type: locate
-    prompt: 滚动条最底端位置
-    cache:
-      xpaths:
-        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]

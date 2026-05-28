@@ -13,7 +13,9 @@ import {
   isMissingQueryResult,
   canUseScrollRecovery,
   canReplanApiGuideStep,
+  detectScrollExtreme,
   STEP_TIMEOUT_MS,
+  SCROLL_EXTREME_STEP_TIMEOUT_MS,
   STEP_MAX_ATTEMPTS,
   STEP_RETRY_DELAY_MS,
   SCROLL_DRAG_TIMEOUT_MS,
@@ -98,10 +100,19 @@ export async function executeStepWithRecovery(agent, step, ctx, executeOne) {
   let lastError = null;
   let lastQueryMissing;
 
+  // Scroll-extreme dispatcher in runner.js does its own internal verify
+  // loop (aiAct drag up to SCROLL_DRAG_TIMEOUT_MS + aiBoolean verify up to
+  // SCROLL_DRAG_TIMEOUT_MS). Give it the headroom — otherwise the outer
+  // 120s ceiling fires while the inner work is still completing, causing
+  // the runner to "retry" a step that actually already succeeded.
+  const isScrollExtreme = normalizeApiName(step) === 'aiScroll'
+    && detectScrollExtreme(step.naturalLanguageInstruction ?? '');
+  const stepTimeoutMs = isScrollExtreme ? SCROLL_EXTREME_STEP_TIMEOUT_MS : STEP_TIMEOUT_MS;
+
   for (let attempt = 1; attempt <= STEP_MAX_ATTEMPTS; attempt += 1) {
     try {
       if (attempt > 1) ctx.log(`Step ${step.order} retry attempt ${attempt}/${STEP_MAX_ATTEMPTS}`);
-      const result = await withTimeout(executeOne(agent, step, ctx), STEP_TIMEOUT_MS, `Step ${step.order}`);
+      const result = await withTimeout(executeOne(agent, step, ctx), stepTimeoutMs, `Step ${step.order}`);
       if (normalizeApiName(step) === 'aiQuery' && isMissingQueryResult(result)) {
         ctx.log(`Step ${step.order} query target not found: ${JSON.stringify(result)}`);
         lastError = new Error(`查询目标未找到：${JSON.stringify(result)}`);

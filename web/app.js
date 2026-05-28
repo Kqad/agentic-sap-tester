@@ -3326,7 +3326,12 @@ async function generateApiGuide(caseId) {
   }
 }
 
-async function openJsRunModal(caseId, cacheMode) {
+// `opts.followRunId`: skip the Start flow and immediately attach to a run
+// that is already in flight (re-opened from the bottom-right "active runs"
+// badge). The modal becomes a watch-only view — Abort still works, Start
+// is hidden, and polling drives the step/log/status updates until the run
+// disappears from /api/midscene-js/runs/active (= finished).
+async function openJsRunModal(caseId, cacheMode, opts = {}) {
   let detail;
   try {
     detail = await api.get('/api/cases/' + encodeURIComponent(caseId));
@@ -3396,8 +3401,19 @@ async function openJsRunModal(caseId, cacheMode) {
     }),
   );
 
+  const followRunId = opts.followRunId ?? null;
+  if (followRunId) {
+    startBtn.style.display = 'none';
+    statusEl.textContent = 'Re-attaching to live run…';
+  }
+
+  // Tracked at modal scope so onClose can clearInterval — fixes a leak where
+  // closing the modal mid-run left the poller firing forever.
+  let pollHandle = null;
+
   const m = modal({
-    title: 'JS run · ' + (parsed.title ?? caseId) + ' · cache=' + cacheMode,
+    title: (followRunId ? 'Follow JS run · ' : 'JS run · ') + (parsed.title ?? caseId)
+      + (followRunId ? '' : ' · cache=' + cacheMode),
     wide: true,
     body: h('div', {},
       h('div', { class: 'field' },
@@ -3410,9 +3426,11 @@ async function openJsRunModal(caseId, cacheMode) {
       reportLinkBox,
     ),
     footer: h('div', { class: 'row', style: { marginLeft: 'auto', gap: '8px' } }, abortBtn, startBtn),
+    onClose: () => { if (pollHandle) { clearInterval(pollHandle); pollHandle = null; } },
   });
 
-  let activeRunId = null;
+  let activeRunId = followRunId;
+  if (followRunId) abortBtn.disabled = false;
   abortBtn.addEventListener('click', async () => {
     if (!activeRunId) return;
     abortBtn.disabled = true;
@@ -3427,20 +3445,24 @@ async function openJsRunModal(caseId, cacheMode) {
     }
   });
 
-  startBtn.addEventListener('click', async () => {
-    startBtn.disabled = true;
-    abortBtn.disabled = true;
-    abortBtn.textContent = 'Abort';
-    statusEl.textContent = 'Launching browser…';
-    consoleEl.textContent = '';
-    activeRunId = null;
-
-    let lastLogIdx = 0;
-    const pollHandle = setInterval(async () => {
+  // Polling loop — used by both the Start path (new run) and the follow path
+  // (re-attach to an in-flight run). Looks up the right active entry by
+  // runId when known (follow), else by caseId (Start path before runId is
+  // discovered). Calls onFinish() when the entry disappears from the active
+  // list — caller decides whether to await the run POST or self-terminate.
+  let lastLogIdx = 0;
+  function startPolling(onFinish) {
+    if (pollHandle) clearInterval(pollHandle);
+    pollHandle = setInterval(async () => {
       try {
         const r = await api.get('/api/midscene-js/runs/active');
-        const mine = r.active.find((a) => a.caseId === caseId);
-        if (!mine) return;
+        const mine = activeRunId
+          ? r.active.find((a) => a.runId === activeRunId)
+          : r.active.find((a) => a.caseId === caseId);
+        if (!mine) {
+          if (activeRunId && onFinish) onFinish();
+          return;
+        }
         activeRunId = mine.runId;
         abortBtn.disabled = false;
         const step = mine.currentStep;
@@ -3448,11 +3470,9 @@ async function openJsRunModal(caseId, cacheMode) {
           'Running — step ' + (step?.order ?? '?') + '/' + mine.totalSteps +
           (step ? ` (${step.api}: ${truncForStatus(step.title, 50)})` : '') +
           '  · ' + Math.round(mine.elapsedMs / 100) / 10 + 's elapsed';
-        // Highlight current step
         for (const li of stepsList.children) {
           li.style.background = li.dataset.stepOrder === String(step?.order ?? -1) ? 'rgba(80,140,255,0.18)' : '';
         }
-        // Pull new log lines from logTail (server keeps last 200; we dedupe by idx)
         const fresh = mine.logTail.slice(lastLogIdx);
         if (fresh.length) {
           consoleEl.textContent += (consoleEl.textContent ? '\n' : '') + fresh.map((l) => l.line).join('\n');
@@ -3461,6 +3481,28 @@ async function openJsRunModal(caseId, cacheMode) {
         }
       } catch { /* ignore poll errors */ }
     }, 1500);
+  }
+
+  // Follow mode: run is already in flight, just start polling and stop when
+  // the entry disappears from the active list (= run ended).
+  if (followRunId) {
+    startPolling(() => {
+      clearInterval(pollHandle);
+      pollHandle = null;
+      statusEl.textContent = 'Run finished. Open the History tab on the case page for the report.';
+      abortBtn.disabled = true;
+    });
+  }
+
+  startBtn.addEventListener('click', async () => {
+    startBtn.disabled = true;
+    abortBtn.disabled = true;
+    abortBtn.textContent = 'Abort';
+    statusEl.textContent = 'Launching browser…';
+    consoleEl.textContent = '';
+    activeRunId = null;
+    lastLogIdx = 0;
+    startPolling();
 
     try {
       const r = await api.post(
@@ -3581,7 +3623,10 @@ async function pollActiveRuns() {
           abortBtn.textContent = 'Abort';
         }
       });
-      badge.appendChild(h('div', { style: { marginTop: '4px', borderTop: '1px solid #333', paddingTop: '4px' } },
+      const row = h('div', {
+        style: { marginTop: '4px', borderTop: '1px solid #333', paddingTop: '4px', cursor: 'pointer' },
+        title: 'Click to reopen the run progress window',
+      },
         h('div', { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
           h('span', { style: { flex: 1 } }, (a.caseTitle || a.caseId) + ' · ' + elapsedS + 's'),
           abortBtn,
@@ -3589,7 +3634,13 @@ async function pollActiveRuns() {
         h('div', { style: { opacity: 0.75 } },
           step ? `step ${step.order}/${a.totalSteps} · ${step.api}: ${truncForStatus(step.title, 38)}`
                : '(launching…)'),
-      ));
+      );
+      row.addEventListener('click', (ev) => {
+        // The Abort button already stopPropagation()'s, but guard anyway.
+        if (ev.target === abortBtn || abortBtn.contains?.(ev.target)) return;
+        openJsRunModal(a.caseId, 'read', { followRunId: a.runId });
+      });
+      badge.appendChild(row);
     }
   } catch { /* swallow; badge stays as last state */ }
 }

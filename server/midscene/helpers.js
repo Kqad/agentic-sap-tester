@@ -103,6 +103,12 @@ export function safeStringify(v) {
 
 // Step-execution timeouts / retry knobs (copied from Desktop).
 export const STEP_TIMEOUT_MS = 120 * 1000;
+// Scroll-extreme steps need extra headroom: aiAct drag (up to
+// SCROLL_DRAG_TIMEOUT_MS) + aiBoolean verify (also up to SCROLL_DRAG_TIMEOUT_MS
+// if the LLM is slow / hangs internally before erroring out). Without this,
+// the outer recovery layer can time out at 120s while the inner work is still
+// finishing — so the runner retries even though the drag actually succeeded.
+export const SCROLL_EXTREME_STEP_TIMEOUT_MS = 240 * 1000;
 export const STEP_MAX_ATTEMPTS = 2;
 export const STEP_RETRY_DELAY_MS = 3000;
 export const SCROLL_DRAG_TIMEOUT_MS = 90 * 1000;

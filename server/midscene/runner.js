@@ -209,8 +209,9 @@ async function dispatchStep(agent, step, ctx) {
         }
 
         const confirmed = await llmConfirmScrollProgress(agent, beforeBase64, `${label} attempt ${attempt}`, ctx.log);
-        if (confirmed === true) {
-          ctx.log(`${label} confirmed by LLM on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}.`);
+        ctx.log(`${label} llmConfirmScrollProgress returned ${JSON.stringify(confirmed)} (typeof=${typeof confirmed})`);
+        if (confirmed) {
+          ctx.log(`${label} confirmed (truthy) on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}, returning to runner.`);
           return undefined;
         }
         if (confirmed === null) {
@@ -291,15 +292,15 @@ export async function runJavascript(caseObj, opts = {}) {
   // returns it (no end-of-run commit). That's bad when LLM locate-misses to
   // a wrong xpath, because partial / wrong writes pollute the file.
   //
-  // Read mode (Run JS w/ Cache): always restore the snapshot. The intent of
-  //   read mode is to REPLAY confirmed-good locations; any LLM-fallback
-  //   writes during the run are noise we don't want persisted.
-  //
-  // Write mode (Run JS): only restore when the run FAILS. The intent of
-  //   write mode is to record a fresh cache, but only a fully-passing run
-  //   produces a trustworthy cache. If any step fails, roll the file back
-  //   to its pre-run state so a half-written cache doesn't replace the
-  //   confirmed-good version.
+  // Unified policy (both modes):
+  //   - Run PASSED → keep whatever Midscene wrote. A fully-passing run
+  //     validates every locator Midscene executed, so the recorded xpaths
+  //     (new entries or refreshed ones for previously-cached steps that the
+  //     LLM re-located) are trustworthy. Lets read-mode runs accumulate
+  //     cache for previously-uncached steps automatically.
+  //   - Run FAILED → restore the pre-run snapshot. A partial / mid-flight
+  //     cache could include bad xpaths from the LLM trying to recover from
+  //     the step that ultimately failed.
   let cacheSnapshot = null;
   try {
     cacheSnapshot = fs.readFileSync(resolveCachePath(cacheId));
@@ -390,6 +391,21 @@ export async function runJavascript(caseObj, opts = {}) {
     });
     cleanupTasks.push({ name: 'context', fn: () => context.close().catch(() => {}) });
 
+    // Inject a small default page zoom so SAP WebGUI text and tables render
+    // bigger in the spawned Chrome. Runs on every page / sub-frame nav via
+    // addInitScript — survives SAP's internal redirects (login → desktop →
+    // transaction screen). Overridable via MIDSCENE_PAGE_ZOOM env (e.g. "1.2").
+    const pageZoom = Number(process.env.MIDSCENE_PAGE_ZOOM) || 1.3;
+    await context.addInitScript((zoom) => {
+      const apply = () => {
+        if (document.documentElement) {
+          document.documentElement.style.zoom = String(zoom);
+        }
+      };
+      apply();
+      document.addEventListener('DOMContentLoaded', apply);
+    }, pageZoom);
+
     // Persist Playwright downloads into the user's real Downloads folder so
     // downloads.js (which polls ~/Downloads for fresh files) can detect them.
     // Without this, Playwright stores downloads in a tmp dir keyed off the
@@ -476,27 +492,25 @@ export async function runJavascript(caseObj, opts = {}) {
       try { await t.fn(); }
       catch (e) { log(`Cleanup(${t.name}) failed: ${e?.message ?? e}`); }
     }
-    // Restore the pre-run cache snapshot. See the snapshot block above for
-    // the rules:
-    //   - read mode: always restore (run cannot mutate cache)
-    //   - write mode + run failed: restore (don't persist a partial cache)
-    //   - write mode + run passed: keep what Midscene wrote (fresh cache)
-    const shouldRestore =
-      cacheSnapshot && (cacheMode === 'read' || status !== 'passed');
+    // Restore the pre-run cache snapshot. See the snapshot block above:
+    //   - run failed → restore (don't persist a partial / mid-flight cache)
+    //   - run passed → keep whatever Midscene wrote (validated by the run)
+    const shouldRestore = cacheSnapshot && status !== 'passed';
     if (shouldRestore) {
       try {
         fs.writeFileSync(resolveCachePath(cacheId), cacheSnapshot);
-        const reason = cacheMode === 'read'
-          ? 'read-mode run cannot mutate cache'
-          : `write-mode run ended with status=${status}, rolling back partial cache`;
-        log(`Cache protection: restored ${cacheSnapshot.length} bytes (${reason}).`);
+        log(`Cache protection: restored ${cacheSnapshot.length} bytes (run ended with status=${status}, rolling back partial cache).`);
       } catch (e) {
         log(`Cache restore failed (continuing): ${e?.message ?? e}`);
       }
-    } else if (cacheSnapshot && cacheMode === 'write' && status === 'passed') {
-      log(`Cache protection: write-mode run passed, keeping ${(() => {
-        try { return fs.statSync(resolveCachePath(cacheId)).size; } catch { return '?'; }
-      })()} bytes of freshly-recorded cache.`);
+    } else if (status === 'passed') {
+      const finalSize = (() => {
+        try { return fs.statSync(resolveCachePath(cacheId)).size; } catch { return null; }
+      })();
+      const baselineSize = cacheSnapshot ? cacheSnapshot.length : 0;
+      const delta = finalSize != null ? finalSize - baselineSize : null;
+      const deltaStr = delta == null ? '' : (delta > 0 ? ` (+${delta} bytes vs baseline)` : delta < 0 ? ` (${delta} bytes vs baseline)` : ' (unchanged vs baseline)');
+      log(`Cache protection: run passed, keeping ${finalSize ?? '?'} bytes of recorded cache${deltaStr}.`);
     }
     unregisterActiveRun(runId);
   }

@@ -9,6 +9,15 @@ caches:
           flow:
             - Sleep: ''
               timeMs: 10000
+  - type: plan
+    prompt: 按住右侧的纵向滚动条的滑块,拖到最底端
+    yamlWorkflow: |
+      tasks:
+        - name: 按住右侧的纵向滚动条的滑块,拖到最底端
+          flow:
+            - aiDragAndDrop: ''
+              from: 右侧纵向滚动条的滑块
+              to: 右侧纵向滚动条的最底端位置
   - type: locate
     prompt: 进入 Menu
     cache:
@@ -113,4 +122,4 @@ caches:
     prompt: 右侧纵向滚动条的最底端位置
     cache:
       xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]
