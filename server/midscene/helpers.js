@@ -138,11 +138,11 @@ export function delayAfterStepMs(step) {
 // steps that match get the verify-once path in runner.js: one drag, one LLM
 // screenshot compare, then return regardless — never retry, never re-drag.
 export function detectScrollExtreme(instruction) {
-  if (!instruction || !/[滑拖]/.test(instruction)) return null;
-  if (/最[下底]/.test(instruction)) return 'bottom';
-  if (/最[上顶]/.test(instruction)) return 'top';
-  if (/最右/.test(instruction)) return 'right';
-  if (/最左/.test(instruction)) return 'left';
+  if (!instruction || !/[滑拖滚拉]/.test(instruction)) return null;
+  if (/(?:最|到)[下底]/.test(instruction)) return 'bottom';
+  if (/(?:最|到)[上顶]/.test(instruction)) return 'top';
+  if (/(?:最|到)右/.test(instruction)) return 'right';
+  if (/(?:最|到)左/.test(instruction)) return 'left';
   return null;
 }
 
@@ -150,14 +150,16 @@ export const FULL_PAGE_SCROLL_RECOVERY_STEPS = [
   {
     label: '滑动到底部',
     instruction:
-      '将整个网页向下滚动到最底部，让原本在下方被裁掉的内容显示出来。' +
+      '页面右侧有一条纵向滚动条，滑块当前大概在屏幕右上角附近（因为页面停在顶部）。' +
+      '按住这个滑块向下一路拖动到最底端，让原本在下方被裁掉的内容显示出来。' +
       '不要点击任何按钮或表格行，不要切换页面，不要拖动横向滚动条。',
     settleMs: SCROLL_RECOVERY_DELAY_MS,
   },
   {
     label: '滑动到最右边',
     instruction:
-      '将整个网页向右横向滚动到最右边，让原本在右侧被裁掉的内容显示出来。' +
+      '页面底部有一条横向滚动条，滑块当前大概在屏幕左下角附近（因为页面停在最左侧）。' +
+      '按住这个滑块向右一路拖动到最右端，让原本在右侧被裁掉的内容显示出来。' +
       '不要点击任何按钮或表格行，不要切换页面，不要拖动纵向滚动条。',
     settleMs: RIGHT_SCROLL_RECOVERY_DELAY_MS,
   },

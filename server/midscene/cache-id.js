@@ -30,6 +30,12 @@
 // without this field stay on the full-hash behavior — their cache YAMLs
 // keep matching their existing filenames.
 //
+// Scroll-extreme normalization: any step whose NL or exampleCode matches a
+// "drag/scroll to last edge" pattern is collapsed to a canonical
+// "scroll-extreme:<direction>" key in the hash. Lets us swap between
+// agent.aiAct("...拖到最底端") and agent.aiScroll({scrollType:'scrollToBottom'})
+// (or re-word the drag prompt) without rolling the cacheId.
+//
 // Diverges from the Desktop project's buildJavascriptCacheId. Existing cache
 // files were migrated by scripts/rename-cache-ids.mjs (one-shot, idempotent).
 
@@ -37,6 +43,28 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { ROOT } from '../paths.js';
+import { detectScrollExtreme } from './helpers.js';
+
+// Scroll-extreme steps ("滑到最底端", "拖到最右", etc.) can be authored as
+// EITHER `agent.aiAct("按住...拖到最X端")` OR `agent.aiScroll({ scrollType:
+// 'scrollToBottom' })` — they produce the same logical motion. Switching
+// between the two forms (or tweaking the prompt wording inside aiAct)
+// should NOT roll the cacheId. Returns a stable canonical string like
+// "scroll-extreme:bottom" when the step is scroll-extreme, else null.
+function canonicalScrollExtreme(step) {
+  const nl = step?.naturalLanguageInstruction ?? '';
+  const code = step?.exampleCode ?? '';
+  const dir = detectScrollExtreme(nl)
+    || detectScrollExtreme(code);
+  if (dir) return `scroll-extreme:${dir}`;
+  // Cover aiScroll({scrollType:'scrollToTop|Bottom|Left|Right'}) where the
+  // NL might be too vague for detectScrollExtreme to fire.
+  const m = /scrollType\s*:\s*(['"`])scrollTo(Top|Bottom|Left|Right)\1/i.exec(code);
+  if (m) {
+    return `scroll-extreme:${m[2].toLowerCase()}`;
+  }
+  return null;
+}
 
 // Returns every tcode value in the case, in step-order, joined with "|".
 // A "tcode step" is any aiInput step whose locator matches the SAP tcode
@@ -97,12 +125,26 @@ function normalizeApiGuideForHash(apiGuide, stepLimit = Infinity) {
     steps: apiGuide.steps
       .filter((s) => !isSleepStep(s))
       .slice(0, stepLimit)
-      .map((s, i) => ({
-        index: i,
-        midsceneApi: s.midsceneApi,
-        xpath: s.xpath,
-        exampleCode: stripValueLiteralsFromExampleCode(s.exampleCode),
-      })),
+      .map((s, i) => {
+        // Scroll-extreme: collapse aiAct(...drag...) and aiScroll({scrollType
+        // :...}) variants into one canonical token so switching between them
+        // (or tweaking the drag prompt wording) doesn't roll the cacheId.
+        const scrollKey = canonicalScrollExtreme(s);
+        if (scrollKey) {
+          return {
+            index: i,
+            midsceneApi: 'aiScrollExtreme',
+            xpath: s.xpath,
+            exampleCode: scrollKey,
+          };
+        }
+        return {
+          index: i,
+          midsceneApi: s.midsceneApi,
+          xpath: s.xpath,
+          exampleCode: stripValueLiteralsFromExampleCode(s.exampleCode),
+        };
+      }),
   };
 }
 

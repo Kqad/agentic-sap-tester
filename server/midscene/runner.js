@@ -58,24 +58,6 @@ function extractAiInputArgs(code) {
   return { locator: m[2], value: m[4] };
 }
 
-// Detect `aiAct("按住X纵向滚动条的滑块,拖到最顶端|最底端")` shapes baked into
-// older apiGuides (cases imported from desktop predate the aiScroll rewrite
-// in formatAiScrollExampleCode). For those, swap to a deterministic
-// agent.aiScroll({ scrollType: 'scrollToBottom' | 'scrollToTop' }) call so we
-// skip Midscene's aiAct verify-retry loop — which on SAP can mis-classify a
-// long drag as "navigation, not scroll" and burn minutes re-trying with the
-// wrong before-scroll frame.
-function extractVerticalScrollExtremeFromAiAct(code) {
-  if (!code) return null;
-  const m = /aiAct\s*\(\s*(['"`])([\s\S]*?)\1\s*\)/.exec(code);
-  if (!m) return null;
-  const text = m[2];
-  if (!/纵向滚动条/.test(text)) return null;
-  if (/拖到\s*最\s*[底下]/.test(text) || /最底端/.test(text)) return 'scrollToBottom';
-  if (/拖到\s*最\s*[顶上]/.test(text) || /最顶端/.test(text)) return 'scrollToTop';
-  return null;
-}
-
 const VIEWPORT = { width: 1920, height: 1080 };
 const CHROME_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36';
@@ -101,7 +83,9 @@ async function llmConfirmScrollProgress(agent, beforeBase64, label, log) {
       agent.aiBoolean({
         prompt:
           '附件中的第一张图是拖动/滚动操作之前的页面截图，请把它和当前页面截图作对比，' +
-          '判断页面或表格内容是否发生了明显的滚动位移。仅 tooltip、动画、loading 提示、光标等无关变化不算明显滚动。' +
+          '判断页面或表格内容是否发生了明显的滚动位移（包括纵向 = 数据行换了，以及横向 = 表头列换了 / 列名出现的位置移动了）。' +
+          '只要表头列发生了横向位移、或者表格里出现了之前看不到的列/行，都算明显滚动 → 返回 true。' +
+          '仅 tooltip、动画、loading 提示、光标等无关变化不算明显滚动。' +
           '如果有明显滚动返回 true，否则返回 false。',
         images: [{ name: 'before-scroll', url: `data:image/jpeg;base64,${beforeBase64}` }],
       }),
@@ -254,6 +238,13 @@ async function dispatchStep(agent, step, ctx) {
           lastReason = 'LLM says no visible scroll';
           ctx.log(`${label} ${lastReason} on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}`);
         }
+        // Verify failed → cache hit (if any) was stale or the wheel call
+        // missed; invalidate scroll cache so the next attempt forces a
+        // fresh LLM plan. Other cache entries (locate/plan for non-scroll
+        // steps) are left alone.
+        if (attempt < MAX_DRAG_ATTEMPTS && typeof ctx.invalidateScrollCache === 'function') {
+          ctx.invalidateScrollCache();
+        }
         if (attempt < MAX_DRAG_ATTEMPTS) await sleep(STEP_RETRY_DELAY_MS);
       }
       throw new Error(`${label} failed after ${MAX_DRAG_ATTEMPTS} drag attempts (${lastReason})`);
@@ -356,6 +347,7 @@ export async function runJavascript(caseObj, opts = {}) {
   // hash input), so changing values still replays from the same cache file.
   const params = (caseObj.params && typeof caseObj.params === 'object' && !Array.isArray(caseObj.params))
     ? caseObj.params : {};
+  const cachePath = resolveCachePath(cacheId);
   const ctx = {
     log,
     params,
@@ -365,6 +357,22 @@ export async function runJavascript(caseObj, opts = {}) {
       downloads: [],
       downloadStartedAtMs: startMs,
       lastDownloadCheckAtMs: startMs,
+    },
+    // On-demand scroll-cache invalidation. dispatchStep's aiScroll-extreme
+    // verify loop calls this after a failed aiBoolean check so the next
+    // attempt's `agent.aiScroll(...)` / `agent.aiAct(...)` misses cache
+    // and re-plans via the LLM. Other (non-scroll) cache entries stay.
+    invalidateScrollCache() {
+      try {
+        const scrub = stripScrollCacheEntries(cachePath);
+        if (scrub && scrub.removed > 0) {
+          log(`  …invalidated ${scrub.removed} scroll cache entries (next attempt will re-plan via LLM)`);
+        }
+        return scrub;
+      } catch (e) {
+        log(`  …invalidateScrollCache failed: ${e?.message ?? e}`);
+        return null;
+      }
     },
   };
 
@@ -379,18 +387,16 @@ export async function runJavascript(caseObj, opts = {}) {
     log(`Param overrides: ${paramKeys.length} step${paramKeys.length === 1 ? '' : 's'} (${paramKeys.sort((a, b) => Number(a) - Number(b)).join(', ')})`);
   }
 
-  // Scrub scroll entries from cache so aiScroll / aiAct-drag steps always
-  // re-plan via LLM (stale scroll xpaths often replay as a no-op). Other
-  // locate/plan entries stay intact. Per user rule: "only scroll bypasses
-  // cache". Applies to BOTH cache modes — write-only also writes through.
-  try {
-    const scrub = stripScrollCacheEntries(resolveCachePath(cacheId));
-    if (scrub && scrub.removed > 0) {
-      log(`Cache scrub: removed ${scrub.removed} scroll-class entries, kept ${scrub.kept}.`);
-    }
-  } catch (e) {
-    log(`Cache scrub failed (continuing): ${e?.message ?? e}`);
-  }
+  // ── Scroll-cache policy: try cache first, invalidate on verify failure ──
+  // Previously we strip-scrubbed scroll entries up front so every aiScroll
+  // step re-planned via LLM. Now we KEEP the cache so the first attempt
+  // replays the recorded scrollbar xpath/wheel call. The aiScroll-extreme
+  // branch in dispatchStep then aiBoolean-verifies whether the page
+  // actually scrolled — only if it didn't do we invalidate the scroll
+  // cache (via ctx.invalidateScrollCache) so the retry forces a fresh LLM
+  // plan. This way: cache hit + actually scrolled = fast path; cache hit
+  // + stale xpath = automatic re-plan; both without permanently losing
+  // good scroll cache entries.
 
   configureLlmProxy();
 
@@ -420,7 +426,7 @@ export async function runJavascript(caseObj, opts = {}) {
     // bigger in the spawned Chrome. Runs on every page / sub-frame nav via
     // addInitScript — survives SAP's internal redirects (login → desktop →
     // transaction screen). Overridable via MIDSCENE_PAGE_ZOOM env (e.g. "1.2").
-    const pageZoom = Number(process.env.MIDSCENE_PAGE_ZOOM) || 1.3;
+    const pageZoom = Number(process.env.MIDSCENE_PAGE_ZOOM) || 1.1;
     await context.addInitScript((zoom) => {
       const apply = () => {
         if (document.documentElement) {
