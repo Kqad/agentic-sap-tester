@@ -2306,32 +2306,6 @@ function renderParamsTab(caseData, stepsTree) {
       }
     }
 
-    // Read-only: JS assembled from apiGuide steps. This is the script the
-    // runner actually evals per-step (or that Desktop used to display under
-    // "生成的 JS" before each run).
-    if (parsed.apiGuide?.steps?.length) {
-      const generatedJs =
-        '// Auto-assembled from apiGuide.steps[].exampleCode\n' +
-        '// Title: ' + (parsed.title ?? '') + '\n' +
-        '// Target URL: ' + (parsed.sapUrl ?? '') + '\n\n' +
-        'async function run(agent) {\n' +
-        parsed.apiGuide.steps.map((s) => {
-          const reason = s.reason ? `  // ${String(s.reason).split('\n')[0]}\n` : '';
-          return `  // Step ${s.order}: ${s.title ?? ''}\n${reason}  ${(s.exampleCode ?? '').trim()}`;
-        }).join('\n\n') +
-        '\n}\n';
-
-      wrap.appendChild(h('details', { open: true, style: { marginBottom: '10px' } },
-        h('summary', { class: 'muted' },
-          '生成的 JS (from apiGuide · ' + parsed.apiGuide.steps.length + ' steps, ' +
-          generatedJs.length + ' chars)'),
-        h('pre', {
-          class: 'code-block',
-          style: { maxHeight: '320px', overflow: 'auto', fontSize: '12px', margin: '6px 0 0 0' },
-        }, generatedJs),
-      ));
-    }
-
     // Read-only: API guide step list. Label shows the API the runner ACTUALLY
     // calls (parsed from exampleCode), not the midsceneApi classification —
     // which sometimes diverges for "拖到最X端" type scroll steps that get
@@ -2340,7 +2314,7 @@ function renderParamsTab(caseData, stepsTree) {
     if (parsed.apiGuide?.steps?.length) {
       const stepsList = h('ol', {
         class: 'mono',
-        style: { fontSize: '12px', maxHeight: '300px', overflow: 'auto', paddingLeft: '24px', margin: '6px 0 0 0' },
+        style: { fontSize: '12px', maxHeight: '300px', overflow: 'auto', paddingLeft: '44px', margin: '6px 0 0 0' },
       }, ...parsed.apiGuide.steps.map((s) => {
         const actual = displayApiFromStep(s);
         const planned = plannedApiTagIfDifferent(s);
@@ -2356,11 +2330,39 @@ function renderParamsTab(caseData, stepsTree) {
           }, '· planned ' + planned),
         );
       }));
-      wrap.appendChild(h('details', { style: { marginBottom: '10px' } },
+      wrap.appendChild(h('details', { open: true, style: { marginBottom: '10px' } },
         h('summary', { class: 'muted' },
           'API guide steps · ' + parsed.apiGuide.steps.length +
           ' (read-only — labels show what runner actually calls; "planned" = LLM classification)'),
         stepsList,
+      ));
+    }
+
+    // Read-only: JS assembled from apiGuide steps. This is the script the
+    // runner actually evals per-step (or that Desktop used to display under
+    // "生成的 JS" before each run). Collapsed by default — most users only
+    // need to see the structured step list above; this block is for when
+    // they want to copy/paste the actual executable JS.
+    if (parsed.apiGuide?.steps?.length) {
+      const generatedJs =
+        '// Auto-assembled from apiGuide.steps[].exampleCode\n' +
+        '// Title: ' + (parsed.title ?? '') + '\n' +
+        '// Target URL: ' + (parsed.sapUrl ?? '') + '\n\n' +
+        'async function run(agent) {\n' +
+        parsed.apiGuide.steps.map((s) => {
+          const reason = s.reason ? `  // ${String(s.reason).split('\n')[0]}\n` : '';
+          return `  // Step ${s.order}: ${s.title ?? ''}\n${reason}  ${(s.exampleCode ?? '').trim()}`;
+        }).join('\n\n') +
+        '\n}\n';
+
+      wrap.appendChild(h('details', { style: { marginBottom: '10px' } },
+        h('summary', { class: 'muted' },
+          '生成的 JS (from apiGuide · ' + parsed.apiGuide.steps.length + ' steps, ' +
+          generatedJs.length + ' chars)'),
+        h('pre', {
+          class: 'code-block',
+          style: { maxHeight: '320px', overflow: 'auto', fontSize: '12px', margin: '6px 0 0 0' },
+        }, generatedJs),
       ));
     }
 
@@ -2416,11 +2418,13 @@ function renderParamsTab(caseData, stepsTree) {
     wrap.appendChild(h('div', { class: 'muted', style: { marginBottom: '10px' } }, t('params.empty')));
   }
 
-  // Raw JSON — always available, collapsed by default for "formable" cases.
-  const rawToggle = h('button', { class: 'btn ghost sm' }, isFormable ? t('params.showRaw') : t('params.hideRaw'));
+  // Raw JSON — always collapsed by default, regardless of case shape. The
+  // structured editor above covers almost all routine edits; users only
+  // need raw JSON for unusual structural tweaks.
+  const rawToggle = h('button', { class: 'btn ghost sm' }, t('params.showRaw'));
   const rawTa = h('textarea', { style: { minHeight: '320px' }, disabled: !hasPerm('cases:write') }, caseData.raw);
   rawTa.addEventListener('input', markDirty);
-  const rawWrap = h('div', { class: 'raw-json', style: { display: isFormable ? 'none' : 'block' } },
+  const rawWrap = h('div', { class: 'raw-json', style: { display: 'none' } },
     h('div', { class: 'field' }, h('span', {}, t('cases.paramsLabel')), rawTa),
   );
   rawToggle.addEventListener('click', () => {
@@ -2752,7 +2756,7 @@ function renderMidsceneJsTab(caseData, runs) {
   } else {
     runCard.appendChild(h('ol', {
       class: 'mono',
-      style: { fontSize: '12px', maxHeight: '420px', overflow: 'auto', paddingLeft: '24px', margin: 0 },
+      style: { fontSize: '12px', maxHeight: '420px', overflow: 'auto', paddingLeft: '44px', margin: 0 },
     }, ...apiGuide.steps.map((s) => {
       const actual = displayApiFromStep(s);
       const planned = plannedApiTagIfDifferent(s);
@@ -3383,10 +3387,40 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
   const abortBtn = h('button', { class: 'btn danger', disabled: true, title: 'Abort the in-flight run (closes browser handles)' }, 'Abort');
   const reportLinkBox = h('div', { class: 'muted', style: { minHeight: '20px' } });
 
-  const stepsList = h('ol', { class: 'mono', style: { fontSize: '12px', maxHeight: '320px', overflow: 'auto', paddingLeft: '20px' } },
+  // Per-step "force re-plan" checkboxes — only useful in cache=read mode,
+  // where the default is to replay every cached locator. Checking a step
+  // tells the server to strip THAT step's cache entry before the run, so
+  // Midscene cache-misses on it and re-LLMs that one locator. Other steps
+  // still hit cache as normal.
+  //
+  // Drag/scroll steps (aiAct / aiScroll) default to BYPASS-ON. They're the
+  // most cache-fragile class — exact-prompt match required for the Plan
+  // entry, and SAP scrollbar element positions shift between sessions, so
+  // cached locates often resolve to stale xpaths. User can uncheck per step
+  // if they're confident the cache is fresh.
+  function isDragLikeStep(step) {
+    const api = String(step?.midsceneApi || '').toLowerCase();
+    if (api.includes('aiact') || api.includes('aiscroll')) return true;
+    const code = String(step?.exampleCode || '');
+    return /\bagent\.(aiAct|aiScroll)\s*\(/.test(code);
+  }
+  const stepBypassChecks = new Map(); // step.order → checkbox element
+  const stepsList = h('ol', { class: 'mono', style: { fontSize: '12px', maxHeight: '320px', overflow: 'auto', paddingLeft: '44px' } },
     ...apiGuide.steps.map((s) => {
       const actual = displayApiFromStep(s);
       const planned = plannedApiTagIfDifferent(s);
+      const defaultBypass = isDragLikeStep(s);
+      const bypassChk = cacheMode === 'read'
+        ? h('input', {
+            type: 'checkbox',
+            checked: defaultBypass,
+            style: { marginLeft: '8px', verticalAlign: 'middle' },
+            title: defaultBypass
+              ? 'Drag/scroll step — defaulting to bypass cache (cache is fragile here). Uncheck to use cache anyway.'
+              : 'Force re-plan: strip this step\'s cache entry before run, so it re-LLMs even though cache is enabled',
+          })
+        : null;
+      if (bypassChk) stepBypassChecks.set(s.order, bypassChk);
       return h('li', {
         dataset: { stepOrder: String(s.order) },
         title: planned ? `Runner evals exampleCode, which calls agent.${actual}(). LLM classified this as ${planned} but the exampleCode was rewritten.` : '',
@@ -3397,6 +3431,10 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
           class: 'muted small',
           style: { marginLeft: '6px', opacity: 0.65 },
         }, '· planned ' + planned),
+        bypassChk && h('label', {
+          class: 'muted small',
+          style: { marginLeft: '6px', cursor: 'pointer', color: defaultBypass ? 'var(--warn, #b45309)' : undefined },
+        }, bypassChk, defaultBypass ? ' bypass cache (drag default)' : ' bypass cache'),
       );
     }),
   );
@@ -3505,9 +3543,13 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
     startPolling();
 
     try {
+      const noCacheSteps = [];
+      for (const [order, chk] of stepBypassChecks.entries()) {
+        if (chk.checked) noCacheSteps.push(order);
+      }
       const r = await api.post(
         '/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/run?cache=' + encodeURIComponent(cacheMode),
-        { headed: headedChk.checked },
+        { headed: headedChk.checked, noCacheSteps },
       );
       clearInterval(pollHandle);
       const run = r.run;

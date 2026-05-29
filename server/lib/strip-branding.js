@@ -25,7 +25,7 @@ const BLANK_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAA
 
 // Bump this whenever the injected style/script needs to change. Existing
 // reports on disk will be re-themed on the next sweep.
-const THEME_VERSION = '2';
+const THEME_VERSION = '3';
 const THEME_TAG_RE = /\n?<(style|script) data-saptest-themed="\d+">[\s\S]*?<\/\1>/g;
 
 // JS string literals visible in the rendered UI (panel headings, error
@@ -126,9 +126,12 @@ function buildThemeBlock(version) {
   // Script: (1) read `?theme=` from the URL (set by the SAPTest SPA when it
   // embeds the report) and fall back to prefers-color-scheme; (2) follow the
   // currently-playing step — MutationObserver-watch .task-row class changes
-  // and scrollIntoView({block:'center'}) the .playing/.selected row. Works
-  // in both iframe embed and direct new-tab open since it's inlined into the
-  // report HTML itself.
+  // and scrollIntoView({block:'center'}) the .playing/.selected row; (3)
+  // inline data:image attachment links as <img> previews so users can SEE
+  // the screenshot without clicking (Chrome blocks navigating to data:
+  // URLs from <a href> for security, but <img src="data:..."> works fine).
+  // Works in both iframe embed and direct new-tab open since it's inlined
+  // into the report HTML itself.
   const js = `
     (function () {
       try {
@@ -154,19 +157,54 @@ function buildThemeBlock(version) {
         if (rafId !== null) return;
         rafId = requestAnimationFrame(scrollActive);
       }
+
+      // Inline data:image attachments as visible thumbnails. Default 420x300
+      // contain-fit; click toggles fullsize. Uses dataset flag to stay
+      // idempotent across MutationObserver firings.
+      function inlineDataImages() {
+        var anchors = document.querySelectorAll('a[href^="data:image"]');
+        for (var i = 0; i < anchors.length; i++) {
+          var a = anchors[i];
+          if (a.dataset.saptestInlined) continue;
+          a.dataset.saptestInlined = '1';
+          var img = document.createElement('img');
+          img.src = a.href;
+          img.alt = a.textContent || 'image';
+          img.title = (a.textContent || 'image') + ' (click to toggle full size)';
+          img.style.cssText = 'max-width:420px;max-height:300px;display:block;margin:6px 0;border:1px solid hsl(var(--saptest-border, 240 5.9% 90%));border-radius:4px;cursor:zoom-in;';
+          img.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.style.maxWidth === 'none') {
+              this.style.maxWidth = '420px'; this.style.maxHeight = '300px';
+              this.style.cursor = 'zoom-in';
+            } else {
+              this.style.maxWidth = 'none'; this.style.maxHeight = 'none';
+              this.style.cursor = 'zoom-out';
+            }
+          });
+          a.parentNode.insertBefore(img, a);
+          a.style.display = 'none';
+        }
+      }
+
       function arm() {
         if (!document.body) { setTimeout(arm, 50); return; }
         new MutationObserver(function (records) {
+          var classChanged = false;
           for (var i = 0; i < records.length; i++) {
             var r = records[i];
-            if (r.type !== 'attributes' || r.attributeName !== 'class') continue;
-            if (r.target.classList && r.target.classList.contains('task-row')) {
-              requestScroll();
-              return;
+            if (r.type === 'attributes' && r.attributeName === 'class' &&
+                r.target.classList && r.target.classList.contains('task-row')) {
+              classChanged = true;
             }
           }
-        }).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+          if (classChanged) requestScroll();
+          // Re-inline any newly-mounted data: anchors. Cheap (dataset gate).
+          inlineDataImages();
+        }).observe(document.body, { attributes: true, attributeFilter: ['class'], childList: true, subtree: true });
         requestScroll();
+        inlineDataImages();
       }
       arm();
     })();

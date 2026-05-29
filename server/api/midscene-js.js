@@ -132,16 +132,22 @@ router.post(
     const cacheMode = req.query.cache === 'read' ? 'read' : 'write';
     const headed = req.body?.headed !== false; // default true
     const startedByUsername = req.user?.username ?? null;
+    // Per-step cache bypass: array of step.order numbers to force-re-plan.
+    // Filter to numeric values only — UI sends an array but be defensive.
+    const noCacheSteps = Array.isArray(req.body?.noCacheSteps)
+      ? req.body.noCacheSteps.filter((n) => Number.isFinite(Number(n))).map(Number)
+      : [];
 
     await audit(req, 'midscene-js.run.started', {
       caseId: c.id,
       title: c.title,
       cacheMode,
       headed,
+      noCacheSteps,
     });
 
     try {
-      const record = await runJavascript(c, { cacheMode, headed, startedByUsername });
+      const record = await runJavascript(c, { cacheMode, headed, startedByUsername, noCacheSteps });
       await audit(req, 'midscene-js.run.finished', {
         runId: record.runId,
         caseId: c.id,

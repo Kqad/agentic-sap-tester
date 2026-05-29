@@ -41,8 +41,8 @@
 
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { existsSync, readFileSync, statSync } from 'node:fs';
-import { ROOT } from '../paths.js';
+import { copyFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { ROOT, RUNS_DIR } from '../paths.js';
 import { detectScrollExtreme } from './helpers.js';
 
 // Scroll-extreme steps ("滑到最底端", "拖到最右", etc.) can be authored as
@@ -176,5 +176,96 @@ export function hasUsableCache(cacheId) {
     return /caches:\s*\n\s*-\s+/.test(head);
   } catch {
     return false;
+  }
+}
+
+// When the case JSON is edited (NL / apiGuide / params for tcode), the hash
+// rotates and the old cache file gets stranded under a "historical v4c" name
+// that we can't reproduce from the current case state. Rather than make the
+// user re-record from scratch, find the most recent passed run for this
+// caseId in run-history/, take its cacheId, and COPY that file to the
+// current cacheId name. The user already validated that file by passing a
+// real run on it, so it's the safest auto-pick.
+//
+// We COPY (not rename) so the source file stays at its historical name:
+//   - If the migrated cache turns out to mismatch the new case state (e.g.
+//     user changed tcode and we picked the cache for the OLD screen), the
+//     run will fail and snapshot-rollback will restore the (still bad)
+//     migrated content under the new name. But the ORIGINAL source file
+//     stays untouched, so if the user reverts the case JSON, the original
+//     working cache is found again.
+//   - Orphan accumulation is fine — each file is small (KB-ish) and the user
+//     can rerun the rename-cache-ids.mjs migration script to consolidate.
+//
+// No-ops when:
+//   - current cacheId file already exists (nothing to migrate)
+//   - run-history is missing / empty
+//   - no passed run found for this caseId
+//   - the referenced cache file doesn't exist on disk
+//
+// Returns { from, to } on success, null otherwise.
+export function autoMigrateCacheFromLatestPassedRun(caseId, currentCacheId, log = () => {}) {
+  if (hasUsableCache(currentCacheId)) return null;
+  if (!existsSync(RUNS_DIR)) return null;
+
+  let entries;
+  try {
+    entries = readdirSync(RUNS_DIR).filter((n) => n.endsWith('.json'));
+  } catch {
+    return null;
+  }
+  // Filenames are ISO-timestamped; lexical sort desc = chronological desc.
+  entries.sort((a, b) => b.localeCompare(a));
+
+  // Pass 1: prefer latest passed run whose cache file STILL EXISTS on disk.
+  for (const name of entries) {
+    let rec;
+    try {
+      rec = JSON.parse(readFileSync(path.join(RUNS_DIR, name), 'utf8'));
+    } catch { continue; }
+    if (rec?.caseId !== caseId) continue;
+    if (rec?.status !== 'passed') continue;
+    const historicalId = rec?.cacheId;
+    if (!historicalId || historicalId === currentCacheId) continue;
+    const fromPath = resolveCachePath(historicalId);
+    if (!existsSync(fromPath)) continue;
+    const toPath = resolveCachePath(currentCacheId);
+    try {
+      copyFileSync(fromPath, toPath);
+      log(`Auto-migrated cache: copied ${historicalId} → ${currentCacheId} (source: passed run at ${rec.finishedAt ?? rec.startedAt ?? 'unknown'})`);
+      return { from: historicalId, to: currentCacheId, reason: 'latest-passed-run' };
+    } catch (e) {
+      log(`Auto-migrate copy failed: ${e?.message ?? e}`);
+      return null;
+    }
+  }
+
+  // Pass 2 fallback: no passed run's cache file is still around (got renamed
+  // away by a previous migration / cleanup / etc.). Pick the LARGEST existing
+  // orphan cache file for this caseId — most entries = best starting point.
+  // Worth trying: even though we can't prove it passes, the user's case
+  // structure is similar enough that a substantial overlap is likely.
+  try {
+    const cacheDir = path.join(ROOT, 'midscene_run', 'cache');
+    if (!existsSync(cacheDir)) return null;
+    const prefix = `saptest-js-${caseId}-`;
+    const candidates = readdirSync(cacheDir)
+      .filter((n) => n.startsWith(prefix) && n.endsWith('.cache.yaml') && n !== `${currentCacheId}.cache.yaml`)
+      .map((n) => {
+        const full = path.join(cacheDir, n);
+        return { name: n, full, size: statSync(full).size };
+      })
+      .filter((c) => c.size > 100) // skip empty stub files
+      .sort((a, b) => b.size - a.size);
+    if (candidates.length === 0) return null;
+    const best = candidates[0];
+    const historicalId = best.name.replace('.cache.yaml', '');
+    const toPath = resolveCachePath(currentCacheId);
+    copyFileSync(best.full, toPath);
+    log(`Auto-migrated cache: copied ${historicalId} → ${currentCacheId} (fallback: largest orphan ${best.size} bytes; no passed-run source available)`);
+    return { from: historicalId, to: currentCacheId, reason: 'largest-orphan' };
+  } catch (e) {
+    log(`Auto-migrate fallback failed: ${e?.message ?? e}`);
+    return null;
   }
 }

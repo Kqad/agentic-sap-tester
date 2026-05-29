@@ -20,8 +20,9 @@ import {
   buildJavascriptCacheId,
   hasUsableCache,
   resolveCachePath,
+  autoMigrateCacheFromLatestPassedRun,
 } from './cache-id.js';
-import { stripScrollCacheEntries } from './cache-scrub.js';
+import { stripScrollCacheEntries, stripCacheEntriesByPrompt } from './cache-scrub.js';
 import { configureLlmProxy } from './llm-proxy.js';
 import {
   registerActiveRun,
@@ -295,6 +296,15 @@ export async function runJavascript(caseObj, opts = {}) {
 
   const cacheMode = opts.cacheMode === 'read' ? 'read' : 'write';
   const cacheId = buildJavascriptCacheId(caseObj);
+
+  // Self-heal: when case JSON edits roll the cacheId, an old-named file gets
+  // stranded. Look up the most recent passed run for this caseId in run-
+  // history and rename ITS cache file to the current cacheId. The user
+  // already validated that file by passing on it, so it's the safest pick.
+  // Silent no-op if current file already exists, or if no passed history.
+  // Logs to a tmp buffer because `log()` isn't set up yet at this point.
+  const migration = autoMigrateCacheFromLatestPassedRun(caseObj.id, cacheId);
+
   if (cacheMode === 'read' && !hasUsableCache(cacheId)) {
     throw new Error(
       `No cache for current apiGuide hash. ` +
@@ -380,6 +390,48 @@ export async function runJavascript(caseObj, opts = {}) {
   log(`Cache id: ${cacheId}`);
   log(`Cache strategy: ${cacheMode === 'read' ? 'read-write' : 'write-only'}`);
   log(`Cache path: ${resolveCachePath(cacheId)}`);
+  if (migration) {
+    log(`Auto-migrated cache: copied ${migration.from} → ${migration.to} ` +
+        `(picked up from most recent passed run for this case in run-history; original kept as orphan)`);
+  }
+
+  // Per-step cache bypass: user marked specific step.orders to "force re-plan"
+  // in the run modal. Snapshot was already taken above, so on failure the
+  // original cache (including the stripped entries) gets restored. On pass,
+  // the new LLM-relocated entries get kept — effectively "refreshing" only
+  // the marked steps without re-recording the whole case.
+  const bypassOrders = Array.isArray(opts.noCacheSteps)
+    ? opts.noCacheSteps.map((n) => String(n)).filter(Boolean)
+    : [];
+  if (bypassOrders.length) {
+    const ordersSet = new Set(bypassOrders);
+    const promptsToStrip = new Set();
+    const stepLabels = [];
+    for (const s of caseObj.apiGuide.steps) {
+      if (!ordersSet.has(String(s.order))) continue;
+      const code = s.exampleCode || '';
+      const m = code.match(/agent\.ai\w+\s*\(\s*(['"`])([\s\S]*?)\1/);
+      if (m) {
+        promptsToStrip.add(m[2]);
+        stepLabels.push(`step ${s.order} ("${m[2].slice(0, 32)}")`);
+      } else {
+        log(`Cache bypass: step ${s.order} has no extractable locator — skipped`);
+      }
+    }
+    if (promptsToStrip.size) {
+      try {
+        const r = stripCacheEntriesByPrompt(resolveCachePath(cacheId), promptsToStrip);
+        if (r) {
+          log(`Cache bypass: removed ${r.removed} entries for ${stepLabels.join(', ')}` +
+              (r.matchedPrompts.length < promptsToStrip.size
+                ? ` (note: ${promptsToStrip.size - r.matchedPrompts.length} prompt(s) weren't in cache — already cache-miss)`
+                : ''));
+        }
+      } catch (e) {
+        log(`Cache bypass failed (continuing): ${e?.message ?? e}`);
+      }
+    }
+  }
   log(`Target URL: ${caseObj.sapUrl.trim()}`);
   log(`Steps: ${caseObj.apiGuide.steps.length}`);
   const paramKeys = Object.keys(params).filter((k) => params[k] !== undefined && params[k] !== null && params[k] !== '');

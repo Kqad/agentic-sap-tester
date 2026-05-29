@@ -87,3 +87,59 @@ export function stripScrollCacheEntries(cacheFilePath) {
   }
   return { kept: kept.length, removed };
 }
+
+/**
+ * Strip cache entries whose `prompt:` field is in `promptsToRemove`.
+ * Used for per-step "bypass cache" — the runner deletes targeted entries
+ * before the run so Midscene cache-misses on those locators and re-LLMs.
+ *
+ * @param {string} cacheFilePath
+ * @param {Set<string>} promptsToRemove  set of locator strings to drop
+ * @returns {{ kept: number, removed: number, matchedPrompts: string[] } | null}
+ *          null when file missing; matchedPrompts lists which prompts in the
+ *          set actually had an entry (lets callers detect typos / silent
+ *          misses).
+ */
+export function stripCacheEntriesByPrompt(cacheFilePath, promptsToRemove) {
+  if (!existsSync(cacheFilePath)) return null;
+  if (!(promptsToRemove instanceof Set) || promptsToRemove.size === 0) {
+    return { kept: 0, removed: 0, matchedPrompts: [] };
+  }
+  const text = readFileSync(cacheFilePath, 'utf8');
+  const headerMatch = text.match(/^([\s\S]*?\bcaches:\s*\n)/);
+  if (!headerMatch) return { kept: 0, removed: 0, matchedPrompts: [] };
+  const header = headerMatch[1];
+  const tail = text.slice(header.length);
+
+  const re = /^\s{0,4}-\s+type:/gm;
+  const positions = [];
+  let m;
+  while ((m = re.exec(tail)) !== null) positions.push(m.index);
+  if (positions.length === 0) return { kept: 0, removed: 0, matchedPrompts: [] };
+
+  const blocks = [];
+  for (let i = 0; i < positions.length; i += 1) {
+    const start = positions[i];
+    const end = i + 1 < positions.length ? positions[i + 1] : tail.length;
+    blocks.push(tail.slice(start, end));
+  }
+  const preamble = tail.slice(0, positions[0]);
+
+  const kept = [];
+  let removed = 0;
+  const matchedPrompts = new Set();
+  for (const block of blocks) {
+    const inline = block.match(/^\s*prompt:\s*(.+?)\s*$/m);
+    const prompt = inline?.[1]?.replace(/^['"]|['"]$/g, '') ?? null;
+    if (prompt && promptsToRemove.has(prompt)) {
+      removed += 1;
+      matchedPrompts.add(prompt);
+    } else {
+      kept.push(block);
+    }
+  }
+
+  const next = header + preamble + kept.join('');
+  if (removed > 0) writeFileSync(cacheFilePath, next, 'utf8');
+  return { kept: kept.length, removed, matchedPrompts: [...matchedPrompts] };
+}
