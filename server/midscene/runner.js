@@ -77,6 +77,77 @@ function bufferSha1(buf) {
   return buf ? crypto.createHash('sha1').update(buf).digest('hex') : null;
 }
 
+// Drag the scrollbar slider to the viewport extreme by COMPUTING the target
+// coordinate from the slider's current position + direction, instead of
+// asking the LLM to find both the start AND the end of the scrollbar (which
+// it often gets wrong — "滚动条最底端位置" gets misinterpreted as "page
+// bottom center" rather than "vertical scrollbar end on right edge").
+//
+// Only one LLM call: aiLocate to find the SLIDER (which has a distinct
+// visual appearance and is easy to locate, plus it's cacheable). The target
+// coordinate is pure geometry — same X (vertical drag), Y near viewport edge
+// (or vice-versa for horizontal). Drag goes raw through Playwright mouse
+// events, no extra LLM planning needed.
+async function dragSliderToExtreme(agent, page, direction, log) {
+  const isVertical = direction === 'top' || direction === 'bottom';
+  // Slider locator phrasing matters for cache reuse — keep stable across
+  // runs so the locate cache key matches.
+  const sliderPrompt = isVertical
+    ? '右侧纵向滚动条的滑块'
+    : '底部横向滚动条的滑块';
+
+  let located;
+  try {
+    located = await agent.aiLocate(sliderPrompt);
+  } catch (e) {
+    log(`  …slider locate failed: ${e?.message ?? e}`);
+    throw e;
+  }
+  const center = located?.center;
+  if (!Array.isArray(center) || center.length < 2) {
+    throw new Error(`slider locate returned no center: ${JSON.stringify(located)}`);
+  }
+  const cx = Math.round(center[0]);
+  const cy = Math.round(center[1]);
+
+  const viewport = page.viewportSize() ?? { width: 1920, height: 1080 };
+  // Overshoot by MARGIN so the slider clamps at the true extreme.
+  const MARGIN = 6;
+  let targetX, targetY;
+  switch (direction) {
+    case 'top':    targetX = cx;                          targetY = MARGIN;                   break;
+    case 'bottom': targetX = cx;                          targetY = viewport.height - MARGIN; break;
+    case 'left':   targetX = MARGIN;                      targetY = cy;                       break;
+    case 'right':  targetX = viewport.width - MARGIN;     targetY = cy;                       break;
+    default: throw new Error(`unknown scroll direction: ${direction}`);
+  }
+
+  log(`  …slider drag (${direction}): from [${cx},${cy}] → [${targetX},${targetY}]`);
+  const t0 = Date.now();
+  await page.mouse.move(cx, cy);
+  await page.mouse.down();
+  // Multi-step move so the drag is recognized; SAP scrollbars sometimes
+  // ignore single-step jumps.
+  await page.mouse.move(targetX, targetY, { steps: 30 });
+  await page.mouse.up();
+  const dragMs = Date.now() - t0;
+
+  // Add a card to the Midscene report so the drag shows up in the timeline.
+  // page.mouse.* is raw Playwright — it bypasses Midscene's auto-instrumented
+  // logging, so without this manual card the replay only shows the slider
+  // locate and skips the drag motion + endpoint entirely.
+  try {
+    await agent.recordToReport?.('Slider drag', {
+      content: [
+        `direction: ${direction}`,
+        `from: [${cx}, ${cy}]  (located via aiLocate "${sliderPrompt}")`,
+        `to:   [${targetX}, ${targetY}]  (computed: viewport ${viewport.width}×${viewport.height}, margin ${MARGIN})`,
+        `duration: ${dragMs}ms (30 mouse-move steps)`,
+      ].join('\n'),
+    });
+  } catch { /* report attachment is best-effort */ }
+}
+
 async function llmConfirmScrollProgress(agent, beforeBase64, label, log) {
   if (typeof agent.aiBoolean !== 'function' || !beforeBase64) return null;
   try {
@@ -212,37 +283,51 @@ async function dispatchStep(agent, step, ctx) {
       const hashBefore = bufferSha1(before);
 
       for (let attempt = 1; attempt <= MAX_DRAG_ATTEMPTS; attempt += 1) {
-        const code = (step.exampleCode ?? '').trim();
-        if (code) {
-          const fn = new AsyncFunction('agent', code);
-          await withTimeout(fn(agent), SCROLL_DRAG_TIMEOUT_MS, `${label} drag attempt ${attempt}`);
+        // Snapshot cache RIGHT BEFORE this attempt's drag. If the drag
+        // ends up failing verification, we roll back to this snapshot —
+        // so the failed attempt's plan/locate writes (which Midscene
+        // flushes during the call) don't pollute the cache. Only the
+        // SUCCESSFUL attempt's writes survive past the loop.
+        const preAttemptCacheSnapshot = ctx.snapshotCacheNow();
+
+        // Drag via computed-target geometry instead of LLM-planned aiAct.
+        // Find the slider (one cacheable locate), then drag toward the
+        // viewport edge — no need for LLM to guess "scrollbar end".
+        try {
+          await withTimeout(
+            dragSliderToExtreme(agent, ctx.page, extreme, ctx.log),
+            SCROLL_DRAG_TIMEOUT_MS,
+            `${label} drag attempt ${attempt}`,
+          );
+        } catch (e) {
+          ctx.log(`${label} drag attempt ${attempt} threw: ${normalizeError(e)}`);
+          // fall through to verify — maybe drag still moved something
         }
 
-        const confirmed = await llmConfirmScrollProgress(agent, beforeBase64, `${label} attempt ${attempt}`, ctx.log);
-        ctx.log(`${label} llmConfirmScrollProgress returned ${JSON.stringify(confirmed)} (typeof=${typeof confirmed})`);
-        if (confirmed) {
-          ctx.log(`${label} confirmed (truthy) on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}, returning to runner.`);
-          return undefined;
+        // Verify by sha1 hash of pre vs post screenshot. Deterministic and
+        // 100x faster than aiBoolean — the previous LLM-based comparison was
+        // unreliable (e.g. saw "473 items displayed" indicator unchanged and
+        // wrongly concluded "page didn't scroll" even when row content was
+        // clearly different). Visual hash is fragile to dynamic UI (cursor
+        // blink, anti-aliasing) but for SAP table scrolling the row content
+        // changes enough that the hash will reliably differ.
+        const after = await captureScrollScreenBuffer(ctx.page);
+        const hashAfter = bufferSha1(after);
+        const hashChanged = !(hashBefore && hashAfter) || hashBefore !== hashAfter;
+        if (hashChanged) {
+          ctx.log(`${label} hash compare: changed → scroll confirmed (attempt ${attempt}/${MAX_DRAG_ATTEMPTS}).`);
+          return undefined; // keep this attempt's writes
         }
-        if (confirmed === null) {
-          // LLM unavailable → fall back to sha1 screenshot hash compare.
-          const after = await captureScrollScreenBuffer(ctx.page);
-          const hashAfter = bufferSha1(after);
-          const changed = !(hashBefore && hashAfter) || hashBefore !== hashAfter;
-          if (changed) {
-            ctx.log(`${label} LLM unavailable, hash compare says scrolled — done (attempt ${attempt}).`);
-            return undefined;
-          }
-          lastReason = 'LLM unavailable + screenshot hash unchanged';
-          ctx.log(`${label} ${lastReason} on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}`);
-        } else {
-          lastReason = 'LLM says no visible scroll';
-          ctx.log(`${label} ${lastReason} on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}`);
-        }
-        // Verify failed → cache hit (if any) was stale or the wheel call
-        // missed; invalidate scroll cache so the next attempt forces a
-        // fresh LLM plan. Other cache entries (locate/plan for non-scroll
-        // steps) are left alone.
+        lastReason = 'screenshot hash unchanged after drag';
+        ctx.log(`${label} ${lastReason} on attempt ${attempt}/${MAX_DRAG_ATTEMPTS}`);
+        // Attempt failed verification → roll cache back to its pre-attempt
+        // state so the failed plan/locate entries don't survive into the
+        // next attempt or the next run. Without this, failed attempts'
+        // writes accumulate and get replayed on subsequent runs.
+        ctx.restoreCacheTo(preAttemptCacheSnapshot);
+        ctx.log(`${label} attempt ${attempt} cache writes rolled back (only the eventually-successful attempt persists)`);
+        // Also invalidate scroll cache so the NEXT attempt forces a fresh
+        // LLM plan instead of reusing whatever stale entry might exist.
         if (attempt < MAX_DRAG_ATTEMPTS && typeof ctx.invalidateScrollCache === 'function') {
           ctx.invalidateScrollCache();
         }
@@ -382,6 +467,34 @@ export async function runJavascript(caseObj, opts = {}) {
       } catch (e) {
         log(`  …invalidateScrollCache failed: ${e?.message ?? e}`);
         return null;
+      }
+    },
+    // Per-attempt cache snapshot / restore. Used by the scroll-extreme retry
+    // loop to roll back FAILED attempts' cache writes (Midscene flushes plan/
+    // locate entries to the YAML as the LLM returns them — those entries
+    // persist even if the drag turns out not to scroll the page). Without
+    // rollback, all 3 attempts' failed entries accumulate and get replayed
+    // next run, wasting time. With rollback, only the successful attempt's
+    // entries survive.
+    snapshotCacheNow() {
+      try {
+        if (fs.existsSync(cachePath)) return fs.readFileSync(cachePath);
+        return null; // file didn't exist; rollback means delete
+      } catch (e) {
+        log(`  …snapshotCacheNow failed: ${e?.message ?? e}`);
+        return undefined; // sentinel: snapshot couldn't be taken, skip restore
+      }
+    },
+    restoreCacheTo(snapshot) {
+      if (snapshot === undefined) return; // snapshot wasn't taken cleanly
+      try {
+        if (snapshot === null) {
+          if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
+        } else {
+          fs.writeFileSync(cachePath, snapshot);
+        }
+      } catch (e) {
+        log(`  …restoreCacheTo failed: ${e?.message ?? e}`);
       }
     },
   };

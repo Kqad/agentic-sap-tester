@@ -9,18 +9,6 @@ caches:
           flow:
             - aiDragAndDrop: ''
               from: 底部横向滚动条的滑块（当前在左下角附近）
-              to: 底部横向滚动条的最右端位置
-            - aiDragAndDrop: ''
-              from: 底部横向滚动条滑块的当前位置（左端）
-              to: 底部横向滚动条的最右端
-  - type: plan
-    prompt: 底部的横向滚动条的滑块当前大概在屏幕左下角附近,按住它一路拖到最右端
-    yamlWorkflow: |
-      tasks:
-        - name: 底部的横向滚动条的滑块当前大概在屏幕左下角附近,按住它一路拖到最右端
-          flow:
-            - aiDragAndDrop: ''
-              from: 底部横向滚动条的滑块（当前在左下角附近）
               to: 底部横向滚动条的最右端
   - type: locate
     prompt: 进入 Menu
@@ -71,17 +59,17 @@ caches:
     prompt: 点击跳出栏目的第一个
     cache:
       xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[3]/span[1]
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[4]/span[1]
   - type: locate
     prompt: Report date
     cache:
       xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[17]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Report date"]
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[16]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Report date"]
   - type: locate
     prompt: 勾选 List assets 复选框
     cache:
       xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[17]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[9]/span[1]/span[normalize-space()="List assets"]
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[16]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[9]/span[1]/span[normalize-space()="List assets"]
   - type: locate
     prompt: 点击 Execute 按钮执行查询
     cache:
@@ -122,48 +110,3 @@ caches:
     cache:
       xpaths:
         - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[2]/tr[1]/td[1]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/span[1]/span[normalize-space()="Asset Balances -> Asset Lists -> Asset Balances -> ... by Asset Number"]
-  - type: locate
-    prompt: 点击 Execute 按钮执行查询
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
-  - type: locate
-    prompt: company code
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Company code"]
-  - type: locate
-    prompt: Asset number
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[6]/span[1]/label[1]/span[normalize-space()="Asset number"]
-  - type: locate
-    prompt: 点击跳出栏目的第一个
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[4]/span[1]
-  - type: locate
-    prompt: Report date
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[16]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Report date"]
-  - type: locate
-    prompt: 勾选 List assets 复选框
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[16]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[9]/span[1]/span[normalize-space()="List assets"]
-  - type: locate
-    prompt: 点击 Execute 按钮执行查询
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
-  - type: locate
-    prompt: 底部横向滚动条的滑块（当前在左下角附近）
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
-  - type: locate
-    prompt: 底部横向滚动条的最右端
-    cache:
-      xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
