@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Flow View · Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+<style>
+:root {
+  --background: 220 11% 96%;
+  --foreground: 220 13% 16%;
+  --card: 0 0% 100%;
+  --primary: 212 100% 47%;
+  --muted: 220 11% 94%;
+  --muted-foreground: 220 8% 42%;
+  --border: 220 13% 86%;
+  --success: 142 55% 32%;
+  --destructive: 358 70% 47%;
+  --warning: 26 95% 45%;
+  --info: 212 100% 47%;
+  --success-muted: 142 50% 94%;
+  --warning-muted: 38 96% 92%;
+  --info-muted: 212 100% 95%;
+  --sans: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--sans);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.shell {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+}
+.shell h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0 0 4px;
+}
+.shell .sub {
+  font-size: 12.5px;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 20px;
+}
+.shell .sub a { color: hsl(var(--primary)); text-decoration: none; border-bottom: 1px solid hsl(var(--primary) / 0.3); }
+
+.panel {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  margin-bottom: 18px;
+}
+.panel-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid hsl(var(--border));
+  display: flex; align-items: center; gap: 12px;
+  background: hsl(var(--muted) / 0.4);
+}
+.panel-head .h-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.panel-head .h-sub {
+  font-size: 11.5px;
+  color: hsl(var(--muted-foreground));
+}
+.panel-head .h-spacer { flex: 1; }
+.panel-body { padding: 18px; }
+
+.btn {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 12px;
+  border-radius: 5px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  transition: all .12s;
+}
+.btn:hover { background: hsl(var(--muted)); }
+.btn.primary {
+  background: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: white;
+  font-weight: 600;
+}
+.btn.primary:hover { background: hsl(var(--primary) / 0.88); }
+.btn.success {
+  background: hsl(var(--success-muted));
+  border-color: hsl(var(--success) / 0.55);
+  color: hsl(var(--success));
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 hsl(var(--success));
+}
+
+.view-toggle {
+  display: inline-flex;
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  padding: 2px;
+  gap: 0;
+}
+.view-toggle button {
+  border: 0;
+  background: transparent;
+  height: 26px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  color: hsl(var(--muted-foreground));
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.view-toggle button.is-active {
+  background: hsl(var(--card));
+  color: hsl(var(--primary));
+  box-shadow: 0 1px 2px hsl(220 14% 10% / 0.06);
+}
+
+.stats {
+  display: inline-flex; gap: 14px; align-items: center;
+  font-size: 11.5px;
+  color: hsl(var(--muted-foreground));
+}
+.stats .stat-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+}
+.stats .stat-chip.cache {
+  background: hsl(var(--success-muted));
+  color: hsl(var(--success));
+  border-color: hsl(var(--success) / 0.35);
+}
+.stats .stat-chip.llm {
+  background: hsl(280 60% 96%);
+  color: hsl(280 60% 40%);
+  border-color: hsl(280 60% 40% / 0.35);
+}
+.stats .stat-chip.fail {
+  background: hsl(var(--destructive) / 0.10);
+  color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive) / 0.35);
+}
+
+/* ─────────────  FLOW CANVAS  ─────────────  */
+.flow-canvas {
+  position: relative;
+  overflow: hidden;
+}
+.flow-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 36px 28px;
+  position: relative;
+  z-index: 1;
+}
+.flow-edge-layer {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.flow-edge-layer svg { width: 100%; height: 100%; }
+.flow-edge-layer .edge-line {
+  fill: none;
+  stroke: hsl(var(--border));
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  transition: stroke .25s, stroke-dasharray .25s;
+}
+.flow-edge-layer .edge-line.is-done {
+  stroke: hsl(var(--success));
+  stroke-dasharray: none;
+  stroke-width: 2;
+}
+.flow-edge-layer .edge-line.is-active {
+  stroke: hsl(var(--info));
+  stroke-dasharray: 4 3;
+  stroke-width: 2;
+  animation: edgeFlow 1.4s linear infinite;
+}
+@keyframes edgeFlow {
+  to { stroke-dashoffset: -100; }
+}
+.flow-edge-layer .edge-comet {
+  fill: hsl(var(--info));
+  filter: drop-shadow(0 0 4px hsl(var(--info)));
+}
+
+/* Card */
+.flow-card {
+  position: relative;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.2,1,.3,1), box-shadow .2s, border-color .12s;
+}
+.flow-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 22px hsl(220 14% 10% / 0.10), 0 1px 3px hsl(220 14% 10% / 0.06);
+  border-color: hsl(var(--primary) / 0.55);
+  z-index: 5;
+}
+.flow-card.is-running {
+  border-color: hsl(var(--info));
+  box-shadow: 0 0 0 1px hsl(var(--info)), 0 0 18px hsl(var(--info) / 0.32);
+  animation: cardPulse 1.4s ease-in-out infinite;
+}
+@keyframes cardPulse {
+  0%, 100% { box-shadow: 0 0 0 1px hsl(var(--info)), 0 0 18px hsl(var(--info) / 0.32); }
+  50%      { box-shadow: 0 0 0 1px hsl(var(--info)), 0 0 28px hsl(var(--info) / 0.50); }
+}
+.flow-card.is-passed { border-color: hsl(var(--success) / 0.45); }
+.flow-card.is-failed {
+  border-color: hsl(var(--destructive));
+  box-shadow: 0 0 0 1px hsl(var(--destructive) / 0.55), 0 6px 18px hsl(var(--destructive) / 0.15);
+}
+
+/* Card thumbnail */
+.flow-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  background: hsl(220 14% 92%);
+  overflow: hidden;
+  border-bottom: 1px solid hsl(var(--border));
+}
+.flow-thumb svg { display: block; width: 100%; height: 100%; }
+.flow-thumb.is-empty {
+  display: grid; place-items: center;
+  background:
+    repeating-linear-gradient(45deg,
+      hsl(220 13% 92%) 0 6px,
+      hsl(220 13% 95%) 6px 12px);
+}
+.flow-thumb.is-empty::after {
+  content: "▣";
+  font-size: 24px;
+  color: hsl(var(--muted-foreground) / 0.4);
+}
+.flow-thumb .thumb-overlay {
+  position: absolute; inset: 0;
+  background: hsl(220 14% 10% / 0);
+  pointer-events: none;
+  transition: background .15s;
+}
+.flow-card:hover .flow-thumb .thumb-overlay {
+  background: hsl(220 14% 10% / 0.06);
+}
+.flow-thumb .thumb-zoom {
+  position: absolute; right: 6px; bottom: 6px;
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  background: hsl(220 14% 10% / 0.65);
+  color: white;
+  display: grid; place-items: center;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
+}
+.flow-card:hover .flow-thumb .thumb-zoom { opacity: 1; }
+
+/* "Live capture" reveal animation */
+.flow-thumb.just-arrived svg { animation: thumbReveal .5s ease-out; }
+@keyframes thumbReveal {
+  from { opacity: 0; transform: scale(1.04); filter: blur(3px); }
+  to   { opacity: 1; transform: none;        filter: none; }
+}
+
+/* Card body */
+.flow-body {
+  padding: 7px 10px 9px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.flow-row1 {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+}
+.flow-num {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.flow-status {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  display: inline-grid; place-items: center;
+  font-size: 9px;
+  font-weight: 700;
+  border: 1.5px solid hsl(var(--muted-foreground) / 0.4);
+  background: hsl(var(--card));
+  color: transparent;
+  flex-shrink: 0;
+}
+.flow-card.is-passed .flow-status {
+  border-color: hsl(var(--success));
+  background: hsl(var(--success));
+  color: white;
+}
+.flow-card.is-passed .flow-status::after { content: "✓"; }
+.flow-card.is-running .flow-status {
+  border-color: hsl(var(--info));
+  background: hsl(var(--info));
+  animation: runningDot 1.1s ease-in-out infinite;
+}
+@keyframes runningDot {
+  0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0 hsl(var(--info) / 0.4); }
+  50%      { transform: scale(1.2); box-shadow: 0 0 0 4px hsl(var(--info) / 0); }
+}
+.flow-card.is-failed .flow-status {
+  border-color: hsl(var(--destructive));
+  background: hsl(var(--destructive));
+  color: white;
+}
+.flow-card.is-failed .flow-status::after { content: "✕"; }
+
+.flow-title {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em;
+}
+.flow-row2 {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-size: 10px;
+  margin-top: 2px;
+}
+.flow-badge {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 0px 5px;
+  height: 14px;
+  border-radius: 2px;
+  display: inline-flex; align-items: center; gap: 3px;
+  letter-spacing: 0.02em;
+}
+.flow-badge.api {
+  background: hsl(220 13% 92%);
+  color: hsl(var(--muted-foreground));
+}
+.flow-badge.cache {
+  background: hsl(var(--success-muted));
+  color: hsl(var(--success));
+}
+.flow-badge.llm {
+  background: hsl(280 60% 96%);
+  color: hsl(280 60% 40%);
+}
+.flow-badge.fail {
+  background: hsl(var(--destructive) / 0.10);
+  color: hsl(var(--destructive));
+}
+.flow-dur {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: hsl(var(--muted-foreground));
+  margin-left: auto;
+}
+
+/* Cache hit "spark" effect right when a card flips to passed */
+.flow-card.is-passed.with-cache::before {
+  content: "⚡";
+  position: absolute;
+  top: 4px; right: 4px;
+  font-size: 10px;
+  color: hsl(var(--success));
+  background: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid hsl(var(--success) / 0.4);
+  z-index: 3;
+  animation: cacheSpark .55s ease-out both;
+}
+@keyframes cacheSpark {
+  from { transform: scale(0) rotate(-30deg); opacity: 0; }
+  60%  { transform: scale(1.25) rotate(8deg); opacity: 1; }
+  to   { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* ─────────────  ENLARGED VIEWER  ─────────────  */
+.zoom-back {
+  position: fixed; inset: 0;
+  background: hsl(220 14% 10% / 0.55);
+  backdrop-filter: blur(4px);
+  display: none;
+  place-items: center;
+  z-index: 100;
+  padding: 32px;
+  animation: zoomBackIn .15s ease-out;
+}
+.zoom-back.is-open { display: grid; }
+.zoom-card {
+  background: hsl(var(--card));
+  border-radius: 8px;
+  width: 100%;
+  max-width: 720px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px hsl(220 14% 10% / 0.35);
+  animation: zoomCardIn .25s cubic-bezier(.2,1,.3,1);
+}
+@keyframes zoomBackIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes zoomCardIn {
+  from { transform: translateY(20px) scale(0.96); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.zoom-card .zoom-img { background: hsl(220 14% 92%); }
+.zoom-card .zoom-img svg { display: block; width: 100%; height: auto; }
+.zoom-card .zoom-meta {
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 14px;
+  font-size: 12.5px;
+  color: hsl(var(--muted-foreground));
+}
+.zoom-card .zoom-meta strong { color: hsl(var(--foreground)); }
+.zoom-card .zoom-meta .spacer { flex: 1; }
+
+/* ─────────────  HISTORY SCRUBBER  ─────────────  */
+.scrubber {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px;
+  border-top: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.4);
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+}
+.scrubber input[type=range] {
+  flex: 1;
+  accent-color: hsl(var(--primary));
+}
+.scrubber .scrub-time {
+  font-family: var(--mono);
+  font-feature-settings: "tnum";
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Hint banner */
+.hint {
+  font-size: 11.5px;
+  color: hsl(var(--muted-foreground));
+  padding: 6px 12px;
+  background: hsl(var(--info-muted));
+  border: 1px dashed hsl(var(--info) / 0.3);
+  border-radius: 4px;
+  margin-bottom: 14px;
+}
+.hint b { color: hsl(var(--info)); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <h1>Step pipeline · Flow view (mockup)</h1>
+  <div class="sub">
+    saptest1 · 模拟 12 步执行 · 截图为合成 SAP 屏 ·
+    <a href="/docs/ui-refactor.html">← 回 UI 重构说明</a>
+  </div>
+
+  <div class="hint">
+    <b>Demo 操作：</b>
+    点 <b>Reset → Run cached</b> 模拟一次缓存重放（含 1 个 LLM miss + 1 个 fail）。
+    每个步骤卡 hover 看放大动画，点缩略图打开大图预览。
+    下方 history scrubber 可回放过程。
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <span class="h-title">Step pipeline</span>
+      <span class="h-sub" id="hSub">12 steps · idle</span>
+
+      <span class="h-spacer"></span>
+
+      <div class="stats">
+        <span class="stat-chip cache" title="Cache hits">⚡ <span id="cntCache">0</span></span>
+        <span class="stat-chip llm"   title="LLM calls (cache miss)">AI <span id="cntLLM">0</span></span>
+        <span class="stat-chip fail"  title="Failed steps">✕ <span id="cntFail">0</span></span>
+      </div>
+
+      <div class="view-toggle" role="tablist">
+        <button>≡ list</button>
+        <button class="is-active">▣ flow</button>
+      </div>
+
+      <button class="btn" onclick="resetRun()">Reset</button>
+      <button class="btn success" onclick="startRun()">▶ Run cached</button>
+    </div>
+
+    <div class="panel-body">
+      <div class="flow-canvas" id="canvas">
+        <div class="flow-edge-layer" id="edges">
+          <svg viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="flow-grid" id="grid"></div>
+      </div>
+    </div>
+
+    <div class="scrubber" id="scrubber" style="display:none;">
+      <span>History</span>
+      <input type="range" id="scrubInput" min="0" max="12" step="1" value="12" />
+      <span class="scrub-time" id="scrubTime">end</span>
+    </div>
+  </div>
+</div>
+
+<!-- Enlarged viewer -->
+<div class="zoom-back" id="zoom" onclick="if(event.target===this)closeZoom()">
+  <div class="zoom-card">
+    <div class="zoom-img" id="zoomImg"></div>
+    <div class="zoom-meta">
+      <strong id="zoomTitle">Step</strong>
+      <span id="zoomSub"></span>
+      <span class="spacer"></span>
+      <button class="btn" onclick="closeZoom()">Close (Esc)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ───────── Demo data ─────────
+const STEPS = [
+  { o: 1,  title: '进入 Menu',                    api: 'aiTap',    cached: true },
+  { o: 2,  title: '点击 Setting',                  api: 'aiTap',    cached: true },
+  { o: 3,  title: '点击 Visualization',            api: 'aiTap',    cached: true },
+  { o: 4,  title: '启用 show Ok code field',       api: 'aiTap',    cached: true },
+  { o: 5,  title: '保存',                          api: 'aiTap',    cached: true },
+  { o: 6,  title: '在 左上角矩形输入框 输入 S_ALR_87011990', api: 'aiInput', cached: true },
+  { o: 7,  title: '点击 右下角 execute',           api: 'aiTap',    cached: true },
+  { o: 8,  title: '在 company code 字段 输入 8540', api: 'aiInput', cached: false }, // LLM miss
+  { o: 9,  title: '在 Asset number 字段 输入 1010001732', api: 'aiInput', cached: true },
+  { o: 10, title: '点击跳出栏目的第一个',           api: 'aiTap',    cached: true },
+  { o: 11, title: '在 Report date 字段 输入 30.04.2026', api: 'aiInput', cached: true, fail: true },
+  { o: 12, title: '从查询结果表格中读取 Curr.bk.val.', api: 'aiQuery', cached: true },
+];
+
+// ───────── Fake SAP-screen thumbnail generator ─────────
+// Each step gets a deterministic but distinct "SAP screen" SVG so the
+// flow looks like real captured screenshots.
+function fakeSAPScreen(seed, opts = {}) {
+  const w = 160, hh = 110;
+  // colors keyed by seed for visual variety
+  const accents = ['#1976d2', '#0070f2', '#3f51b5', '#00796b', '#5e35b1', '#0288d1'];
+  const accent = accents[seed % accents.length];
+  const hasError = !!opts.error;
+
+  let html = `<svg viewBox="0 0 ${w} ${hh}" preserveAspectRatio="xMidYMid slice">`;
+  // background
+  html += `<rect width="${w}" height="${hh}" fill="#fafafa"/>`;
+  // title bar
+  html += `<rect width="${w}" height="10" fill="${accent}"/>`;
+  html += `<circle cx="5" cy="5" r="1.2" fill="white" opacity=".8"/>`;
+  html += `<rect x="10" y="3" width="40" height="4" fill="white" opacity=".7"/>`;
+  // left nav
+  html += `<rect x="0" y="10" width="22" height="${hh - 10}" fill="#eceff1"/>`;
+  for (let i = 0; i < 6; i++) {
+    html += `<rect x="3" y="${15 + i * 13}" width="16" height="2.5" fill="#90a4ae" opacity="0.7"/>`;
+  }
+  // main body — a "form" with fields + a button
+  const fieldY = [22, 35, 48, 61];
+  for (let i = 0; i < fieldY.length; i++) {
+    html += `<rect x="28" y="${fieldY[i]}" width="30" height="3" fill="#90a4ae" opacity=".6"/>`;
+    const w2 = 50 + (seed * 7 + i * 11) % 60;
+    const filled = (seed + i) % 2 === 0;
+    html += `<rect x="60" y="${fieldY[i] - 1}" width="${w2}" height="5" fill="${filled ? '#fff' : '#fff'}" stroke="${accent}" stroke-width=".5"/>`;
+    if (filled) {
+      html += `<rect x="62" y="${fieldY[i]}" width="${w2 / 2}" height="2" fill="${accent}" opacity=".75"/>`;
+    }
+  }
+  // grid (table-like)
+  for (let i = 0; i < 4; i++) {
+    html += `<rect x="28" y="${78 + i * 6}" width="${w - 32}" height="0.7" fill="#cfd8dc"/>`;
+  }
+  // button (lower right)
+  html += `<rect x="${w - 30}" y="${hh - 14}" width="24" height="9" rx="1.5" fill="${accent}"/>`;
+  html += `<rect x="${w - 26}" y="${hh - 11}" width="16" height="3" fill="white" opacity=".95"/>`;
+
+  // optional error overlay
+  if (hasError) {
+    html += `<rect x="40" y="40" width="${w - 80}" height="22" fill="#fdecea" stroke="#c62828" stroke-width="1"/>`;
+    html += `<rect x="45" y="45" width="${w - 90}" height="3" fill="#c62828"/>`;
+    html += `<rect x="45" y="52" width="${(w - 90) * 0.7}" height="3" fill="#e53935" opacity=".7"/>`;
+  }
+  html += `</svg>`;
+  return html;
+}
+
+// ───────── State ─────────
+const state = {
+  running: false,
+  cursor: -1,       // index of currently-running step
+  done: new Set(),  // completed steps (0-based)
+  failed: new Set(),
+  cacheHits: new Set(),
+  llmMisses: new Set(),
+  scrubAt: STEPS.length, // 0..N
+};
+
+const $ = (s) => document.querySelector(s);
+const grid = $('#grid');
+const edgesSvg = $('#edges svg');
+
+// ───────── Render ─────────
+function render() {
+  grid.innerHTML = '';
+  STEPS.forEach((s, i) => {
+    const isPassed = state.done.has(i) && !state.failed.has(i);
+    const isFailed = state.failed.has(i);
+    const isRunning = state.cursor === i;
+    const shouldHaveThumb = (state.done.has(i) || state.failed.has(i)) && i < state.scrubAt;
+    const cached = state.cacheHits.has(i);
+    const justArrived = window.__lastDone === i; // for fade-in trigger
+
+    const cls = [
+      'flow-card',
+      isPassed ? 'is-passed' : '',
+      isFailed ? 'is-failed' : '',
+      isRunning ? 'is-running' : '',
+      cached && (isPassed || isFailed) ? 'with-cache' : '',
+    ].filter(Boolean).join(' ');
+
+    const thumbHtml = shouldHaveThumb
+      ? `<div class="flow-thumb ${justArrived ? 'just-arrived' : ''}" data-step="${i}">${fakeSAPScreen(i + 3, { error: isFailed })}<div class="thumb-overlay"></div><div class="thumb-zoom">↗</div></div>`
+      : `<div class="flow-thumb is-empty"></div>`;
+
+    const apiBadge = `<span class="flow-badge api">${s.api}</span>`;
+    let cacheBadge = '';
+    if (state.done.has(i) || state.failed.has(i)) {
+      if (state.cacheHits.has(i))  cacheBadge = `<span class="flow-badge cache">⚡ cached</span>`;
+      else if (state.llmMisses.has(i)) cacheBadge = `<span class="flow-badge llm">AI ${(0.8 + i * 0.15).toFixed(1)}s</span>`;
+      if (state.failed.has(i)) cacheBadge += `<span class="flow-badge fail">FAIL</span>`;
+    }
+    const dur = (state.done.has(i) || state.failed.has(i)) ? `<span class="flow-dur">${(0.2 + (i * 0.07) % 3).toFixed(1)}s</span>` : '';
+
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="${cls}" data-i="${i}" onclick="openZoom(${i})">
+        ${thumbHtml}
+        <div class="flow-body">
+          <div class="flow-row1">
+            <span class="flow-status"></span>
+            <span class="flow-num">#${s.o}</span>
+          </div>
+          <div class="flow-title">${s.title}</div>
+          <div class="flow-row2">${apiBadge}${cacheBadge}${dur}</div>
+        </div>
+      </div>
+    `);
+  });
+  window.__lastDone = null;
+  drawEdges();
+  updateSubHeader();
+}
+
+function updateSubHeader() {
+  const done = state.done.size + state.failed.size;
+  const total = STEPS.length;
+  const sub = state.running
+    ? `${done} / ${total} · running step ${state.cursor != null ? STEPS[state.cursor]?.o : ''}`
+    : (done === total ? `${total} / ${total} · finished` : `${total} steps · idle`);
+  $('#hSub').textContent = sub;
+  $('#cntCache').textContent = state.cacheHits.size;
+  $('#cntLLM').textContent = state.llmMisses.size;
+  $('#cntFail').textContent = state.failed.size;
+}
+
+// Draw bezier connectors between consecutive cards.
+function drawEdges() {
+  // Wait one frame so layout settles
+  requestAnimationFrame(() => {
+    const canvas = $('#canvas');
+    const cRect = canvas.getBoundingClientRect();
+    edgesSvg.setAttribute('viewBox', `0 0 ${cRect.width} ${cRect.height}`);
+    edgesSvg.innerHTML = '';
+    const cards = Array.from(grid.querySelectorAll('.flow-card'));
+    for (let i = 0; i < cards.length - 1; i++) {
+      const a = cards[i].getBoundingClientRect();
+      const b = cards[i + 1].getBoundingClientRect();
+      const ax = a.right - cRect.left;
+      const ay = a.top + a.height / 2 - cRect.top;
+      const bx = b.left - cRect.left;
+      const by = b.top + b.height / 2 - cRect.top;
+      const sameRow = Math.abs(ay - by) < 5;
+      // For same-row neighbors: a smooth horizontal sine-ish curve.
+      // For row-wrap (b is at start of next row): a U-shape.
+      let path;
+      if (sameRow) {
+        const midX = (ax + bx) / 2;
+        path = `M${ax},${ay} C${midX},${ay} ${midX},${by} ${bx},${by}`;
+      } else {
+        // Row wrap: go right of A, down past the row, left and into B.
+        const dropY = (ay + by) / 2;
+        path = `M${ax},${ay}
+                C${ax + 30},${ay} ${cRect.width - 6},${ay}
+                  ${cRect.width - 6},${dropY}
+                S${bx - 30},${by} ${bx},${by}`;
+      }
+      const isDone = state.done.has(i + 1) || state.failed.has(i + 1) ||
+                     (state.done.has(i) && state.cursor > i);
+      const isActive = state.cursor === i + 1 || (state.cursor === i && state.running);
+      const cls = `edge-line ${isDone ? 'is-done' : ''} ${isActive ? 'is-active' : ''}`;
+      edgesSvg.insertAdjacentHTML('beforeend', `<path class="${cls}" d="${path}"/>`);
+    }
+    // Comet at the current active edge head — small circle that pulses.
+    if (state.running && state.cursor >= 0 && state.cursor < cards.length - 1) {
+      const b = cards[state.cursor + 1].getBoundingClientRect();
+      const cx = b.left - cRect.left;
+      const cy = b.top + b.height / 2 - cRect.top;
+      edgesSvg.insertAdjacentHTML('beforeend',
+        `<circle class="edge-comet" cx="${cx}" cy="${cy}" r="4"><animate attributeName="r" values="3;6;3" dur="1.1s" repeatCount="indefinite"/></circle>`);
+    }
+  });
+}
+
+// ───────── Run simulation ─────────
+let runTimer = null;
+function startRun() {
+  if (state.running) return;
+  resetRun();
+  state.running = true;
+  state.cursor = 0;
+  // First card immediately enters "running" state.
+  render();
+  let i = 0;
+  const tick = () => {
+    if (i >= STEPS.length) {
+      state.running = false;
+      state.cursor = -1;
+      state.scrubAt = STEPS.length;
+      $('#scrubber').style.display = 'flex';
+      $('#scrubInput').value = STEPS.length;
+      $('#scrubTime').textContent = 'end';
+      render();
+      return;
+    }
+    const step = STEPS[i];
+    // Mark done.
+    state.done.add(i);
+    if (step.fail) state.failed.add(i);
+    if (step.cached) state.cacheHits.add(i); else state.llmMisses.add(i);
+    state.scrubAt = i + 1;
+    window.__lastDone = i;
+    // Advance cursor to next.
+    state.cursor = i + 1 < STEPS.length ? i + 1 : -1;
+    render();
+    i++;
+    // Variable timing — cache hits are fast, LLM calls slow.
+    const delay = step.cached ? 320 : 900;
+    runTimer = setTimeout(tick, delay);
+  };
+  setTimeout(tick, 800);  // initial small delay (the "ignition" beat)
+}
+
+function resetRun() {
+  clearTimeout(runTimer);
+  state.running = false;
+  state.cursor = -1;
+  state.done.clear();
+  state.failed.clear();
+  state.cacheHits.clear();
+  state.llmMisses.clear();
+  state.scrubAt = 0;
+  $('#scrubber').style.display = 'none';
+  render();
+}
+
+// ───────── Zoom viewer ─────────
+function openZoom(i) {
+  const s = STEPS[i];
+  if (!(state.done.has(i) || state.failed.has(i))) return; // no thumb yet
+  $('#zoomImg').innerHTML = fakeSAPScreen(i + 3, { error: state.failed.has(i) });
+  $('#zoomTitle').textContent = `Step #${s.o} · ${s.title}`;
+  $('#zoomSub').innerHTML = state.cacheHits.has(i)
+    ? `<span class="flow-badge cache">⚡ cached</span>`
+    : `<span class="flow-badge llm">AI call (LLM miss)</span>`;
+  $('#zoom').classList.add('is-open');
+}
+function closeZoom() { $('#zoom').classList.remove('is-open'); }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(); });
+
+// ───────── History scrubber ─────────
+$('#scrubInput').addEventListener('input', (e) => {
+  const v = Number(e.target.value);
+  // Rebuild done sets from history up to v
+  state.done.clear(); state.failed.clear();
+  state.cacheHits.clear(); state.llmMisses.clear();
+  for (let i = 0; i < v; i++) {
+    state.done.add(i);
+    if (STEPS[i].fail) state.failed.add(i);
+    if (STEPS[i].cached) state.cacheHits.add(i); else state.llmMisses.add(i);
+  }
+  state.scrubAt = v;
+  state.cursor = v < STEPS.length ? v : -1;
+  state.running = false;
+  $('#scrubTime').textContent = v === 0 ? 'start' : (v === STEPS.length ? 'end' : `step ${v}`);
+  render();
+});
+
+window.addEventListener('resize', () => drawEdges());
+
+// Initial render
+render();
+</script>
+
+</body>
+</html>

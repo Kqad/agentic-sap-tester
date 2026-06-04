@@ -6,6 +6,7 @@ test-results/
 midscene_run/report/
 midscene_run/log/
 midscene_run/output/
+midscene_run/screenshots/
 # run-history/ and midscene_run/report/ both stay ignored by default to
 # keep the repo lean. For each case we force-add exactly ONE run JSON +
 # ONE HTML report (the latest passing one) via `git add -f`. Local runs

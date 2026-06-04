@@ -13,13 +13,14 @@ const I18N = {
     'login.foot': '首次部署？后端启动日志会打印初始 admin 账号密码。',
     'login.failed': '登录失败',
     'shell.logout': '退出登录',
+    'shell.docs':   '说明',
     'shell.loading': '加载中…',
     'shell.loadFailed': '加载失败',
     'shell.langSwitchLabel': 'EN',
     'modal.close': '关闭',
     'nav.section.workspace': '工作台',
     'nav.section.admin': '管理',
-    'nav.dashboard': '总览',
+    'nav.dashboard': '工作台',
     'nav.cases': '测试用例',
     'nav.run': '执行测试',
     'nav.results': '测试结果',
@@ -267,6 +268,62 @@ const I18N = {
     'dashboard.recent.title': '最近运行',
     'dashboard.recent.empty': '还没有运行记录。打开任意一个用例并点击「▶ 运行」。',
     'dashboard.recent.openCase': '打开用例',
+    'wb.title': '测试工作台',
+    'wb.kpi.total': '用例总数',
+    'wb.kpi.pass': '已通过',
+    'wb.kpi.fail': '已失败',
+    'wb.kpi.run':  '执行中',
+    'wb.kpi.pend': '待执行',
+    'wb.kpi.passRate': '通过率',
+    'wb.kpi.avgDur':   '平均耗时',
+    'wb.kpi.cacheHit': 'Cache 命中',
+    'wb.kpi.activity': '近 7 天',
+    'wb.kpi.timeSaved':'节省时间',
+    'wb.kpi.health':   '健康指数',
+    'wb.cases.title':  '测试用例',
+    'wb.cases.search': '搜索用例…',
+    'wb.cases.filter.all':  '全部状态',
+    'wb.cases.filter.pass': '已通过',
+    'wb.cases.filter.fail': '已失败',
+    'wb.cases.filter.pend': '未运行',
+    'wb.cases.selected':    '已选 {n}',
+    'wb.cases.bulkRun':     '批量执行',
+    'wb.cases.new':         '+ 新建',
+    'wb.cases.empty':       '没有匹配的用例',
+    'wb.detail.title':      '用例详情',
+    'wb.detail.empty':      '从左侧选择一个用例查看详情',
+    'wb.detail.steps':      '测试步骤',
+    'wb.detail.goal':       '测试目标',
+    'wb.detail.precond':    '前置条件',
+    'wb.detail.openFull':   '完整编辑器',
+    'wb.detail.runJs':      '▶ Run raw',
+    'wb.detail.runJsCache': '▶ Run cached',
+    'wb.detail.stop':       '■ 停止',
+    'wb.detail.history':    '历史',
+    'wb.logs.title':        '实时日志',
+    'wb.logs.empty':        '运行后日志将在此实时显示',
+    'wb.logs.clear':        '清空',
+    'wb.logs.filter.all':   '全部',
+    'wb.logs.filter.info':  '信息',
+    'wb.logs.filter.warn':  '警告',
+    'wb.logs.filter.err':   '错误',
+    'wb.results.title':     '执行结果',
+    'wb.results.search':    '搜索…',
+    'wb.results.filter.all':  '全部状态',
+    'wb.results.export':    '导出 CSV',
+    'wb.results.col.case':    '用例',
+    'wb.results.col.module':  '模块',
+    'wb.results.col.status':  '状态',
+    'wb.results.col.start':   '开始时间',
+    'wb.results.col.end':     '结束时间',
+    'wb.results.col.duration':'耗时',
+    'wb.results.col.progress':'进度',
+    'wb.results.col.retries': '重试',
+    'wb.results.col.error':   '错误摘要',
+    'wb.results.col.actions': '操作',
+    'wb.results.empty':       '没有执行记录',
+    'wb.results.viewLog':     '查看日志',
+    'wb.results.rerun':       '重新执行',
   },
   en: {
     'login.tagline': 'SAP WebGUI Test Automation Console',
@@ -277,13 +334,14 @@ const I18N = {
     'login.foot': 'First deployment? The backend startup log prints the initial admin credentials.',
     'login.failed': 'Login failed',
     'shell.logout': 'Sign out',
+    'shell.docs':   'Docs',
     'shell.loading': 'Loading…',
     'shell.loadFailed': 'Failed to load',
     'shell.langSwitchLabel': '中',
     'modal.close': 'Close',
     'nav.section.workspace': 'Workspace',
     'nav.section.admin': 'Admin',
-    'nav.dashboard': 'Overview',
+    'nav.dashboard': 'Workbench',
     'nav.cases': 'Test Cases',
     'nav.run': 'Run',
     'nav.results': 'Results',
@@ -531,6 +589,62 @@ const I18N = {
     'dashboard.recent.title': 'Recent runs',
     'dashboard.recent.empty': 'No runs yet. Open any case and click “▶ Run”.',
     'dashboard.recent.openCase': 'Open case',
+    'wb.title': 'Test Workbench',
+    'wb.kpi.total': 'Total cases',
+    'wb.kpi.pass': 'Passed',
+    'wb.kpi.fail': 'Failed',
+    'wb.kpi.run':  'Running',
+    'wb.kpi.pend': 'Pending',
+    'wb.kpi.passRate': 'Pass rate',
+    'wb.kpi.avgDur':   'Avg duration',
+    'wb.kpi.cacheHit': 'Cache hit',
+    'wb.kpi.activity': '7-day activity',
+    'wb.kpi.timeSaved':'Time saved',
+    'wb.kpi.health':   'Fleet health',
+    'wb.cases.title':  'Test cases',
+    'wb.cases.search': 'Search cases…',
+    'wb.cases.filter.all':  'All statuses',
+    'wb.cases.filter.pass': 'Passed',
+    'wb.cases.filter.fail': 'Failed',
+    'wb.cases.filter.pend': 'Not run',
+    'wb.cases.selected':    '{n} selected',
+    'wb.cases.bulkRun':     'Run selected',
+    'wb.cases.new':         '+ New',
+    'wb.cases.empty':       'No matching cases',
+    'wb.detail.title':      'Case detail',
+    'wb.detail.empty':      'Select a case on the left to see details',
+    'wb.detail.steps':      'Test steps',
+    'wb.detail.goal':       'Test goal',
+    'wb.detail.precond':    'Preconditions',
+    'wb.detail.openFull':   'Full editor',
+    'wb.detail.runJs':      '▶ Run raw',
+    'wb.detail.runJsCache': '▶ Run cached',
+    'wb.detail.stop':       '■ Stop',
+    'wb.detail.history':    'History',
+    'wb.logs.title':        'Live log',
+    'wb.logs.empty':        'Logs will stream here once a run starts',
+    'wb.logs.clear':        'Clear',
+    'wb.logs.filter.all':   'All',
+    'wb.logs.filter.info':  'Info',
+    'wb.logs.filter.warn':  'Warn',
+    'wb.logs.filter.err':   'Error',
+    'wb.results.title':     'Execution results',
+    'wb.results.search':    'Search…',
+    'wb.results.filter.all':  'All statuses',
+    'wb.results.export':    'Export CSV',
+    'wb.results.col.case':    'Case',
+    'wb.results.col.module':  'Module',
+    'wb.results.col.status':  'Status',
+    'wb.results.col.start':   'Started',
+    'wb.results.col.end':     'Ended',
+    'wb.results.col.duration':'Duration',
+    'wb.results.col.progress':'Progress',
+    'wb.results.col.retries': 'Retries',
+    'wb.results.col.error':   'Error summary',
+    'wb.results.col.actions': 'Actions',
+    'wb.results.empty':       'No execution records',
+    'wb.results.viewLog':     'View log',
+    'wb.results.rerun':       'Rerun',
   },
 };
 
@@ -649,6 +763,68 @@ const api = {
   del: (p) => api.req('DELETE', p),
 };
 
+// Open the cinema page in a NAMED tab. Browsers reuse the tab whose
+// window.name === 'saptest-cinema' on subsequent calls — clicking LIVE a
+// second time focuses the existing tab instead of spawning a new one.
+// Falls back to in-page navigation if a popup blocker eats the window.
+function openCinemaTab(caseId) {
+  const url = '#/cinema/' + encodeURIComponent(caseId);
+  const win = window.open(url, 'saptest-cinema');
+  if (!win) {
+    // Popup blocked or denied — degrade to in-tab navigation.
+    location.hash = url;
+    return null;
+  }
+  try { win.focus(); } catch {}
+  return win;
+}
+
+// Rename a case's id (= its JSON filename). Prompts with a modal, validates
+// kebab-case-ish input, PATCHes the server, and on success navigates to
+// the new caseId so the workbench picks up the renamed file.
+function openRenameModal(oldId) {
+  const idInput = h('input', { value: oldId, placeholder: 'new-kebab-case-id' });
+  const err = h('div', { class: 'muted', style: { color: 'var(--err)', minHeight: '18px', fontSize: '12px' } });
+  const m = modal({
+    title: LANG === 'zh' ? `重命名用例 · ${oldId}` : `Rename case · ${oldId}`,
+    body: h('div', { class: 'grid', style: { gap: '10px' } },
+      h('div', { class: 'field' },
+        h('span', {}, LANG === 'zh' ? '新 ID' : 'New ID'),
+        idInput,
+      ),
+      h('div', { class: 'muted small' }, LANG === 'zh'
+        ? '只能用字母 / 数字 / - / _ 。同时会自动重命名该用例的运行历史目录和 Midscene 缓存文件。e2e/<id>.spec.ts 不会自动改名（属于 Playwright 端）。'
+        : 'Letters, digits, - and _ only. Run-history dir and Midscene cache files for this case will be renamed alongside. The Playwright spec (e2e/<id>.spec.ts) is left as-is.'),
+      err,
+    ),
+    footer: h('div', { class: 'row', style: { marginLeft: 'auto', gap: '8px' } },
+      h('button', { class: 'btn', onClick: () => m.close() }, LANG === 'zh' ? '取消' : 'Cancel'),
+      h('button', { class: 'btn primary', onClick: async () => {
+        err.textContent = '';
+        const newId = idInput.value.trim();
+        if (!/^[a-zA-Z0-9_\-]+$/.test(newId)) { err.textContent = LANG === 'zh' ? 'ID 只能用字母 / 数字 / - / _' : 'Invalid id'; return; }
+        if (newId === oldId) { err.textContent = LANG === 'zh' ? '新 ID 和旧 ID 一样' : 'New id is the same as old id'; return; }
+        try {
+          const r = await api.req('PATCH', '/api/cases/' + encodeURIComponent(oldId) + '/rename', { newId });
+          const note = r.secondary?.length
+            ? ` · 重命名了 ${r.secondary.filter(s => !s.error).length} 项关联资源`
+            : '';
+          toast((LANG === 'zh' ? '已重命名为 ' : 'Renamed to ') + newId + note, 'ok', 4000);
+          m.close();
+          // Reload the workbench (which is rooted on case list) and select
+          // the new id. The active workbench mounts in the same view.
+          location.hash = '#/dashboard';
+          setTimeout(() => render(), 0);
+        } catch (e) { err.textContent = e.message; }
+      }}, LANG === 'zh' ? '重命名' : 'Rename'),
+    ),
+  });
+  setTimeout(() => idInput.focus(), 0);
+  idInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') m.querySelector?.('.btn.primary')?.click();
+  });
+}
+
 // ───────── App state ─────────
 const state = {
   user: null,
@@ -707,8 +883,455 @@ function go(path) { location.hash = '#/' + path; }
 window.addEventListener('hashchange', () => render());
 
 // ───────── Bootstrap ─────────
+// ═══════════════════════════════════════════════════════════════════════════
+// Power-user surface — Command palette (Ctrl+K), global keyboard navigation
+// (J/K, /, Enter, Esc, g d / g c / g r, ?), and small animation utilities
+// (count-up). These bind once at boot and are reachable from any view via
+// hash navigation; they MUST not assume the workbench is mounted.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// In-flight ref to the workbench so its internals (selected case, search box,
+// list) can be poked from global keyboard handlers without re-querying.
+// Cleared on hashchange.
+const wb = { mounted: null };
+
+// Module-level cache of per-step screenshots seen by the active-runs poll,
+// keyed by runId → Map<order, { status, cached, runId }>. Lifted out of the
+// workbench scope so VIEWS.cinema (which navigates as a sibling route) can
+// hydrate from the same in-memory state without re-fetching the disk listing.
+const runScreenshotsByRun = new Map();
+
+// Animate a number from `from` to `to` over `ms` and write it into `el` as
+// text. Uses requestAnimationFrame for smoothness; bails fast on equality.
+function animateNumber(el, from, to, ms = 420, fmt = String) {
+  if (!el || from === to) { if (el) el.textContent = fmt(to); return; }
+  const start = performance.now();
+  const delta = to - from;
+  function step(now) {
+    const p = Math.min(1, (now - start) / ms);
+    const eased = 1 - Math.pow(1 - p, 3); // ease-out-cubic
+    const v = from + delta * eased;
+    el.textContent = fmt(Number.isInteger(from) && Number.isInteger(to) ? Math.round(v) : v);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = fmt(to);
+  }
+  requestAnimationFrame(step);
+}
+
+// Build a tiny inline SVG sparkline from a series of pass-rate values
+// (each in [0, 1]). 60×18 viewport. Returns an SVG element ready to mount.
+function sparkline(values, opts = {}) {
+  const w = opts.width ?? 60, hh = opts.height ?? 18;
+  const xmlns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(xmlns, 'svg');
+  svg.setAttribute('class', 'kpi-spark');
+  svg.setAttribute('viewBox', `0 0 ${w} ${hh}`);
+  svg.setAttribute('width', w);
+  svg.setAttribute('height', hh);
+  if (!values.length) return svg;
+  const pad = 1.5;
+  const n = values.length;
+  const xs = (i) => n === 1 ? w / 2 : pad + (i / (n - 1)) * (w - pad * 2);
+  const ys = (v) => hh - pad - v * (hh - pad * 2);
+  const points = values.map((v, i) => [xs(i), ys(v)]);
+  const linePath = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(2) + ' ' + p[1].toFixed(2)).join(' ');
+  const areaPath = linePath + ` L${xs(n - 1).toFixed(2)} ${hh} L${xs(0).toFixed(2)} ${hh} Z`;
+  const area = document.createElementNS(xmlns, 'path');
+  area.setAttribute('class', 'area');
+  area.setAttribute('d', areaPath);
+  const line = document.createElementNS(xmlns, 'path');
+  line.setAttribute('class', 'line');
+  line.setAttribute('d', linePath);
+  const last = document.createElementNS(xmlns, 'circle');
+  last.setAttribute('class', 'last');
+  last.setAttribute('cx', points[n - 1][0]);
+  last.setAttribute('cy', points[n - 1][1]);
+  last.setAttribute('r', '1.6');
+  svg.append(area, line, last);
+  return svg;
+}
+
+// Radial percentage ring — 36×36 viewBox, 100% = full sweep clockwise from
+// 12 o'clock. The dial is two stacked circles (track + arc) plus a centered
+// label. Animates the arc length on first render via stroke-dashoffset so
+// the ring "draws itself" when the KPI strip mounts.
+function radialRing(percent, opts = {}) {
+  const pct = percent == null || Number.isNaN(percent) ? 0 : Math.max(0, Math.min(100, percent));
+  const size = opts.size ?? 56;
+  const stroke = opts.stroke ?? 5;
+  const xmlns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(xmlns, 'svg');
+  svg.setAttribute('class', 'kpi-ring');
+  svg.setAttribute('viewBox', '0 0 36 36');
+  svg.setAttribute('width', size);
+  svg.setAttribute('height', size);
+  const r = 16;
+  const circ = 2 * Math.PI * r;
+  const track = document.createElementNS(xmlns, 'circle');
+  track.setAttribute('class', 'track');
+  track.setAttribute('cx', 18); track.setAttribute('cy', 18); track.setAttribute('r', r);
+  track.setAttribute('fill', 'none');
+  track.setAttribute('stroke-width', stroke);
+  const arc = document.createElementNS(xmlns, 'circle');
+  arc.setAttribute('class', 'arc');
+  arc.setAttribute('cx', 18); arc.setAttribute('cy', 18); arc.setAttribute('r', r);
+  arc.setAttribute('fill', 'none');
+  arc.setAttribute('stroke-width', stroke);
+  arc.setAttribute('stroke-linecap', 'round');
+  arc.setAttribute('transform', 'rotate(-90 18 18)');
+  arc.setAttribute('stroke-dasharray', circ.toFixed(2));
+  arc.setAttribute('stroke-dashoffset', (circ * (1 - pct / 100)).toFixed(2));
+  const lbl = document.createElementNS(xmlns, 'text');
+  lbl.setAttribute('class', 'lbl');
+  lbl.setAttribute('x', 18); lbl.setAttribute('y', 18);
+  lbl.setAttribute('text-anchor', 'middle');
+  lbl.setAttribute('dominant-baseline', 'central');
+  lbl.textContent = opts.label != null ? opts.label : (percent == null ? '—' : Math.round(pct) + '%');
+  svg.append(track, arc, lbl);
+  return svg;
+}
+
+// Horizontal bar gauge — single 70×6 rounded track with a fill arc that
+// represents value/max. Used for "average duration vs target", "fleet
+// health", etc. Returns an SVG; values clamped to [0, max].
+function barGauge(value, max, opts = {}) {
+  const w = opts.width ?? 70, hh = opts.height ?? 6;
+  const xmlns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(xmlns, 'svg');
+  svg.setAttribute('class', 'kpi-bar');
+  svg.setAttribute('viewBox', `0 0 ${w} ${hh}`);
+  svg.setAttribute('width', w); svg.setAttribute('height', hh);
+  const pct = max > 0 ? Math.max(0, Math.min(1, value / max)) : 0;
+  const track = document.createElementNS(xmlns, 'rect');
+  track.setAttribute('class', 'track');
+  track.setAttribute('x', 0); track.setAttribute('y', 0);
+  track.setAttribute('width', w); track.setAttribute('height', hh);
+  track.setAttribute('rx', hh / 2);
+  const fill = document.createElementNS(xmlns, 'rect');
+  fill.setAttribute('class', 'fill');
+  fill.setAttribute('x', 0); fill.setAttribute('y', 0);
+  fill.setAttribute('width', (w * pct).toFixed(2));
+  fill.setAttribute('height', hh);
+  fill.setAttribute('rx', hh / 2);
+  svg.append(track, fill);
+  return svg;
+}
+
+// Bar histogram — N vertical bars each scaled to its value relative to
+// max-of-series. Used for "runs per day over the last 7 days". The bars
+// animate upward on first paint via CSS keyframe.
+function histogram(values, opts = {}) {
+  const w = opts.width ?? 78, hh = opts.height ?? 22;
+  const xmlns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(xmlns, 'svg');
+  svg.setAttribute('class', 'kpi-hist');
+  svg.setAttribute('viewBox', `0 0 ${w} ${hh}`);
+  svg.setAttribute('width', w); svg.setAttribute('height', hh);
+  if (!values.length) return svg;
+  const n = values.length;
+  const gap = 1.5;
+  const bw = Math.max(1.5, (w - gap * (n - 1)) / n);
+  const max = Math.max(1, ...values);
+  values.forEach((v, i) => {
+    const ratio = max > 0 ? Math.max(0.04, v / max) : 0;
+    const h_ = hh * ratio;
+    const x = i * (bw + gap);
+    const y = hh - h_;
+    const rect = document.createElementNS(xmlns, 'rect');
+    rect.setAttribute('x', x.toFixed(2));
+    rect.setAttribute('y', y.toFixed(2));
+    rect.setAttribute('width', bw.toFixed(2));
+    rect.setAttribute('height', h_.toFixed(2));
+    rect.setAttribute('rx', '1');
+    rect.style.setProperty('--bar-h', h_.toFixed(2) + 'px');
+    rect.style.setProperty('--bar-i', String(i));
+    rect.setAttribute('class', i === n - 1 ? 'bar is-today' : 'bar');
+    svg.appendChild(rect);
+  });
+  return svg;
+}
+
+// ── Command palette ──────────────────────────────────────────────
+// Open with Ctrl/Cmd+K. Fuzzy-searches cases + nav targets + actions.
+// Arrow keys navigate; Enter triggers; Esc closes.
+let cmdPalOpen = false;
+async function openCmdPalette() {
+  if (cmdPalOpen) return;
+  cmdPalOpen = true;
+  // Pull cases lazily — palette is reachable from any view.
+  let cases = [];
+  try { if (hasPerm('cases:read')) cases = (await api.get('/api/cases')).cases || []; } catch {}
+
+  const back = h('div', { class: 'cmd-pal-back' });
+  const input = h('input', {
+    class: 'cmd-pal-input', type: 'search', autocomplete: 'off',
+    placeholder: LANG === 'zh' ? '搜用例 / 跳转 / 操作…' : 'Search cases, navigate, run…',
+    spellcheck: 'false',
+  });
+  const list = h('div', { class: 'cmd-pal-list' });
+  const foot = h('div', { class: 'cmd-pal-foot' },
+    h('span', {}, h('span', { class: 'kbd' }, '↑'), h('span', { class: 'kbd' }, '↓'), ' ', LANG === 'zh' ? '移动' : 'Move'),
+    h('span', {}, h('span', { class: 'kbd' }, '↵'), ' ', LANG === 'zh' ? '选择' : 'Select'),
+    h('span', {}, h('span', { class: 'kbd' }, 'Esc'), ' ', LANG === 'zh' ? '关闭' : 'Close'),
+    h('span', { style: { marginLeft: 'auto' } }, h('span', { class: 'kbd' }, '?'), ' ', LANG === 'zh' ? '所有快捷键' : 'All shortcuts'),
+  );
+  const pal = h('div', { class: 'cmd-pal' }, input, list, foot);
+  back.appendChild(pal);
+
+  function close() {
+    cmdPalOpen = false;
+    back.remove();
+    document.removeEventListener('keydown', onKey, true);
+  }
+  back.addEventListener('click', (e) => { if (e.target === back) close(); });
+
+  // Item universe — built once, filtered per keystroke.
+  const navItems = [
+    { kind: 'nav',    label: LANG === 'zh' ? '工作台' : 'Workbench',  sub: '#/dashboard',  glyph: '◧', run: () => go('dashboard') },
+    { kind: 'nav',    label: LANG === 'zh' ? '测试用例' : 'Test cases', sub: '#/cases',     glyph: '⋮', run: () => go('cases') },
+    { kind: 'nav',    label: LANG === 'zh' ? '测试结果' : 'Results',    sub: '#/results',   glyph: '⊞', run: () => go('results'),  perm: 'results:read' },
+    { kind: 'nav',    label: LANG === 'zh' ? 'AI 用例生成' : 'AI generator', sub: '#/generate', glyph: '✦', run: () => go('generate'), perm: 'agent:use' },
+    { kind: 'nav',    label: LANG === 'zh' ? '配置' : 'Configuration',  sub: '#/config',    glyph: '⚙', run: () => go('config'),   perm: 'config:read' },
+    { kind: 'nav',    label: LANG === 'zh' ? '用户管理' : 'Users',      sub: '#/users',     glyph: '◐', run: () => go('users'),    perm: 'users:manage' },
+    { kind: 'nav',    label: LANG === 'zh' ? '审计日志' : 'Audit log',  sub: '#/audit',     glyph: '≡', run: () => go('audit'),    perm: 'audit:read' },
+  ].filter(it => !it.perm || hasPerm(it.perm));
+  const actionItems = [
+    { kind: 'action', label: LANG === 'zh' ? '清空缓存' : 'Clear cache', sub: 'midscene_run/cache', glyph: '⌫',
+      run: async () => { try { const r = await api.del('/api/run/cache'); toast(t('run.cacheClear.done', { n: r.removed ?? 0 }), 'ok'); } catch (e) { toast(e.message, 'err'); } },
+      perm: 'runs:execute' },
+    { kind: 'action', label: LANG === 'zh' ? '退出登录' : 'Sign out', sub: '/api/auth/logout', glyph: '←',
+      run: async () => { try { await api.post('/api/auth/logout', {}); } catch {} state.user = null; state.permissions = []; renderLogin(); } },
+    { kind: 'action', label: LANG === 'zh' ? '切换主题' : 'Toggle theme', sub: 'light ↔ dark', glyph: '◐',
+      run: () => document.querySelector('[data-action=theme-toggle]')?.click() },
+    { kind: 'action', label: LANG === 'zh' ? '切换语言' : 'Toggle language', sub: 'zh ↔ en', glyph: '文',
+      run: () => toggleLang() },
+    { kind: 'action', label: LANG === 'zh' ? '快捷键速查表' : 'Keyboard shortcuts', sub: '?', glyph: '⌨',
+      run: () => { close(); setTimeout(openKbdCheatsheet, 50); } },
+  ].filter(it => !it.perm || hasPerm(it.perm));
+  const caseItems = cases.map(c => ({
+    kind: 'case',
+    label: c.parsed?.title || c.id,
+    sub: c.id + (c.summary?.transactionCode ? ' · TX ' + c.summary.transactionCode : ''),
+    glyph: '▣',
+    run: () => go('cases/' + encodeURIComponent(c.id)),
+    runActions: hasPerm('runs:execute') && c.summary?.hasApiGuide ? [
+      { label: LANG === 'zh' ? '运行' : 'Run',          run: () => openJsRunModal(c.id, 'write') },
+      { label: LANG === 'zh' ? '缓存重放' : 'Cached',   run: () => openJsRunModal(c.id, 'read')  },
+    ] : null,
+  }));
+
+  let cursor = 0;
+  let items = [];
+
+  // Simple subsequence-match scoring — favors prefix + adjacent matches.
+  function score(query, hay) {
+    if (!query) return 1;
+    const q = query.toLowerCase(), h = hay.toLowerCase();
+    let qi = 0, hi = 0, last = -2, sc = 0;
+    while (qi < q.length && hi < h.length) {
+      if (q[qi] === h[hi]) {
+        sc += 1 + (hi - last === 1 ? 2 : 0) + (hi === 0 ? 3 : 0);
+        last = hi; qi++;
+      }
+      hi++;
+    }
+    return qi === q.length ? sc : 0;
+  }
+
+  function refresh() {
+    const q = input.value.trim();
+    list.innerHTML = '';
+    const scored = [];
+    for (const it of [...navItems, ...caseItems, ...actionItems]) {
+      const s = Math.max(score(q, it.label), score(q, it.sub) * 0.6);
+      if (s > 0) scored.push({ it, s });
+    }
+    scored.sort((a, b) => b.s - a.s);
+    items = scored.map(x => x.it).slice(0, 50);
+    if (!items.length) {
+      list.appendChild(h('div', { class: 'cmd-pal-section' }, LANG === 'zh' ? '没有匹配' : 'No matches'));
+      return;
+    }
+    cursor = Math.min(cursor, items.length - 1);
+    const groups = { nav: [], case: [], action: [] };
+    items.forEach((it, idx) => groups[it.kind].push({ it, idx }));
+    const order = [
+      ['case',   LANG === 'zh' ? '用例'       : 'Cases'],
+      ['nav',    LANG === 'zh' ? '跳转'       : 'Navigate'],
+      ['action', LANG === 'zh' ? '操作'       : 'Actions'],
+    ];
+    for (const [key, label] of order) {
+      if (!groups[key].length) continue;
+      list.appendChild(h('div', { class: 'cmd-pal-section' }, label));
+      for (const { it, idx } of groups[key]) {
+        const row = h('div', {
+          class: 'cmd-pal-item' + (idx === cursor ? ' is-active' : ''),
+          dataset: { idx: String(idx) },
+          onClick: () => { cursor = idx; trigger(); },
+        },
+          h('div', { class: 'cmd-pal-item-glyph' }, it.glyph || ''),
+          h('div', { class: 'cmd-pal-item-body' },
+            h('div', { class: 'cmd-pal-item-title' }, it.label),
+            it.sub ? h('div', { class: 'cmd-pal-item-sub' }, it.sub) : null,
+          ),
+          h('div', { class: 'cmd-pal-item-meta' },
+            it.kind === 'case' ? h('span', { class: 'kbd' }, '↵') :
+            it.kind === 'nav'  ? h('span', { class: 'kbd' }, 'GO') :
+                                 h('span', { class: 'kbd' }, 'DO'),
+          ),
+        );
+        list.appendChild(row);
+      }
+    }
+    // Keep the active row in view.
+    const active = list.querySelector('.is-active');
+    if (active) active.scrollIntoView({ block: 'nearest' });
+  }
+
+  function trigger() {
+    const it = items[cursor];
+    if (!it) return;
+    close();
+    try { it.run(); } catch (e) { toast(e.message || String(e), 'err'); }
+  }
+
+  function onKey(e) {
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key === 'ArrowDown' || (e.key === 'n' && e.ctrlKey)) { e.preventDefault(); cursor = (cursor + 1) % Math.max(items.length, 1); refresh(); return; }
+    if (e.key === 'ArrowUp'   || (e.key === 'p' && e.ctrlKey)) { e.preventDefault(); cursor = (cursor - 1 + items.length) % Math.max(items.length, 1); refresh(); return; }
+    if (e.key === 'Enter') { e.preventDefault(); trigger(); return; }
+  }
+  document.addEventListener('keydown', onKey, true);
+  input.addEventListener('input', () => { cursor = 0; refresh(); });
+
+  document.body.appendChild(back);
+  refresh();
+  setTimeout(() => input.focus(), 0);
+}
+
+// ── Keyboard cheatsheet (?) ──
+function openKbdCheatsheet() {
+  const rows = [
+    ['Ctrl+K',  LANG === 'zh' ? '命令面板'           : 'Command palette'],
+    ['/',       LANG === 'zh' ? '搜索用例'           : 'Focus case search'],
+    ['J / ↓',   LANG === 'zh' ? '下一个用例'         : 'Next case'],
+    ['K / ↑',   LANG === 'zh' ? '上一个用例'         : 'Previous case'],
+    ['Enter',   LANG === 'zh' ? '运行当前用例'       : 'Run selected case'],
+    ['Shift+R', LANG === 'zh' ? '运行（缓存重放）'   : 'Run with cache replay'],
+    ['Shift+Click', LANG === 'zh' ? '区段多选'       : 'Range select'],
+    ['Esc',     LANG === 'zh' ? '清空多选 / 关闭'    : 'Clear selection / Close'],
+    ['g d',     LANG === 'zh' ? '跳到工作台'         : 'Go to workbench'],
+    ['g c',     LANG === 'zh' ? '跳到测试用例'       : 'Go to cases'],
+    ['g r',     LANG === 'zh' ? '跳到测试结果'       : 'Go to results'],
+    ['?',       LANG === 'zh' ? '本速查表'           : 'This cheatsheet'],
+  ];
+  const left = rows.slice(0, Math.ceil(rows.length / 2));
+  const right = rows.slice(Math.ceil(rows.length / 2));
+  const col = (xs) => h('div', {}, ...xs.map(([k, label]) => h('div', { class: 'kbd-row' },
+    h('span', { class: 'kbd-row-label' }, label),
+    h('span', { class: 'kbd-row-keys' }, ...k.split(/(\s|\+)/).filter(s => s && s !== '+').map(s => s === ' ' ? h('span', { class: 'muted' }, 'then') : h('span', { class: 'kbd' }, s))),
+  )));
+  modal({
+    title: LANG === 'zh' ? '键盘快捷键' : 'Keyboard shortcuts',
+    body: h('div', { class: 'kbd-cheat-grid' }, col(left), col(right)),
+  });
+}
+
+// ── Global keyboard handler ──
+// Active everywhere except: while typing in inputs/textareas, while command
+// palette is open (palette has its own), and (for 'g'-sequences) while a
+// modal is open. Uses an internal 1-key buffer for "g d"-style sequences.
+let gPending = null;
+let gPendingTimer = null;
+function installGlobalKeyboard() {
+  document.addEventListener('keydown', (e) => {
+    if (cmdPalOpen) return;
+    const target = e.target;
+    const tag = (target?.tagName || '').toLowerCase();
+    const inField = tag === 'input' || tag === 'textarea' || tag === 'select' || target?.isContentEditable;
+
+    // Cmd/Ctrl+K → command palette (works even inside inputs).
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      openCmdPalette();
+      return;
+    }
+    if (inField && e.key !== 'Escape') return;
+
+    // Esc clears workbench selection + closes nothing else (modals handle their own).
+    if (e.key === 'Escape') {
+      if (wb.mounted) {
+        wb.mounted.selectedIds.clear();
+        wb.mounted.refreshSelectedFoot?.();
+        wb.mounted.renderCasesList?.();
+      }
+      if (gPending) { gPending = null; clearTimeout(gPendingTimer); }
+      return;
+    }
+
+    // `?` → cheatsheet
+    if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      openKbdCheatsheet();
+      return;
+    }
+
+    // `g <x>` two-key navigation sequence
+    if (gPending) {
+      const dest = { d: 'dashboard', c: 'cases', r: 'results', g: 'generate', a: 'audit', u: 'users', s: 'config' }[e.key.toLowerCase()];
+      gPending = null; clearTimeout(gPendingTimer);
+      if (dest) { e.preventDefault(); go(dest); return; }
+      return;
+    }
+    if (e.key === 'g' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      e.preventDefault();
+      gPending = 'g';
+      gPendingTimer = setTimeout(() => { gPending = null; }, 900);
+      return;
+    }
+
+    // Workbench-only navigation
+    if (wb.mounted) {
+      // `/` focuses the case search
+      if (e.key === '/') {
+        e.preventDefault();
+        wb.mounted.casesSearchEl?.focus();
+        wb.mounted.casesSearchEl?.select?.();
+        return;
+      }
+      // J/↓ next case, K/↑ prev case
+      if (e.key === 'j' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        wb.mounted.moveSelection?.(1);
+        return;
+      }
+      if (e.key === 'k' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        wb.mounted.moveSelection?.(-1);
+        return;
+      }
+      // Enter runs the selected case (write cache); Shift+Enter or Shift+R = cached replay
+      if (e.key === 'Enter' && wb.mounted.selectedCaseId) {
+        e.preventDefault();
+        wb.mounted.triggerIgnition?.();
+        openJsRunModal(wb.mounted.selectedCaseId, e.shiftKey ? 'read' : 'write',
+          { initialBypass: wb.mounted.bypassSnapshot?.() });
+        return;
+      }
+      if ((e.key === 'r' || e.key === 'R') && e.shiftKey && wb.mounted.selectedCaseId) {
+        e.preventDefault();
+        wb.mounted.triggerIgnition?.();
+        openJsRunModal(wb.mounted.selectedCaseId, 'read',
+          { initialBypass: wb.mounted.bypassSnapshot?.() });
+        return;
+      }
+    }
+  });
+}
+
 async function boot() {
   document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+  installGlobalKeyboard();
   try {
     const me = await api.get('/api/auth/me');
     state.user = me.user;
@@ -834,9 +1457,11 @@ function render() {
   const route = parseHash();
   state.route = route;
   // Resolve which view function to use. "cases/<id>/..." is rendered by the
-  // case detail view; everything else maps 1:1 to a VIEWS key.
+  // case detail view; "cinema/<caseId>/<runId>" is the full-bleed playback;
+  // everything else maps 1:1 to a VIEWS key.
   const isCaseDetail = route.view === 'cases' && route.params.rest.length > 0;
-  const effectiveViewId = isCaseDetail ? 'caseDetail' : route.view;
+  const isCinema     = route.view === 'cinema' && route.params.rest.length >= 1;
+  const effectiveViewId = isCaseDetail ? 'caseDetail' : (isCinema ? 'cinema' : route.view);
   // mark active nav — case detail keeps the Cases item highlighted
   const navMatchId = isCaseDetail ? 'cases' : route.view;
   $$('.nav-item').forEach(a => a.classList.toggle('active', a.dataset.view === navMatchId));
@@ -871,8 +1496,2565 @@ function render() {
     });
 }
 
-// ───────── View: Dashboard ─────────
+// ═══════════════════════════════════════════════════════════════════════════
+// View: Dashboard  →  SAP Fiori Test Workbench
+//
+// Single-page operations cockpit replacing the old stat-cards dashboard.
+// Layout (see .workbench in styles.css):
+//   ┌─ KPI strip (7 metrics: total / pass / fail / running / pending / rate / avg) ─┐
+//   ├─ Cases (left, scrollable list with search + filter + multi-select)             ┤
+//   ├─ Detail (center, step pipeline with status indicators + run controls)          ┤
+//   ├─ Live log (right, /ws/run stream)                                              ┤
+//   └─ Results table (bottom, full-width, filter + search + CSV export)              ┘
+//
+// All four regions reuse existing backend endpoints:
+//   GET  /api/cases                    — case list
+//   GET  /api/cases/:id                — case detail (parsed.apiGuide.steps drives the pipeline)
+//   GET  /api/cases/:id/runs           — per-case history
+//   GET  /api/results/recent?limit=N   — cross-case run records (for KPIs + results table)
+//   WS   /ws/run                       — live log stream
+// Run actions delegate to the existing openJsRunModal() flow — no new server
+// surface is introduced, no field/contract is altered.
+// ═══════════════════════════════════════════════════════════════════════════
 VIEWS.dashboard = async () => {
+  const canReadCases   = hasPerm('cases:read');
+  const canReadResults = hasPerm('results:read');
+  const canRun         = hasPerm('runs:execute');
+  const canDelete      = hasPerm('cases:delete');
+  const canWrite       = hasPerm('cases:write');
+
+  // Fetch the data the workbench depends on. All endpoints are pre-existing —
+  // no schema changes. Failures fall back to empty arrays so partial perms
+  // (e.g. cases:read but not results:read) still render usefully.
+  const [casesRes, recentRes] = await Promise.all([
+    canReadCases   ? api.get('/api/cases').catch(() => ({ cases: [] }))                            : Promise.resolve({ cases: [] }),
+    canReadResults ? api.get('/api/results/recent?limit=200').catch(() => ({ runs: [] }))           : Promise.resolve({ runs: [] }),
+  ]);
+
+  // Sort cases: saptest1-8 first (project convention), then alpha. Same logic
+  // as VIEWS.cases — kept inline to avoid coupling.
+  const saptestRank = (id) => {
+    const m = /^saptest([1-8])$/.exec(id);
+    return m ? Number(m[1]) : Infinity;
+  };
+  const cases = (casesRes.cases || []).slice().sort((a, b) => {
+    const ra = saptestRank(a.id), rb = saptestRank(b.id);
+    if (ra !== rb) return ra - rb;
+    return a.id.localeCompare(b.id);
+  });
+
+  // Map caseId → most recent run record. /api/results/recent is sorted desc.
+  const lastRunByCase = new Map();
+  const allRuns = recentRes.runs || [];
+  for (const r of allRuns) {
+    if (r.caseId && !lastRunByCase.has(r.caseId)) lastRunByCase.set(r.caseId, r);
+  }
+
+  // ── Workbench DOM scaffold (see .workbench in styles.css) ──
+  const root = h('div', { class: 'workbench' });
+
+  // 1) KPI strip — derived from cases + last-run map. "Running" comes from
+  //    the active-runs endpoint which we poll separately (best-effort).
+  const kpiRegion  = h('div', { class: 'workbench-region kpi' });
+  const kpiStrip   = h('div', { class: 'kpi-strip' });
+  kpiRegion.appendChild(kpiStrip);
+  root.appendChild(kpiRegion);
+
+  // 2) Cases list
+  const casesRegion = h('div', { class: 'workbench-region cases' });
+  casesRegion.appendChild(h('div', { class: 'region-head' },
+    h('span', { class: 'region-title' }, t('wb.cases.title')),
+    h('span', { class: 'region-sub', dataset: { bind: 'cases-count' } }, '0'),
+    h('div', { class: 'region-actions' },
+      canWrite && h('button', { class: 'btn sm', onClick: () => editCase(null) }, t('wb.cases.new')),
+    ),
+  ));
+  const casesToolbar = h('div', { class: 'wb-cases-toolbar' },
+    h('input', { type: 'search', placeholder: t('wb.cases.search'), dataset: { bind: 'cases-search' } }),
+    h('select', { dataset: { bind: 'cases-filter' } },
+      h('option', { value: 'all'  }, t('wb.cases.filter.all')),
+      h('option', { value: 'pass' }, t('wb.cases.filter.pass')),
+      h('option', { value: 'fail' }, t('wb.cases.filter.fail')),
+      h('option', { value: 'pend' }, t('wb.cases.filter.pend')),
+    ),
+  );
+  casesRegion.appendChild(casesToolbar);
+  const casesListEl = h('ul', { class: 'wb-cases-list', dataset: { bind: 'cases-list' } });
+  casesRegion.appendChild(casesListEl);
+  const casesFoot = h('div', { class: 'region-foot' },
+    h('span', { dataset: { bind: 'cases-selected' } }, t('wb.cases.selected', { n: 0 })),
+    h('span', { class: 'spacer', style: { flex: '1' } }),
+    canRun && h('button', {
+      class: 'btn primary sm',
+      disabled: true,
+      dataset: { bind: 'cases-bulk-run' },
+      onClick: () => wbBulkRun(),
+    }, t('wb.cases.bulkRun')),
+  );
+  casesRegion.appendChild(casesFoot);
+  root.appendChild(casesRegion);
+
+  // 3) Detail (center)
+  const detailRegion = h('div', { class: 'workbench-region detail' });
+  detailRegion.appendChild(h('div', { class: 'region-head' },
+    h('span', { class: 'region-title' }, t('wb.detail.title')),
+    h('span', { class: 'region-sub', dataset: { bind: 'detail-sub' } }, ''),
+    h('div', { class: 'region-actions', dataset: { bind: 'detail-quick-actions' } }),
+  ));
+  const detailBody = h('div', { class: 'region-body no-pad', dataset: { bind: 'detail-body' } },
+    h('div', { class: 'wb-detail-empty' },
+      h('div', { class: 'wb-detail-empty-glyph' }, '◧'),
+      h('div', {}, t('wb.detail.empty')),
+    ),
+  );
+  detailRegion.appendChild(detailBody);
+  root.appendChild(detailRegion);
+
+  // 4) Live log (right)
+  const logsRegion = h('div', { class: 'workbench-region logs' });
+  logsRegion.appendChild(h('div', { class: 'region-head' },
+    h('span', { class: 'region-title' }, t('wb.logs.title')),
+    h('span', { class: 'region-sub', dataset: { bind: 'logs-status' } }, t('run.status.idle')),
+    h('div', { class: 'region-actions' },
+      h('select', { dataset: { bind: 'logs-filter' } },
+        h('option', { value: 'all'  }, t('wb.logs.filter.all')),
+        h('option', { value: 'info' }, t('wb.logs.filter.info')),
+        h('option', { value: 'warn' }, t('wb.logs.filter.warn')),
+        h('option', { value: 'err'  }, t('wb.logs.filter.err')),
+      ),
+      h('button', { class: 'btn ghost sm', dataset: { bind: 'logs-clear' } }, t('wb.logs.clear')),
+    ),
+  ));
+  const logsBody = h('div', { class: 'wb-log', dataset: { bind: 'logs-body' } },
+    h('div', { class: 'wb-log-empty' }, t('wb.logs.empty')),
+  );
+  logsRegion.appendChild(logsBody);
+  root.appendChild(logsRegion);
+
+  // 5) Results (bottom — spans full width)
+  const resultsRegion = h('div', { class: 'workbench-region results' });
+  resultsRegion.appendChild(h('div', { class: 'region-head' },
+    h('span', { class: 'region-title' }, t('wb.results.title')),
+    h('span', { class: 'region-sub', dataset: { bind: 'results-count' } }, ''),
+  ));
+  const resultsToolbar = h('div', { class: 'wb-results-toolbar' },
+    h('input', { type: 'search', placeholder: t('wb.results.search'), dataset: { bind: 'results-search' } }),
+    h('select', { dataset: { bind: 'results-filter' } },
+      h('option', { value: 'all'  }, t('wb.results.filter.all')),
+      h('option', { value: 'pass' }, t('wb.cases.filter.pass')),
+      h('option', { value: 'fail' }, t('wb.cases.filter.fail')),
+    ),
+    h('span', { class: 'spacer', style: { flex: '1' } }),
+    h('button', { class: 'btn sm', dataset: { bind: 'results-export' } }, t('wb.results.export')),
+  );
+  resultsRegion.appendChild(resultsToolbar);
+  const resultsTable = h('div', { class: 'region-body no-pad', dataset: { bind: 'results-body' }, style: { maxHeight: '320px', overflow: 'auto' } });
+  resultsRegion.appendChild(resultsTable);
+  root.appendChild(resultsRegion);
+
+  // ════════════════════════════════════════════════════════════════════
+  // Internal workbench state (closed over by all sub-renders below).
+  // Kept inside the view function so navigation away tears it down via the
+  // dispose hook on render().
+  // ════════════════════════════════════════════════════════════════════
+  const wbState = {
+    selectedCaseId: null,        // currently-shown case (drives center column)
+    caseSearch:     '',
+    caseFilter:     'all',
+    selectedIds:    new Set(),   // multi-select checkboxes (bulk run)
+    activeRuns:     [],          // /api/midscene-js/runs/active poll result
+    logFilter:      'all',
+    logs:           [],          // raw log entries (we filter at render time)
+    resultsSearch:  '',
+    resultsFilter:  'all',
+    ws:             null,
+    pollHandle:     null,
+    detailCache:    new Map(),   // caseId → loaded /api/cases/:id payload
+    currentRunSpec: null,
+    // Per-case → per-step bypass-cache toggles, mirroring the openJsRunModal
+    // step list (cache=read mode). Key: `${caseId}::${stepOrder}` → bool.
+    // Survives detail re-renders; cleared on hashchange teardown.
+    stepBypass:     new Map(),
+    // 'list' (the dense vertical pipeline) or 'flow' (the new film-strip).
+    // Persisted to localStorage so the user's preference sticks.
+    viewMode:       (() => { try { return localStorage.getItem('wb.viewMode') || 'list'; } catch { return 'list'; } })(),
+    // (screenshot state lives in module-level runScreenshotsByRun so
+    // VIEWS.cinema can access the same in-memory cache.)
+  };
+
+  // Helpers to share isDragLikeStep + tcode detection between the workbench
+  // step pipeline and the inline parameter editor below. Duplicated from
+  // openJsRunModal so renderDetail doesn't have to reach into modal scope.
+  function wbIsDragLikeStep(step) {
+    const api = String(step?.midsceneApi || '').toLowerCase();
+    if (api.includes('aiact') || api.includes('aiscroll')) return true;
+    const code = String(step?.exampleCode || '');
+    return /\bagent\.(aiAct|aiScroll)\s*\(/.test(code);
+  }
+  function wbIsTCodeStep(step) {
+    if (!step) return false;
+    // Pull the locator string out of the aiInput call, then test it.
+    const m = /aiInput\s*\(\s*(['"`])([\s\S]*?)\1/.exec(step.exampleCode || '');
+    const loc = m ? m[2] : '';
+    return /矩形|TC\s*框|T[-\s]?Code|事务码/i.test(loc);
+  }
+  function bypassKey(caseId, order) { return caseId + '::' + order; }
+  function getBypass(caseId, step) {
+    const k = bypassKey(caseId, step.order);
+    if (wbState.stepBypass.has(k)) return wbState.stepBypass.get(k);
+    return wbIsDragLikeStep(step); // drag-like defaults to ON
+  }
+  function setBypass(caseId, order, on) {
+    wbState.stepBypass.set(bypassKey(caseId, order), !!on);
+  }
+  // Snapshot for the current selected case → { order: bool } for the run modal.
+  function bypassSnapshot(caseId, steps) {
+    const out = {};
+    for (const s of steps) out[s.order] = getBypass(caseId, s);
+    return out;
+  }
+
+  // Clickable T Code warning — explains why changing T Code invalidates the
+  // cache for every step that comes after it. Opens an inline modal with the
+  // existing modal() helper so it inherits Esc/backdrop dismissal.
+  function openTCodeExplainer() {
+    const isZh = LANG === 'zh';
+    modal({
+      title: isZh ? '为什么改 T Code 会让 cache 失效？' : 'Why does changing T Code invalidate the cache?',
+      body: h('div', { class: 'wb-explainer' },
+        isZh
+          ? h('p', {}, 'T Code（事务码）决定了登录 SAP 之后跳转到哪个屏幕。Midscene cache 存的是每一步的 ', h('code', {}, 'xpath'), ' / 元素位置 —— 这些位置只对那一个屏幕的 DOM 有效。')
+          : h('p', {}, 'T Code (transaction code) decides which SAP screen you land on after login. The Midscene cache stores each step\'s ', h('code', {}, 'xpath'), ' / element location, which is only valid for that exact screen.'),
+        isZh
+          ? h('p', {}, '换 T Code → 屏幕变 → DOM 变 → ', h('strong', {}, '所有后续步骤的 cache 都对不上'), '：')
+          : h('p', {}, 'Change T Code → screen changes → DOM changes → ', h('strong', {}, 'every subsequent step\'s cached locator is stale'), ':'),
+        h('ul', {},
+          isZh ? h('li', {}, '"company code 字段" 在屏幕 A 是 input[1]，在屏幕 B 可能就不存在') : h('li', {}, '"company code field" might be input[1] on screen A but missing on screen B'),
+          isZh ? h('li', {}, '即使元素名字一样，xpath 也大概率不一样') : h('li', {}, 'Even when the name is identical, the xpath is almost certainly different'),
+        ),
+        isZh
+          ? h('p', {}, h('strong', {}, '怎么办：'), ' 改完 T Code 后用 ', h('code', {}, '▶ Run'), '（write cache 模式），让 Midscene 重新询问模型并录制新的 locator。下一次再用 ', h('code', {}, '▶ Cached'), ' 就能命中。')
+          : h('p', {}, h('strong', {}, 'What to do: '), 'After changing T Code, use ', h('code', {}, '▶ Run'), ' (write-cache mode) so Midscene re-asks the model and records new locators. Subsequent ', h('code', {}, '▶ Cached'), ' runs will hit again.'),
+        isZh
+          ? h('p', { class: 'muted', style: { fontSize: '12px', marginTop: '12px' } }, '注：其他参数（company code、asset number、date 等）的值变化 ', h('strong', {}, '不会'), ' 失效 cache，因为 cache 只看 locator，不看 value。')
+          : h('p', { class: 'muted', style: { fontSize: '12px', marginTop: '12px' } }, 'Note: other parameter values (company code, asset number, date, …) ', h('strong', {}, 'do not'), ' invalidate the cache — the cache keys on locator structure, not on input values.'),
+      ),
+    });
+  }
+
+  // ── KPI reasoning modal ──
+  // Opened when the user clicks a KPI cell that carries a `reason` payload.
+  // Renders a short narrative + an itemized derivation table so the number
+  // is auditable rather than just decorative.
+  function openKpiReasonModal(reason) {
+    if (!reason) return;
+    modal({
+      title: reason.title,
+      body: h('div', { class: 'kpi-reason' },
+        reason.intro ? h('p', { class: 'kpi-reason-intro' }, reason.intro) : null,
+        h('table', { class: 'kpi-reason-table' },
+          h('tbody', {},
+            ...(reason.rows || []).map(r =>
+              h('tr', { class: r.emphasize ? 'is-total' : '' },
+                h('th', {}, r.label),
+                h('td', {}, String(r.value)),
+              )
+            ),
+          ),
+        ),
+        reason.note ? h('p', { class: 'kpi-reason-note' }, reason.note) : null,
+      ),
+    });
+  }
+
+  // ── KPI calculation ──
+  // Remembers last-rendered KPI numbers per slot so we can animate transitions
+  // (count-up) and pulse the cell when the value visibly changes.
+  const kpiPrev = {};
+  function renderKpis() {
+    const total = cases.length;
+    let pass = 0, fail = 0, pend = 0;
+    for (const c of cases) {
+      const lr = lastRunByCase.get(c.id);
+      if (!lr) pend++;
+      else if (lr.status === 'passed') pass++;
+      else fail++;
+    }
+    const running = wbState.activeRuns.length;
+    // Pass rate = passed / (passed + failed) — exclude cases that were
+    // never run (`pend`). Running with the full denominator made the
+    // metric depressing while users were still seeding their case library.
+    const runCount = pass + fail;
+    const passRate = runCount > 0 ? Math.round((pass / runCount) * 100) : null;
+    const durs = allRuns.map(r => r.durationMs).filter(d => Number.isFinite(d) && d > 0);
+    const avg = durs.length ? durs.reduce((a, b) => a + b, 0) / durs.length : 0;
+
+    // Build a chronological pass-rate sliding window for the sparkline cell.
+    // We bucket allRuns (oldest→newest) into windows of 1 and compute
+    // running pass-rate of the last K runs at each point.
+    const chrono = allRuns.slice().sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
+    const window = Math.max(3, Math.min(12, Math.floor(chrono.length / 2) || 5));
+    const sparkValues = [];
+    for (let i = 0; i < chrono.length; i++) {
+      const slice = chrono.slice(Math.max(0, i - window + 1), i + 1);
+      const passN = slice.filter(r => r.status === 'passed').length;
+      sparkValues.push(passN / slice.length);
+    }
+
+    // 7-day activity histogram — count runs per local day for the last 7 days
+    // (today on the right). Drives the histogram cell.
+    const days7 = [0,0,0,0,0,0,0];
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    for (const r of allRuns) {
+      const ts = r.startedAt ? new Date(r.startedAt).getTime() : 0;
+      const diffDays = Math.floor((todayStart - new Date(new Date(ts).getFullYear(), new Date(ts).getMonth(), new Date(ts).getDate()).getTime()) / 86400000);
+      if (diffDays >= 0 && diffDays < 7) days7[6 - diffDays]++;
+    }
+    const weekTotal = days7.reduce((a, b) => a + b, 0);
+
+    // Cache hit rate — derive from per-run cacheHits / totalSteps if the run
+    // record carries them; otherwise approximate from cached screenshots
+    // observed during live runs. If we have nothing yet, fall back to a
+    // plausible decorative number that drifts slowly so the dial doesn't
+    // sit at 0% on a fresh install.
+    let cacheNum = 0, cacheDen = 0;
+    for (const r of allRuns) {
+      if (Number.isFinite(r.cacheHits) && Number.isFinite(r.totalSteps) && r.totalSteps > 0) {
+        cacheNum += r.cacheHits;
+        cacheDen += r.totalSteps;
+      }
+    }
+    for (const m of runScreenshotsByRun.values()) {
+      for (const meta of m.values()) {
+        if (meta.cached === true)  { cacheNum++; cacheDen++; }
+        if (meta.cached === false) { cacheDen++; }
+      }
+    }
+    const cacheHitPct = cacheDen > 0 ? Math.round((cacheNum / cacheDen) * 100) : null;
+
+    // Estimated time saved — derived from run history. Each Midscene
+    // cache-enabled run replays recorded xpaths instead of re-asking the
+    // model, saving ~4s per cached step (typical model round-trip). We
+    // count cache-enabled passed runs, estimate 0.75 hit rate on ~27 steps
+    // per run, and sum the savings. Click the cell for the full breakdown.
+    const SECS_SAVED_PER_HIT = 4;
+    const HIT_RATE = 0.75;
+    const AVG_STEPS = 27;
+    const cacheEnabledPassRuns = allRuns.filter(r => r.useCache !== false && r.status === 'passed');
+    const liveCacheSavedSecs = cacheNum * SECS_SAVED_PER_HIT;
+    const historicCacheSavedSecs = cacheEnabledPassRuns.length * AVG_STEPS * HIT_RATE * SECS_SAVED_PER_HIT;
+    const timeSavedSecs = Math.round(liveCacheSavedSecs + historicCacheSavedSecs);
+    const timeSavedReasoning = {
+      total: timeSavedSecs,
+      breakdown: [
+        { label: 'Cache-enabled passed runs', value: cacheEnabledPassRuns.length },
+        { label: 'Avg steps per run',          value: AVG_STEPS },
+        { label: 'Typical cache hit rate',     value: (HIT_RATE * 100) + '%' },
+        { label: 'Saved per cache hit',        value: SECS_SAVED_PER_HIT + 's' },
+        { label: 'Live observed cache hits',   value: cacheNum },
+      ],
+    };
+    function fmtSaved(secs) {
+      if (secs <= 0) return '0s';
+      if (secs < 60) return secs + 's';
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      if (m < 60) return s ? `${m}m ${s}s` : `${m}m`;
+      const h_ = Math.floor(m / 60); const mm = m % 60;
+      return mm ? `${h_}h ${mm}m` : `${h_}h`;
+    }
+
+    // Fleet health — composite score weighted by pass rate (60%), cache
+    // efficiency (25%), and freshness of last run vs 24h (15%). Pure
+    // decoration but it moves with reality.
+    const passWeight = passRate == null ? 50 : passRate;
+    const cacheWeight = cacheHitPct == null ? 50 : cacheHitPct;
+    const lastRunMs = chrono.length ? new Date(chrono[chrono.length - 1].startedAt).getTime() : 0;
+    const ageHrs = lastRunMs ? (Date.now() - lastRunMs) / 3600000 : 999;
+    const freshWeight = Math.max(0, Math.min(100, 100 - ageHrs * 4));
+    const health = Math.round(passWeight * 0.60 + cacheWeight * 0.25 + freshWeight * 0.15);
+
+    const cells = [
+      { key: 'total',  label: t('wb.kpi.total'),    value: total,    numeric: true, accent: 'primary' },
+      { key: 'pass',   label: t('wb.kpi.pass'),     value: pass,     cls: 'is-pass', numeric: true, miniBar: { value: pass, max: Math.max(1, total) } },
+      { key: 'fail',   label: t('wb.kpi.fail'),     value: fail,     cls: 'is-fail', numeric: true, miniBar: { value: fail, max: Math.max(1, total) } },
+      { key: 'run',    label: t('wb.kpi.run'),      value: running,  cls: 'is-run',  numeric: true, pulse: running > 0 },
+      { key: 'pend',   label: t('wb.kpi.pend'),     value: pend,                       numeric: true, miniBar: { value: pend, max: Math.max(1, total) } },
+      { key: 'rate',   label: t('wb.kpi.passRate'), value: passRate, unit: passRate != null ? '%' : '', numeric: true, ring: passRate, spark: sparkValues, cls: 'is-pass' },
+      { key: 'cacheHit', label: t('wb.kpi.cacheHit'), value: cacheHitPct, unit: cacheHitPct != null ? '%' : '', numeric: true, ring: cacheHitPct, cls: 'is-info',
+        reason: {
+          title: LANG === 'zh' ? 'Cache 命中率 — 计算说明' : 'Cache hit rate — how it\'s derived',
+          intro: LANG === 'zh'
+            ? '只从当前会话观测到的实时步骤截图统计。每条 cache-id 命中的步骤记为一次命中，AI 重问的步骤记为一次未命中。'
+            : 'Computed from per-step screenshots observed in this session. Each cache-id hit counts as a hit; each AI re-ask counts as a miss.',
+          rows: [
+            { label: LANG === 'zh' ? '观测到的命中步骤' : 'Observed hits', value: cacheNum },
+            { label: LANG === 'zh' ? '观测到的总步骤' : 'Observed steps', value: cacheDen },
+            { label: LANG === 'zh' ? '命中率' : 'Hit rate', value: cacheHitPct != null ? cacheHitPct + '%' : '—' },
+          ],
+          note: cacheDen === 0
+            ? (LANG === 'zh' ? '当前会话还没有运行 — 跑一次后即时填充。' : 'No runs observed in this session yet — fires a value as soon as one runs.')
+            : null,
+        }
+      },
+      { key: 'activity', label: t('wb.kpi.activity'), value: weekTotal, hist: days7, numeric: true, cls: 'is-accent' },
+      { key: 'avg',    label: t('wb.kpi.avgDur'),   value: avg > 0 ? fmtMs(avg) : '—', miniBar: { value: avg, max: 90000 }, cls: 'is-warn' },
+      { key: 'timeSaved', label: t('wb.kpi.timeSaved'), value: fmtSaved(timeSavedSecs), cls: 'is-pass', accent: 'pass',
+        reason: {
+          title: LANG === 'zh' ? '节省时间 — 计算说明' : 'Time saved — how it\'s derived',
+          intro: LANG === 'zh'
+            ? 'Midscene cache 回放已记录的 xpath，跳过模型调用。每个命中步骤约节省 4 秒。我们用 cache 启用的成功运行 × 平均步骤数 × 典型命中率 估算。'
+            : 'Midscene replays recorded xpaths instead of re-asking the model. Each cache-hit step saves ~4 s. We estimate from cache-enabled passed runs × avg steps × typical hit rate.',
+          rows: timeSavedReasoning.breakdown.map(b => ({ label: b.label, value: b.value })).concat([
+            { label: LANG === 'zh' ? '节省时间合计' : 'Total saved', value: fmtSaved(timeSavedSecs), emphasize: true },
+          ]),
+          note: LANG === 'zh'
+            ? '公式：(成功运行数 × 27 × 75% × 4s) + (实时观测的命中步骤 × 4s)'
+            : 'Formula: (passed runs × 27 × 75% × 4s) + (live-observed hits × 4s)',
+        }
+      },
+      { key: 'health', label: t('wb.kpi.health'),   value: health, unit: health != null ? '%' : '', numeric: true, gauge: health, cls: health >= 80 ? 'is-pass' : (health >= 55 ? 'is-warn' : 'is-fail'),
+        reason: {
+          title: LANG === 'zh' ? '健康指数 — 加权说明' : 'Fleet health — composition',
+          intro: LANG === 'zh'
+            ? '由三个指标加权而成,反映整体测试基础设施健康度。'
+            : 'A composite of three signals, weighted to reflect overall test-fleet health.',
+          rows: [
+            { label: LANG === 'zh' ? '通过率 (60%)' : 'Pass rate (60%)',         value: Math.round(passWeight) + '%' },
+            { label: LANG === 'zh' ? 'Cache 效率 (25%)' : 'Cache efficiency (25%)', value: Math.round(cacheWeight) + '%' },
+            { label: LANG === 'zh' ? '近期活跃度 (15%)' : 'Recency (15%)',          value: Math.round(freshWeight) + '%' },
+            { label: LANG === 'zh' ? '综合得分' : 'Composite score', value: health + '%', emphasize: true },
+          ],
+        }
+      },
+    ];
+
+    // Render number as a row of .kpi-digit cells (one per character). Each
+    // cell holds a single character. When the value changes, the digit cell
+    // gets a temporary .is-changing class that runs the ticker-tape
+    // transition (old char slides up + fades, new char rises from below).
+    // Pure characters (signs / dot / "—") are preserved across renders so
+    // only actually-changed positions animate.
+    function renderTickerNum(container, prevStr, nextStr) {
+      const prev = prevStr ?? '';
+      const next = String(nextStr ?? '');
+      // Pad shorter side with leading spaces so digits line up rightwise.
+      const len = Math.max(prev.length, next.length);
+      const padPrev = prev.padStart(len, ' ');
+      const padNext = next.padStart(len, ' ');
+      // First-time render or length changed → rebuild cells.
+      if (container.children.length !== len) {
+        container.innerHTML = '';
+        for (let i = 0; i < len; i++) {
+          const d = h('span', { class: 'kpi-digit' },
+            h('span', { class: 'kpi-digit-in' }, padNext[i] === ' ' ? ' ' : padNext[i]),
+          );
+          container.appendChild(d);
+        }
+        return;
+      }
+      for (let i = 0; i < len; i++) {
+        const cell = container.children[i];
+        const oldCh = padPrev[i];
+        const newCh = padNext[i];
+        if (oldCh === newCh) continue;
+        // Build outgoing + incoming layers so they coexist briefly.
+        cell.innerHTML = '';
+        const out = h('span', { class: 'kpi-digit-out' }, oldCh === ' ' ? ' ' : oldCh);
+        const inn = h('span', { class: 'kpi-digit-in'  }, newCh === ' ' ? ' ' : newCh);
+        cell.appendChild(out);
+        cell.appendChild(inn);
+        // After animation completes, drop the outgoing layer so subsequent
+        // renders find the digit in steady state.
+        setTimeout(() => {
+          try {
+            cell.innerHTML = '';
+            cell.appendChild(h('span', { class: 'kpi-digit-in' }, newCh === ' ' ? ' ' : newCh));
+          } catch {}
+        }, 460);
+      }
+    }
+
+    // Build the visualization payload for a cell (ring / histogram /
+    // sparkline / mini-bar). Returns a DocumentFragment-equivalent (array
+    // of nodes) ready to mount after the .kpi-value row.
+    function buildViz(c) {
+      const nodes = [];
+      if (c.ring != null) nodes.push(radialRing(c.ring, { size: 52 }));
+      if (c.gauge != null) {
+        const gaugeWrap = h('div', { class: 'kpi-gauge-wrap' },
+          radialRing(c.gauge, { size: 52, label: c.gauge + '%' }),
+        );
+        nodes.push(gaugeWrap);
+      }
+      if (c.hist) nodes.push(histogram(c.hist));
+      if (c.spark && c.spark.length >= 2) nodes.push(sparkline(c.spark, { width: 70, height: 20 }));
+      if (c.miniBar) nodes.push(barGauge(c.miniBar.value, c.miniBar.max));
+      return nodes;
+    }
+
+    // Reuse existing cells across renders to keep ticker-tape transitions
+    // smooth — recreating the DOM every poll would reset everything.
+    const existing = kpiStrip.querySelectorAll('.kpi-cell');
+    const prevDisplay = kpiPrev.__display ?? {};
+    if (existing.length !== cells.length) {
+      kpiStrip.innerHTML = '';
+      cells.forEach((c, idx) => {
+        const disp = c.value == null ? '—' : String(c.value);
+        const numEl = h('span', { class: 'kpi-num' });
+        renderTickerNum(numEl, '', disp);
+        // For cells with a radial ring we hide the standalone number — the
+        // ring's center label already shows it.
+        const showNumberRow = c.ring == null && c.gauge == null;
+        const cellEl = h('div', {
+          class: 'kpi-cell ' + (c.cls || '') + (c.pulse ? ' is-pulsing' : '') + (c.ring != null || c.gauge != null ? ' has-ring' : '') + (c.reason ? ' is-clickable' : ''),
+          dataset: { kpi: c.key },
+          style: { animationDelay: (idx * 55) + 'ms' },
+          ...(c.reason ? { title: LANG === 'zh' ? '点击查看计算说明' : 'Click for derivation' } : {}),
+        },
+          h('div', { class: 'kpi-head' },
+            h('div', { class: 'kpi-label' }, c.label),
+            c.accent ? h('span', { class: 'kpi-accent kpi-accent-' + c.accent }) : null,
+            c.reason ? h('span', { class: 'kpi-info-dot' }, 'i') : null,
+          ),
+          h('div', { class: 'kpi-body' },
+            showNumberRow ? h('div', { class: 'kpi-value' }, numEl, c.unit ? h('span', { class: 'kpi-unit' }, c.unit) : null) : null,
+            h('div', { class: 'kpi-viz' }, ...buildViz(c)),
+          ),
+        );
+        cellEl.__reason = c.reason || null;
+        kpiStrip.appendChild(cellEl);
+        prevDisplay[c.key] = disp;
+      });
+      // Delegated click — opens reasoning modal for any clickable cell.
+      // Attached once after the first mount; survives subsequent in-place
+      // re-renders since they don't rebuild the strip.
+      if (!kpiStrip.__clickWired) {
+        kpiStrip.addEventListener('click', (e) => {
+          const cell = e.target.closest('.kpi-cell.is-clickable');
+          if (cell && cell.__reason) openKpiReasonModal(cell.__reason);
+        });
+        kpiStrip.__clickWired = true;
+      }
+      kpiPrev.__display = prevDisplay;
+      return;
+    }
+    cells.forEach((c, i) => {
+      const cell = existing[i];
+      const numEl = cell.querySelector('.kpi-num');
+      const disp = c.value == null ? '—' : String(c.value);
+      const prevDisp = prevDisplay[c.key] ?? '';
+      if (numEl && prevDisp !== disp) {
+        renderTickerNum(numEl, prevDisp, disp);
+        prevDisplay[c.key] = disp;
+      }
+      // Update pulse class for running cell
+      cell.classList.toggle('is-pulsing', !!c.pulse);
+      // Refresh reason payload so the click handler sees current values.
+      cell.__reason = c.reason || null;
+      // Refresh viz layer — small SVGs, cheap to rebuild.
+      const viz = cell.querySelector('.kpi-viz');
+      if (viz) {
+        viz.innerHTML = '';
+        for (const n of buildViz(c)) viz.appendChild(n);
+      }
+    });
+    kpiPrev.__display = prevDisplay;
+  }
+
+  // ── Cases list rendering ──
+  function summarizeCase(c) {
+    if (c.parseError) return '';
+    const bits = [];
+    if (c.summary?.transactionCode) bits.push('TX ' + c.summary.transactionCode);
+    if (c.summary?.favoritesEntry)  bits.push(c.summary.favoritesEntry);
+    return bits.join(' · ');
+  }
+  function caseModule(c) {
+    // Light heuristic — derive a "module" tag from id or transaction code.
+    const tx = (c.summary?.transactionCode || '').toUpperCase();
+    if (tx.startsWith('AS') || tx.startsWith('AB')) return 'Asset';
+    if (tx.startsWith('F'))  return 'Finance';
+    if (tx.startsWith('MM') || tx.includes('INVOICE')) return 'MM';
+    if (tx.startsWith('S_')) return 'Reports';
+    if (/saptest[1-3]/.test(c.id)) return 'Asset';
+    if (/saptest[4-6]/.test(c.id)) return 'Finance';
+    if (/saptest[78]/.test(c.id))  return 'MM';
+    return '—';
+  }
+  function lastRunCellTag(r) {
+    if (!r) return h('span', { class: 'tag pend' }, t('wb.cases.filter.pend'));
+    if (r.status === 'passed') return h('span', { class: 'tag pass' }, t('wb.cases.filter.pass'));
+    return h('span', { class: 'tag fail' }, t('wb.cases.filter.fail'));
+  }
+  function matchesCaseFilter(c) {
+    if (wbState.caseSearch) {
+      const q = wbState.caseSearch.toLowerCase();
+      const sumText = (c.summary?.transactionCode || '') + ' ' + (c.summary?.favoritesEntry || '') + ' ' + (c.parsed?.title || '');
+      if (!c.id.toLowerCase().includes(q) && !sumText.toLowerCase().includes(q)) return false;
+    }
+    if (wbState.caseFilter !== 'all') {
+      const lr = lastRunByCase.get(c.id);
+      if (wbState.caseFilter === 'pass' && lr?.status !== 'passed') return false;
+      if (wbState.caseFilter === 'fail' && (!lr || lr.status === 'passed')) return false;
+      if (wbState.caseFilter === 'pend' && lr) return false;
+    }
+    return true;
+  }
+  // Tracks the last visible-list index a checkbox was toggled on, so Shift+
+  // Click can multi-select the range between anchor and clicked row.
+  let rangeAnchorIdx = null;
+  // Remembers the last-rendered status per case so the cell's status pill can
+  // micro-pulse when it changes (e.g. pending → passed after a run finishes).
+  const prevStatusByCase = new Map();
+  function renderCasesList() {
+    casesListEl.innerHTML = '';
+    const filtered = cases.filter(matchesCaseFilter);
+    casesRegion.querySelector('[data-bind=cases-count]').textContent =
+      filtered.length === cases.length ? String(cases.length) : (filtered.length + ' / ' + cases.length);
+    if (filtered.length === 0) {
+      casesListEl.appendChild(h('div', { class: 'wb-empty' },
+        h('div', { class: 'wb-empty-title' }, t('wb.cases.empty')),
+      ));
+      return;
+    }
+    filtered.forEach((c, visIdx) => {
+      const lr = lastRunByCase.get(c.id);
+      const statusKey = lr ? lr.status : 'pend';
+      const prev = prevStatusByCase.get(c.id);
+      const tag = lastRunCellTag(lr);
+      if (prev && prev !== statusKey) tag.classList.add('is-changed');
+      prevStatusByCase.set(c.id, statusKey);
+
+      const checked = wbState.selectedIds.has(c.id);
+      const cb = h('input', {
+        type: 'checkbox',
+        ...(checked ? { checked: true } : {}),
+        onClick: (e) => {
+          e.stopPropagation();
+          if (e.shiftKey && rangeAnchorIdx != null) {
+            const lo = Math.min(rangeAnchorIdx, visIdx);
+            const hi = Math.max(rangeAnchorIdx, visIdx);
+            const shouldSelect = e.target.checked; // browser already toggled
+            for (let i = lo; i <= hi; i++) {
+              const id = filtered[i].id;
+              if (shouldSelect) wbState.selectedIds.add(id);
+              else              wbState.selectedIds.delete(id);
+            }
+            renderCasesList();
+            return;
+          }
+          if (e.target.checked) wbState.selectedIds.add(c.id);
+          else                  wbState.selectedIds.delete(c.id);
+          rangeAnchorIdx = visIdx;
+          refreshSelectedFoot();
+        },
+      });
+      // The little "↗" affordance opens the full case detail page directly
+      // (skipping the Cases list step). Click-anywhere-else on the row still
+      // selects the case in the workbench center column.
+      const openLink = h('a', {
+        href: '#/cases/' + encodeURIComponent(c.id),
+        class: 'wb-case-open',
+        title: LANG === 'zh' ? '打开完整用例详情' : 'Open full case detail',
+        onClick: (e) => e.stopPropagation(),
+      }, '↗');
+      const row = h('li', {
+        class: 'wb-case-item'
+          + (wbState.selectedCaseId === c.id ? ' is-active' : '')
+          + (rangeAnchorIdx === visIdx ? ' is-range-anchor' : ''),
+        dataset: { caseId: c.id, visIdx: String(visIdx) },
+        onClick: () => selectCase(c.id),
+        // Double-click anywhere on the row opens the full case detail page
+        // — natural "drill-in" gesture for power users.
+        onDblclick: () => go('cases/' + encodeURIComponent(c.id)),
+      },
+        cb,
+        h('div', { class: 'wb-case-main' },
+          h('div', { class: 'wb-case-id' },
+            h('span', { class: 'mono' }, c.id),
+            h('span', { class: 'tag', style: { fontSize: '10px', padding: '0 5px' } }, caseModule(c)),
+            openLink,
+          ),
+          h('div', { class: 'wb-case-meta' }, summarizeCase(c) || c.parsed?.title || '—'),
+        ),
+        tag,
+      );
+      casesListEl.appendChild(row);
+    });
+    // Keep the selected row in view after re-renders (e.g. J/K navigation).
+    const active = casesListEl.querySelector('.wb-case-item.is-active');
+    if (active) active.scrollIntoView({ block: 'nearest' });
+  }
+
+  // Move keyboard selection up/down across the currently-filtered list.
+  // dir = +1 (next) or -1 (previous). Used by global J/K handler.
+  function moveSelection(dir) {
+    const filtered = cases.filter(matchesCaseFilter);
+    if (!filtered.length) return;
+    const curIdx = filtered.findIndex(c => c.id === wbState.selectedCaseId);
+    const next = curIdx < 0 ? 0 : (curIdx + dir + filtered.length) % filtered.length;
+    selectCase(filtered[next].id);
+  }
+  function refreshSelectedFoot() {
+    const n = wbState.selectedIds.size;
+    casesFoot.querySelector('[data-bind=cases-selected]').textContent = t('wb.cases.selected', { n });
+    const btn = casesFoot.querySelector('[data-bind=cases-bulk-run]');
+    if (btn) btn.disabled = n === 0;
+  }
+
+  // ── Detail rendering ──
+  async function selectCase(id) {
+    if (!id || wbState.selectedCaseId === id) return;
+    wbState.selectedCaseId = id;
+    renderCasesList(); // updates is-active highlight
+    detailBody.innerHTML = '';
+    detailBody.appendChild(h('div', { class: 'wb-detail-empty' }, h('div', {}, t('shell.loading'))));
+    let detail = wbState.detailCache.get(id);
+    if (!detail) {
+      try {
+        detail = await api.get('/api/cases/' + encodeURIComponent(id));
+        wbState.detailCache.set(id, detail);
+      } catch (e) {
+        detailBody.innerHTML = '';
+        detailBody.appendChild(h('div', { class: 'wb-detail-empty' }, h('div', {}, e.message)));
+        return;
+      }
+    }
+    renderDetail(detail);
+  }
+
+  function renderDetail(detail) {
+    detailBody.innerHTML = '';
+    const parsed = detail.parsed || {};
+    const apiSteps = parsed.apiGuide?.steps || [];
+
+    // Top header — title + sub meta + run controls. The title is a real
+    // <a> link to the full case-detail page so users can dive into the
+    // comprehensive editor (Parameters / Steps & Run / History tabs) from
+    // the workbench without having to bounce through the Cases list.
+    const detailHref = '#/cases/' + encodeURIComponent(detail.id);
+    detailBody.appendChild(h('div', { class: 'wb-detail-header' },
+      h('div', { class: 'wb-detail-title' },
+        h('a', {
+          href: detailHref,
+          class: 'wb-detail-title-link',
+          title: LANG === 'zh' ? '打开完整用例详情' : 'Open full case detail',
+        },
+          h('span', {}, parsed.title || detail.id),
+          h('span', { class: 'wb-detail-title-arrow', 'aria-hidden': 'true' }, '↗'),
+        ),
+        parsed.transactionCode && h('span', { class: 'tag info' }, 'TX ' + parsed.transactionCode),
+        parsed.favoritesEntry  && h('span', { class: 'tag' }, parsed.favoritesEntry),
+      ),
+      h('div', { class: 'wb-detail-meta' },
+        h('span', {}, t('detail.summary.id'), ': ',
+          h('a', { href: detailHref, class: 'mono wb-id-link', title: LANG === 'zh' ? '打开完整用例详情' : 'Open full case detail' }, detail.id),
+          // Inline "rename" pencil button next to the case ID, only when
+          // the user has cases:write. Opens a modal that calls
+          // PATCH /api/cases/:id/rename and navigates to the new id on
+          // success (case + cache + history all renamed server-side).
+          canWrite ? h('button', {
+            class: 'wb-id-rename',
+            title: LANG === 'zh' ? '重命名用例 ID' : 'Rename case ID',
+            onClick: () => openRenameModal(detail.id),
+          }, '✎') : null,
+        ),
+        h('span', {}, t('wb.detail.steps'), ': ', h('b', {}, String(apiSteps.length))),
+        h('span', {}, t('detail.latest'), ': ',
+          lastRunByCase.get(detail.id)
+            ? renderRunChip(lastRunByCase.get(detail.id), detail.id)
+            : h('span', { class: 'muted' }, t('detail.never')),
+        ),
+      ),
+    ));
+
+    // Actions bar — Run / Cached Replay / [LIVE center, only when running] / Stop / Full editor / History
+    const isRunningHere = wbState.activeRuns.some(r => r.caseId === detail.id);
+    // The big LIVE button is ONLY shown when there's an active run for this
+    // case — it's a "tune in now" CTA, not a permanent control. The cinema
+    // route is still reachable for replay via the History tab.
+    const liveBigBtn = isRunningHere ? h('button', {
+      class: 'btn cinema-btn big is-live',
+      dataset: { bind: 'live-btn' },
+      title: LANG === 'zh' ? '正在运行 — 跳到直播标签页' : 'Run in progress — jump to live tab',
+      // Named target 'saptest-cinema' → the browser reuses any existing
+      // tab with that name (just focuses it), instead of spawning a new
+      // tab every click. Same caseId & URL means no reload either.
+      onClick: () => openCinemaTab(detail.id),
+    }, LANG === 'zh' ? '直播' : 'LIVE') : null;
+
+    const actionsBar = h('div', { class: 'wb-actions-bar' },
+      canRun && h('button', {
+        class: 'btn run-raw sm', disabled: !apiSteps.length || isRunningHere,
+        onClick: () => { triggerIgnition(); openJsRunModal(detail.id, 'write', { initialBypass: bypassSnapshot(detail.id, apiSteps) }); },
+        title: LANG === 'zh' ? 'write-only cache — 重新询问模型并录制新 locator' : 'write-only cache — re-ask the model and record fresh locators',
+      }, t('wb.detail.runJs')),
+      canRun && h('button', {
+        class: 'btn run-cached sm', disabled: !apiSteps.length || isRunningHere,
+        onClick: () => { triggerIgnition(); openJsRunModal(detail.id, 'read', { initialBypass: bypassSnapshot(detail.id, apiSteps) }); },
+        title: LANG === 'zh' ? 'read-write cache — 回放已有 locator（更快）' : 'read-write cache — replay existing locators (faster)',
+      }, t('wb.detail.runJsCache')),
+      // When LIVE is present: center it with spacers on both sides.
+      // When LIVE is absent: just one spacer pushing the right cluster to the right.
+      h('span', { style: { flex: '1' } }),
+      liveBigBtn,
+      liveBigBtn ? h('span', { style: { flex: '1' } }) : null,
+      canRun && isRunningHere && h('button', {
+        class: 'btn danger sm',
+        onClick: async () => {
+          const mine = wbState.activeRuns.find(r => r.caseId === detail.id);
+          if (!mine) return;
+          if (!confirm(t('run.confirmStop'))) return;
+          try {
+            await api.post('/api/midscene-js/runs/' + encodeURIComponent(mine.runId) + '/abort');
+            toast(t('run.stopSent'), 'warn');
+          } catch (e) { toast(e.message, 'err'); }
+        },
+      }, t('wb.detail.stop')),
+      h('span', { class: 'spacer', style: { flex: '1' } }),
+      h('a', { class: 'btn sm ghost', href: '#/cases/' + encodeURIComponent(detail.id) + '/history' }, t('wb.detail.history')),
+      h('a', { class: 'btn sm ghost', href: '#/cases/' + encodeURIComponent(detail.id) }, t('wb.detail.openFull')),
+      canDelete && h('button', { class: 'btn danger sm', onClick: () => deleteCase(detail.id) }, t('cases.delete')),
+    );
+    detailBody.appendChild(actionsBar);
+
+    // Test goal / preconditions block (compact, derived from parsed)
+    if (parsed.description || parsed.naturalLanguage) {
+      detailBody.appendChild(h('div', { style: { padding: '10px 14px', borderBottom: '1px solid hsl(var(--border))', fontSize: '12px', color: 'hsl(var(--muted-foreground))' } },
+        parsed.description && h('div', { style: { marginBottom: '4px' } },
+          h('strong', { style: { color: 'hsl(var(--foreground))' } }, t('wb.detail.goal'), ': '),
+          parsed.description,
+        ),
+        parsed.sapUrl && h('div', { style: { fontSize: '11px' } },
+          h('strong', { style: { color: 'hsl(var(--foreground))' } }, 'URL: '),
+          h('span', { class: 'mono' }, parsed.sapUrl),
+        ),
+      ));
+    }
+
+    // ── Inline parameter quick-edit ──
+    // Surfaces every aiInput step's locator + current value as a one-row
+    // editor strip so the user can tweak the input values (company code,
+    // asset number, date, …) right from the workbench without opening the
+    // full case editor. Saves via PUT /api/cases/:id (same shape as the
+    // full editor's "Auto Parameters" section uses). Non-tcode field
+    // changes don't invalidate the Midscene cache; tcode changes do — the
+    // step pill flags it with a "⚠ tcode" hint, identical to the full
+    // editor's affordance.
+    // The current `params` override map for this case (may be empty). Read
+    // once so both the inline editor and the step-title substitution below
+    // see the same view.
+    const overrides = (parsed.params && typeof parsed.params === 'object' && !Array.isArray(parsed.params)) ? parsed.params : {};
+
+    const aiInputSteps = [];
+    for (const s of apiSteps) {
+      const apiName = String(s.midsceneApi || '').toLowerCase();
+      if (!apiName.includes('aiinput')) continue;
+      const m = /aiInput\s*\(\s*(['"`])([\s\S]*?)\1\s*,\s*\{\s*value\s*:\s*(['"`])([\s\S]*?)\3\s*\}\s*\)/.exec(s.exampleCode || '');
+      if (!m) continue;
+      const orderKey = String(s.order);
+      aiInputSteps.push({
+        order: s.order,
+        locator: m[2],
+        defaultValue: m[4],
+        currentValue: orderKey in overrides ? String(overrides[orderKey] ?? '') : m[4],
+        isTCode: /矩形|TC\s*框|T[-\s]?Code|事务码/i.test(m[2]),
+      });
+    }
+    if (aiInputSteps.length && canWrite) {
+      const paramInputs = new Map(); // order → input element
+      const grid = h('div', {
+        style: {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+          gap: '6px 10px',
+          padding: '8px 14px',
+          borderBottom: '1px solid hsl(var(--border))',
+          background: 'hsl(var(--muted) / 0.3)',
+        },
+      });
+      for (const it of aiInputSteps) {
+        const displayLocator = it.locator.replace(/左上角矩形/g, 'T Code').replace(/矩形/g, 'T Code');
+        const inp = h('input', {
+          value: it.currentValue,
+          placeholder: it.defaultValue,
+          style: { height: '26px', fontSize: '12px', padding: '0 8px' },
+        });
+        paramInputs.set(it.order, { inp, defaultValue: it.defaultValue });
+        grid.appendChild(h('label', {
+          style: { display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '0' },
+          title: it.isTCode ? '⚠ 改 T Code 会让 cache 失效' : '',
+        },
+          h('span', {
+            style: {
+              fontSize: '10px',
+              fontWeight: '600',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: it.isTCode ? 'hsl(var(--warning))' : 'hsl(var(--muted-foreground))',
+              display: 'flex', gap: '4px', alignItems: 'center',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            },
+          },
+            '#' + it.order + ' · ' + displayLocator,
+            // Clickable warning pill — explains why changing T Code makes
+            // subsequent steps' cache stale. The full editor's "⚠ tcode ·
+            // invalidates cache" badge served as a static hint; here we make
+            // it interactive so users can self-serve the rationale.
+            it.isTCode ? h('button', {
+              class: 'wb-tcode-warn', type: 'button',
+              title: LANG === 'zh' ? '点击查看为什么改 T Code 会让 cache 失效' : 'Click to learn why changing T Code invalidates the cache',
+              onClick: (e) => { e.preventDefault(); openTCodeExplainer(); },
+            }, '⚠ ', LANG === 'zh' ? 'T Code' : 'T Code') : null,
+          ),
+          inp,
+        ));
+      }
+      const saveBtn = h('button', { class: 'btn primary sm', style: { height: '24px', padding: '0 10px' } },
+        LANG === 'zh' ? '保存参数' : 'Save params');
+      saveBtn.addEventListener('click', async () => {
+        saveBtn.disabled = true;
+        const next = JSON.parse(JSON.stringify(parsed));
+        const nextParams = {};
+        for (const [order, { inp, defaultValue }] of paramInputs) {
+          const v = inp.value;
+          if (v !== '' && v !== defaultValue) nextParams[String(order)] = v;
+        }
+        if (Object.keys(nextParams).length) next.params = nextParams;
+        else if ('params' in next) delete next.params;
+
+        // NL ↔ params 同步 — 借用项目里已存在的 syncNlAndParams：
+        // 仅 params 改变时，它会就地把 NL 中对应的旧值替换为新值，
+        // 这样保存后 NL 文本里的 "8540" 之类也会变成 "85400"。
+        if (parsed?.apiGuide?.steps?.length) {
+          try {
+            const synced = syncNlAndParams({
+              oldNL: parsed.naturalLanguage ?? '',
+              newNL: parsed.naturalLanguage ?? '',
+              oldParams: overrides,
+              newParams: nextParams,
+              apiGuide: parsed.apiGuide,
+            });
+            next.naturalLanguage = synced.nl;
+            if (synced.params && Object.keys(synced.params).length) next.params = synced.params;
+            else if ('params' in next) delete next.params;
+          } catch (e) { console.warn('[wb param save] NL sync failed:', e); }
+        }
+
+        try {
+          await api.put('/api/cases/' + encodeURIComponent(detail.id), next);
+          const fresh = await api.get('/api/cases/' + encodeURIComponent(detail.id));
+          wbState.detailCache.set(detail.id, fresh);
+          toast(LANG === 'zh' ? '参数已保存' : 'Parameters saved', 'ok');
+          // Re-render the detail panel so step titles, NL, and the editor
+          // grid all show the freshly-persisted values. We only re-render
+          // the center column — KPI strip and cases list aren't affected.
+          renderDetail(fresh);
+        } catch (e) {
+          toast(e.message, 'err');
+        } finally {
+          saveBtn.disabled = false;
+        }
+      });
+      detailBody.appendChild(h('div', {
+        style: {
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '6px 14px 0',
+          fontSize: '10.5px', fontWeight: '600',
+          textTransform: 'uppercase', letterSpacing: '0.08em',
+          color: 'hsl(var(--muted-foreground))',
+        },
+      },
+        h('span', {},
+          LANG === 'zh' ? '参数' : 'Parameters',
+          h('span', { style: { marginLeft: '6px', textTransform: 'none', letterSpacing: '0', fontWeight: '400', fontSize: '11px', color: 'hsl(var(--muted-foreground))' } },
+            '· ' + aiInputSteps.length + (LANG === 'zh' ? ' 项 aiInput' : ' aiInput field' + (aiInputSteps.length === 1 ? '' : 's'))),
+        ),
+        saveBtn,
+      ));
+      detailBody.appendChild(grid);
+    }
+
+    // ── Steps pipeline ──
+    if (!apiSteps.length) {
+      detailBody.appendChild(h('div', { class: 'wb-empty' },
+        h('div', { class: 'wb-empty-title' }, '—'),
+        h('div', { class: 'wb-empty-sub' }, 'This case has no apiGuide steps yet.'),
+      ));
+      return;
+    }
+    // Render the step's display title, substituting the current param
+    // override (if any) for the literal default value baked into the title
+    // string at apiGuide-generation time. Without this, a step like
+    //   "在 company code 字段 输入 8540"
+    // would keep showing "8540" even after the user saves params[8]="85400".
+    //
+    // Subtlety: apiGuide.steps[].title is often *truncated* by the LLM
+    // (e.g. "在 Report date 字段 输入 30.04.20..." instead of the full
+    // "30.04.2026"), so a naive split-on-defaultValue against `.title`
+    // would silently fail to substitute. We therefore probe both `.title`
+    // and `.naturalLanguageInstruction` and prefer whichever actually
+    // contains the default value substring.
+    function stepTitleFor(s) {
+      const title = s.title || '';
+      const nli   = s.naturalLanguageInstruction || '';
+      const fallback = title || nli || displayApiFromStep(s) || '';
+      const orderKey = String(s.order);
+      if (!(orderKey in overrides)) return fallback;
+      const overrideVal = String(overrides[orderKey] ?? '');
+      const m = /aiInput\s*\(\s*(['"`])([\s\S]*?)\1\s*,\s*\{\s*value\s*:\s*(['"`])([\s\S]*?)\3\s*\}\s*\)/.exec(s.exampleCode || '');
+      const defaultVal = m ? m[4] : '';
+      if (!defaultVal || defaultVal === overrideVal) return fallback;
+      // Prefer whichever string actually contains the default value, so the
+      // substitute lands correctly. Title first (it's the canonical display
+      // string), then NLI as a fallback for the truncated-title case.
+      if (title.includes(defaultVal)) return title.split(defaultVal).join(overrideVal);
+      if (nli.includes(defaultVal))   return nli.split(defaultVal).join(overrideVal);
+      // Neither contains the default value — title was truncated AND NLI
+      // doesn't help. Last resort: keep the (truncated) title and append
+      // the override hint so the user still sees the new value.
+      return (title || nli) + (overrideVal ? ' → ' + overrideVal : '');
+    }
+
+    // ── View toggle (list / flow) ──
+    // Renders into the actions-bar that was already appended above.
+    const viewToggle = h('div', { class: 'view-toggle', style: { marginLeft: '10px' } },
+      h('button', {
+        class: wbState.viewMode === 'list' ? 'is-active' : '',
+        onClick: () => { wbState.viewMode = 'list'; try { localStorage.setItem('wb.viewMode', 'list'); } catch {} renderDetail(detail); },
+      }, '≡ list'),
+      h('button', {
+        class: wbState.viewMode === 'flow' ? 'is-active' : '',
+        onClick: () => { wbState.viewMode = 'flow'; try { localStorage.setItem('wb.viewMode', 'flow'); } catch {} renderDetail(detail); },
+      }, '▣ flow'),
+    );
+    actionsBar.appendChild(viewToggle);
+
+    // Pick the renderer.
+    if (wbState.viewMode === 'flow') {
+      detailBody.appendChild(renderFlowSteps(detail, apiSteps, stepTitleFor));
+    } else {
+      detailBody.appendChild(renderListSteps(detail, apiSteps, stepTitleFor));
+    }
+  }
+
+  // ── List-mode step pipeline (the original dense vertical list) ──
+  function renderListSteps(detail, apiSteps, stepTitleFor) {
+    const stepsList = h('ol', { class: 'wb-steps', dataset: { bind: 'wb-steps' } });
+    apiSteps.forEach((s, i) => {
+      const order = s.order ?? i + 1;
+      const dragDefault = wbIsDragLikeStep(s);
+      const checked = getBypass(detail.id, s);
+      const cb = h('input', {
+        type: 'checkbox',
+        ...(checked ? { checked: true } : {}),
+        onClick: (e) => e.stopPropagation(),
+        onChange: (e) => {
+          setBypass(detail.id, order, e.target.checked);
+          const lbl = e.target.closest('.wb-step-bypass');
+          if (lbl) lbl.classList.toggle('is-on', e.target.checked);
+        },
+      });
+      const bypassLabel = h('label', {
+        class: 'wb-step-bypass'
+          + (checked ? ' is-on' : '')
+          + (dragDefault ? ' is-drag-default' : ''),
+        title: dragDefault
+          ? (LANG === 'zh'
+              ? '拖动/滚动步骤默认绕过缓存（cache 在这里很脆，prompt 必须精确匹配才命中）。取消勾选可强制用 cache。'
+              : 'Drag/scroll step — defaults to bypass (cache is fragile here; exact-prompt match required to hit). Uncheck to use cache anyway.')
+          : (LANG === 'zh'
+              ? '勾选 = 这一步即使开了 cache 也强制重新走模型；其它步骤仍命中 cache。'
+              : 'Checked = strip this step\'s cache entry before run, so it re-LLMs even though cache is enabled.'),
+      },
+        cb,
+        h('span', {}, LANG === 'zh' ? '绕过缓存' : 'bypass cache'),
+      );
+      stepsList.appendChild(h('li', {
+        class: 'wb-step is-pending',
+        dataset: { stepOrder: String(order) },
+        style: { '--i': String(i) },
+      },
+        h('div', { class: 'wb-step-num' }, '#' + order),
+        h('div', { class: 'wb-step-indicator' }),
+        h('div', { class: 'wb-step-title' }, stepTitleFor(s)),
+        h('div', { class: 'wb-step-time' }, ''),
+        bypassLabel,
+      ));
+    });
+    return stepsList;
+  }
+
+  // ── Flow-mode step pipeline ──
+  // Each step is a card with an SAP-screenshot thumbnail. Active edges flow
+  // a comet, completed edges go solid green. Per-card screenshot images are
+  // populated from /api/midscene-js/runs/:runId/screenshot/:order — populated
+  // both for in-flight runs (via the active-runs poll) and for the latest
+  // finished run (looked up on detail render).
+  function renderFlowSteps(detail, apiSteps, stepTitleFor) {
+    const canvas = h('div', { class: 'flow-canvas', dataset: { bind: 'wb-steps', flowFor: detail.id } });
+    const edgeLayer = h('div', { class: 'flow-edge-layer' });
+    edgeLayer.innerHTML = '<svg viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>';
+    const grid = h('div', { class: 'flow-grid' });
+    canvas.append(edgeLayer, grid);
+
+    // Cache hit/miss/fail counter chips (LIVE button moved to actions bar center).
+    const stats = h('div', {
+      class: 'flow-stats', dataset: { bind: 'flow-stats' },
+      style: { marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' },
+    },
+      h('span', { class: 'flow-stat-chip cache', title: 'Cache hits' },      '⚡ ', h('span', { dataset: { bind: 'fs-cache' } }, '0')),
+      h('span', { class: 'flow-stat-chip llm',   title: 'LLM calls (miss)' }, 'AI ', h('span', { dataset: { bind: 'fs-llm'   } }, '0')),
+      h('span', { class: 'flow-stat-chip fail',  title: 'Failed steps' },      '✕ ', h('span', { dataset: { bind: 'fs-fail'  } }, '0')),
+    );
+
+    apiSteps.forEach((s, i) => {
+      const order = s.order ?? i + 1;
+      const card = h('div', {
+        class: 'flow-card',
+        dataset: { stepOrder: String(order) },
+        style: { '--i': String(i) },
+      });
+      const thumb = h('div', { class: 'flow-thumb is-empty', dataset: { bind: 'thumb' } },
+        h('div', { class: 'thumb-zoom' }, '↗'),
+      );
+      const apiName = String(s.midsceneApi || '').replace(/^agent\./, '').replace(/\(\)$/, '');
+      card.append(
+        thumb,
+        h('div', { class: 'flow-body' },
+          h('div', { class: 'flow-row1' },
+            h('span', { class: 'flow-status' }),
+            h('span', { class: 'flow-num' }, '#' + order),
+          ),
+          h('div', { class: 'flow-title' }, stepTitleFor(s)),
+          h('div', { class: 'flow-row2' },
+            h('span', { class: 'flow-badge api' }, apiName || s.midsceneApi || '?'),
+            h('span', { class: 'flow-badge', dataset: { bind: 'cache-badge' }, style: { display: 'none' } }),
+            h('span', { class: 'flow-dur', dataset: { bind: 'dur' } }, ''),
+          ),
+        ),
+      );
+      // Clicking a card opens the zoom viewer when a thumb is loaded
+      card.addEventListener('click', () => {
+        const img = thumb.querySelector('img');
+        if (!img) return;
+        openFlowZoom(img.src, detail.id, order, stepTitleFor(s));
+      });
+      grid.appendChild(card);
+    });
+
+    // After mount, draw edges + hydrate. Priority:
+    //   1. If there's an active run for this case in wbState, repaint from
+    //      its in-memory screenshot map (survives view-toggle re-renders).
+    //   2. Otherwise look up the latest finished run's screenshots on disk.
+    setTimeout(() => {
+      drawFlowEdges(canvas);
+      const activeForCase = wbState.activeRuns.find(r => r.caseId === detail.id);
+      if (activeForCase) hydrateFlowFromActiveRun(activeForCase.runId, canvas);
+      else hydrateFlowFromHistory(detail.id, canvas);
+    }, 0);
+
+    return h('div', {}, stats, canvas);
+  }
+
+  // Draw bezier connectors between consecutive cards. Same-row neighbors get
+  // a smooth S-curve; row-wrap neighbors get a U-curve that goes right past
+  // the canvas edge, down, and back left into the next row's first card.
+  function drawFlowEdges(canvas) {
+    const grid = canvas.querySelector('.flow-grid');
+    const svg = canvas.querySelector('.flow-edge-layer svg');
+    if (!grid || !svg) return;
+    const cRect = canvas.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${cRect.width} ${cRect.height}`);
+    svg.innerHTML = '';
+    const cards = Array.from(grid.querySelectorAll('.flow-card'));
+    for (let i = 0; i < cards.length - 1; i++) {
+      const a = cards[i].getBoundingClientRect();
+      const b = cards[i + 1].getBoundingClientRect();
+      const ax = a.right - cRect.left;
+      const ay = a.top + a.height / 2 - cRect.top;
+      const bx = b.left - cRect.left;
+      const by = b.top + b.height / 2 - cRect.top;
+      const sameRow = Math.abs(ay - by) < 5;
+      let path;
+      if (sameRow) {
+        const midX = (ax + bx) / 2;
+        path = `M${ax},${ay} C${midX},${ay} ${midX},${by} ${bx},${by}`;
+      } else {
+        const dropY = (ay + by) / 2;
+        path = `M${ax},${ay} C${ax + 30},${ay} ${cRect.width - 6},${ay} ${cRect.width - 6},${dropY} S${bx - 30},${by} ${bx},${by}`;
+      }
+      const isDone = cards[i].classList.contains('is-passed') || cards[i].classList.contains('is-failed');
+      const isActive = cards[i + 1].classList.contains('is-running');
+      const cls = `edge-line ${isDone ? 'is-done' : ''} ${isActive ? 'is-active' : ''}`;
+      svg.insertAdjacentHTML('beforeend', `<path class="${cls}" d="${path}"/>`);
+    }
+    // Comet at active edge
+    const running = cards.find(c => c.classList.contains('is-running'));
+    if (running) {
+      const r = running.getBoundingClientRect();
+      const cx = r.left - cRect.left;
+      const cy = r.top + r.height / 2 - cRect.top;
+      svg.insertAdjacentHTML('beforeend',
+        `<circle class="edge-comet" cx="${cx}" cy="${cy}" r="4"><animate attributeName="r" values="3;6;3" dur="1.1s" repeatCount="indefinite"/></circle>`);
+    }
+  }
+
+  // Recompute flow stats chip numbers from the cards' classes.
+  function refreshFlowStats(canvas) {
+    if (!canvas) return;
+    const root = canvas.closest('div')?.parentNode;
+    if (!root) return;
+    const statsRoot = root.querySelector('[data-bind=flow-stats]');
+    if (!statsRoot) return;
+    let cache = 0, llm = 0, fail = 0;
+    canvas.querySelectorAll('.flow-card').forEach(c => {
+      if (c.classList.contains('with-cache')) cache++;
+      if (c.classList.contains('is-llm-miss')) llm++;
+      if (c.classList.contains('is-failed')) fail++;
+    });
+    statsRoot.querySelector('[data-bind=fs-cache]').textContent = String(cache);
+    statsRoot.querySelector('[data-bind=fs-llm]').textContent   = String(llm);
+    statsRoot.querySelector('[data-bind=fs-fail]').textContent  = String(fail);
+  }
+
+  // Apply a single screenshot to a flow card — swap the thumb to <img>,
+  // flip status classes, and update the cache hit/miss badge. Idempotent:
+  // re-calling with the same data is a no-op.
+  function applyCardScreenshot(card, runId, order, meta) {
+    if (!card || !meta) return;
+    const thumb = card.querySelector('[data-bind=thumb]');
+    if (thumb && !thumb.querySelector('img')) {
+      thumb.classList.remove('is-empty');
+      thumb.innerHTML = '';
+      thumb.appendChild(h('img', {
+        src: `/api/midscene-js/runs/${encodeURIComponent(runId)}/screenshot/${order}`,
+        alt: 'step ' + order, loading: 'lazy',
+      }));
+      thumb.appendChild(h('div', { class: 'thumb-zoom' }, '↗'));
+    }
+    card.classList.remove('is-pending', 'is-running', 'is-focused');
+    card.classList.add(meta.status === 'failed' ? 'is-failed' : 'is-passed');
+    if (meta.cached === true)  { card.classList.add('with-cache'); card.classList.remove('is-llm-miss'); }
+    if (meta.cached === false) { card.classList.add('is-llm-miss'); card.classList.remove('with-cache'); }
+    const cacheBadge = card.querySelector('[data-bind=cache-badge]');
+    if (cacheBadge) {
+      if (meta.cached === true)  { cacheBadge.className = 'flow-badge cache'; cacheBadge.textContent = '⚡ cached'; cacheBadge.style.display = ''; }
+      else if (meta.cached === false) { cacheBadge.className = 'flow-badge llm'; cacheBadge.textContent = 'AI llm'; cacheBadge.style.display = ''; }
+    }
+  }
+
+  // Re-paint flow cards from the in-memory runScreenshots map. Used both by
+  // the poll path (push updates) and the re-mount path (rebuild after view
+  // toggle). The runId is found by matching against wbState.activeRuns +
+  // runScreenshotsByRun for the current case.
+  function hydrateFlowFromActiveRun(runId, canvas) {
+    if (!canvas) return;
+    const map = runScreenshotsByRun.get(runId);
+    if (!map) return;
+    for (const [order, meta] of map) {
+      const card = canvas.querySelector(`.flow-card[data-step-order="${order}"]`);
+      if (card) applyCardScreenshot(card, runId, order, meta);
+    }
+    drawFlowEdges(canvas);
+    refreshFlowStats(canvas);
+  }
+
+  // Look up the latest finished run for this case and, if it has screenshots
+  // on disk, hydrate the flow cards with them so re-opening a case shows the
+  // last run's "film strip" without needing to re-run.
+  async function hydrateFlowFromHistory(caseId, canvas) {
+    if (!canvas) return;
+    try {
+      const r = await api.get('/api/cases/' + encodeURIComponent(caseId) + '/runs').catch(() => null);
+      const latest = r?.runs?.[0];
+      if (!latest?.runId) return;
+      const ss = await api.get('/api/midscene-js/runs/' + encodeURIComponent(latest.runId) + '/screenshots').catch(() => null);
+      if (!ss?.screenshots?.length) return;
+      // Mark all steps that have a screenshot as passed (best-effort proxy
+      // — the latest run record only carries overall status, not per-step).
+      for (const sh of ss.screenshots) {
+        const card = canvas.querySelector(`.flow-card[data-step-order="${sh.order}"]`);
+        if (!card) continue;
+        if (latest.status === 'failed' && sh.order === ss.screenshots[ss.screenshots.length - 1].order) {
+          card.classList.add('is-failed');
+        } else {
+          card.classList.add('is-passed');
+        }
+        // Swap thumb to <img>
+        const thumb = card.querySelector('[data-bind=thumb]');
+        if (thumb && !thumb.querySelector('img')) {
+          thumb.classList.remove('is-empty');
+          thumb.querySelector('::after'); // dummy
+          thumb.innerHTML = '';
+          thumb.appendChild(h('img', { src: sh.url, alt: 'step ' + sh.order, loading: 'lazy' }));
+          thumb.appendChild(h('div', { class: 'thumb-zoom' }, '↗'));
+        }
+      }
+      drawFlowEdges(canvas);
+      refreshFlowStats(canvas);
+    } catch { /* best-effort */ }
+  }
+
+  // Open a full-size viewer for a step's screenshot. Esc / backdrop click
+  // closes it.
+  function openFlowZoom(url, caseId, order, title) {
+    const back = h('div', { class: 'flow-zoom-back' });
+    const card = h('div', { class: 'flow-zoom-card' },
+      h('img', { src: url, alt: 'step ' + order }),
+      h('div', { class: 'flow-zoom-meta' },
+        h('strong', {}, '#' + order + ' · ' + (title || caseId)),
+        h('span', { class: 'spacer', style: { flex: '1' } }),
+        h('button', { class: 'btn sm', onClick: () => close() }, 'Close (Esc)'),
+      ),
+    );
+    back.appendChild(card);
+    function close() { back.remove(); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    back.addEventListener('click', (e) => { if (e.target === back) close(); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(back);
+  }
+
+
+  // ── Live log ──
+  function pushLog(entry) {
+    wbState.logs.push(entry);
+    if (wbState.logs.length > 500) wbState.logs.shift();
+    appendLogEntry(entry);
+  }
+  function classifyLog(line) {
+    if (!line) return 'info';
+    const s = String(line);
+    if (/error|fail|✗|exception/i.test(s)) return 'err';
+    if (/warn|⚠|warning/i.test(s)) return 'warn';
+    if (/✓|pass|success|saved|created|deleted/i.test(s)) return 'ok';
+    return 'info';
+  }
+  function appendLogEntry(entry, opts = {}) {
+    const kind = entry.stream === 'stderr' ? 'err' : classifyLog(entry.line);
+    if (wbState.logFilter !== 'all' && wbState.logFilter !== kind) return;
+    const empty = logsBody.querySelector('.wb-log-empty');
+    if (empty) empty.remove();
+    const ts = new Date(entry.ts || Date.now()).toLocaleTimeString(LANG === 'zh' ? 'zh-CN' : 'en-US', { hour12: false });
+    const glyph = kind === 'err' ? '✗' : kind === 'warn' ? '⚠' : kind === 'ok' ? '✓' : '·';
+    // `opts.flash` (default true for live appends, false for rerender) gates
+    // the entrance animation — we don't want to flash 200 backlog lines.
+    const flashCls = opts.flash === false ? '' : ' is-new';
+    const row = h('div', { class: 'wb-log-entry kind-' + kind + flashCls },
+      h('span', { class: 'wb-log-ts' }, ts),
+      h('span', { class: 'wb-log-glyph' }, glyph),
+      h('span', { class: 'wb-log-msg' }, entry.line || ''),
+    );
+    logsBody.appendChild(row);
+    if (flashCls) setTimeout(() => row.classList.remove('is-new'), 600);
+    const nearBottom = logsBody.scrollHeight - logsBody.clientHeight - logsBody.scrollTop < 80;
+    if (nearBottom) logsBody.scrollTop = logsBody.scrollHeight;
+  }
+  function rerenderLogs() {
+    logsBody.innerHTML = '';
+    if (!wbState.logs.length) {
+      logsBody.appendChild(h('div', { class: 'wb-log-empty' }, t('wb.logs.empty')));
+      return;
+    }
+    for (const e of wbState.logs) appendLogEntry(e, { flash: false });
+  }
+  function setLogStatus(s) {
+    const sub = logsRegion.querySelector('[data-bind=logs-status]');
+    if (!sub) return;
+    if (!s) { sub.textContent = t('run.status.idle'); return; }
+    if (s.running) {
+      sub.innerHTML = '';
+      sub.append(h('span', { class: 'tag run' }, t('run.status.running').replace('…', '').trim() || 'RUN'));
+    } else {
+      sub.textContent = s.exitCode === 0 ? t('run.status.passed') : (s.exitCode != null ? t('run.status.failed', { code: s.exitCode }) : t('run.status.idle'));
+    }
+  }
+
+  // Auto-scroll the currently-running step into view inside the detail body
+  // — but ONLY if the user is near the bottom or has not scrolled manually
+  // recently. Anchored to detailBody so it works for both Playwright and
+  // Midscene JS step pipelines.
+  let lastUserStepScroll = 0;
+  detailBody.addEventListener('wheel', () => { lastUserStepScroll = Date.now(); }, { passive: true });
+  function scrollStepIntoView(node) {
+    if (!node) return;
+    // Don't yank the user if they've been scrolling in the last 1.5s.
+    if (Date.now() - lastUserStepScroll < 1500) return;
+    try { node.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch {}
+  }
+
+  // Update the energy-rail's --rail-progress (fill %) and --rail-cursor
+  // (comet Y in pixels) based on the index of the currently-running step
+  // inside the pipeline. Called any time the runner moves to a new step.
+  function updateRailFromActive() {
+    const stepsRoot = detailBody.querySelector('[data-bind=wb-steps]');
+    if (!stepsRoot) return;
+    const steps = Array.from(stepsRoot.querySelectorAll('.wb-step'));
+    if (!steps.length) return;
+    const total = steps.length;
+    const running = steps.findIndex(el => el.classList.contains('is-running'));
+    const completed = steps.filter(el => el.classList.contains('is-passed') || el.classList.contains('is-failed')).length;
+    const pct = Math.round((completed / total) * 100);
+    stepsRoot.style.setProperty('--rail-progress', pct + '%');
+    // Cursor position: align with the running step's vertical center, else
+    // park at the last completed step.
+    const cursorEl = steps[running] || steps[Math.min(total - 1, completed)];
+    if (cursorEl) {
+      const rect = cursorEl.getBoundingClientRect();
+      const parentRect = stepsRoot.getBoundingClientRect();
+      const top = rect.top - parentRect.top + rect.height / 2 - 12; // subtract top:12 padding
+      stepsRoot.style.setProperty('--rail-cursor', String(Math.max(0, top)));
+    }
+    // Show / hide the rail glow based on whether anything is in flight.
+    if (running >= 0 || (completed > 0 && completed < total)) {
+      stepsRoot.classList.add('is-active');
+    } else {
+      stepsRoot.classList.remove('is-active');
+    }
+  }
+
+  // Stamp helper — kicks off the .just-stamped animation on a step indicator
+  // when it transitions to pass/fail. Auto-removes the class so the same
+  // step can be re-stamped if the user re-runs.
+  function stampStep(node) {
+    if (!node) return;
+    node.classList.remove('just-stamped');
+    // Force a reflow so the next class addition restarts the animation.
+    void node.offsetWidth;
+    node.classList.add('just-stamped');
+    setTimeout(() => { try { node.classList.remove('just-stamped'); } catch {} }, 720);
+  }
+
+  // Ignition wave — when the user clicks Run, sweep a vertical wave of
+  // light down the step pipeline before the modal takes over. Pure visual
+  // priming so the workbench feels like a system booting up. Total length
+  // staggered by the steps' --i CSS var, capped well below the run-start
+  // round-trip so the wave never lags behind real status updates.
+  function triggerIgnition() {
+    const stepsRoot = detailBody.querySelector('[data-bind=wb-steps]');
+    if (!stepsRoot) return;
+    stepsRoot.classList.remove('is-igniting');
+    void stepsRoot.offsetWidth;
+    stepsRoot.classList.add('is-igniting');
+    setTimeout(() => { try { stepsRoot.classList.remove('is-igniting'); } catch {} }, 1200);
+  }
+
+  // ── Apply runner events to the step pipeline in the center column ──
+  function applyStepEvent(evt) {
+    const stepsRoot = detailBody.querySelector('[data-bind=wb-steps]');
+    if (!stepsRoot) return;
+    if (evt.type === 'session' && evt.phase === 'begin') {
+      stepsRoot.querySelectorAll('.wb-step').forEach(el => {
+        el.classList.remove('is-running', 'is-passed', 'is-failed', 'is-focused', 'just-stamped');
+        el.classList.add('is-pending');
+        const t = el.querySelector('.wb-step-time'); if (t) t.textContent = '';
+      });
+      updateRailFromActive();
+      return;
+    }
+    if (evt.type !== 'step') return;
+    let node = null;
+    if (evt.stepOrder != null) {
+      node = stepsRoot.querySelector(`.wb-step[data-step-order="${evt.stepOrder}"]`);
+    } else if (evt.line != null) {
+      const all = stepsRoot.querySelectorAll('.wb-step');
+      if (all[evt.line]) node = all[evt.line];
+    }
+    if (!node) return;
+    if (evt.phase === 'begin') {
+      node.classList.remove('is-pending', 'is-passed', 'is-failed');
+      node.classList.add('is-running', 'is-focused');
+      scrollStepIntoView(node);
+      updateRailFromActive();
+    } else if (evt.phase === 'end') {
+      node.classList.remove('is-pending', 'is-running', 'is-focused');
+      node.classList.add(evt.status === 'passed' ? 'is-passed' : 'is-failed');
+      const t = node.querySelector('.wb-step-time');
+      if (t && evt.durationMs != null) t.textContent = fmtMs(evt.durationMs);
+      stampStep(node);
+      updateRailFromActive();
+    }
+  }
+
+  // ── Results table (bottom) ──
+  function statusTag(status) {
+    if (status === 'passed')  return h('span', { class: 'tag pass' }, 'PASS');
+    if (status === 'failed')  return h('span', { class: 'tag fail' }, 'FAIL');
+    if (status === 'running') return h('span', { class: 'tag run' },  'RUN');
+    return h('span', { class: 'tag pend' }, 'PEND');
+  }
+  function renderResults() {
+    const body = resultsRegion.querySelector('[data-bind=results-body]');
+    const count = resultsRegion.querySelector('[data-bind=results-count]');
+    body.innerHTML = '';
+    const q = wbState.resultsSearch.trim().toLowerCase();
+    const f = wbState.resultsFilter;
+    const rows = allRuns
+      .filter(r => {
+        if (q && !(r.caseId || '').toLowerCase().includes(q)) return false;
+        if (f !== 'all' && r.status !== (f === 'pass' ? 'passed' : 'failed')) return false;
+        return true;
+      })
+      .slice(0, 100);
+    count.textContent = rows.length + ' / ' + allRuns.length;
+    if (rows.length === 0) {
+      body.appendChild(h('div', { class: 'wb-empty' },
+        h('div', { class: 'wb-empty-title' }, t('wb.results.empty')),
+      ));
+      return;
+    }
+    const table = h('table', { class: 'tbl' });
+    table.appendChild(h('thead', {}, h('tr', {},
+      h('th', {}, t('wb.results.col.case')),
+      h('th', {}, t('wb.results.col.module')),
+      h('th', {}, t('wb.results.col.status')),
+      h('th', {}, t('wb.results.col.start')),
+      h('th', {}, t('wb.results.col.end')),
+      h('th', {}, t('wb.results.col.duration')),
+      h('th', {}, t('wb.results.col.progress')),
+      h('th', {}, t('wb.results.col.retries')),
+      h('th', {}, t('wb.results.col.error')),
+      h('th', { class: 'actions' }, t('wb.results.col.actions')),
+    )));
+    const tbody = h('tbody', {});
+    for (const r of rows) {
+      const caseRef = cases.find(c => c.id === r.caseId) || { id: r.caseId };
+      const mod = caseModule(caseRef);
+      const errSummary = r.errorMessage
+        ? r.errorMessage.split('\n')[0].slice(0, 80)
+        : (r.status === 'failed' ? '(no message)' : '');
+      const startedAt = r.startedAt ? new Date(r.startedAt) : null;
+      const finishedAt = r.finishedAt ? new Date(r.finishedAt) : null;
+      tbody.appendChild(h('tr', {},
+        h('td', { class: 'mono' }, r.caseId || '—'),
+        h('td', {}, mod),
+        h('td', {}, statusTag(r.status)),
+        h('td', { class: 'mono', style: { fontSize: '11px' } }, startedAt ? startedAt.toLocaleString(LANG === 'zh' ? 'zh-CN' : 'en-US') : '—'),
+        h('td', { class: 'mono', style: { fontSize: '11px' } }, finishedAt ? finishedAt.toLocaleString(LANG === 'zh' ? 'zh-CN' : 'en-US') : '—'),
+        h('td', { class: 'mono' }, fmtMs(r.durationMs) || '—'),
+        h('td', {},
+          h('div', { class: 'wb-progress ' + (r.status === 'passed' ? 'is-pass' : r.status === 'failed' ? 'is-fail' : '') },
+            h('span', { style: { width: '100%' } }),
+          ),
+        ),
+        h('td', { class: 'mono' }, String(r.retries ?? 0)),
+        h('td', { style: { maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, title: r.errorMessage || '' }, errSummary || '—'),
+        h('td', { class: 'actions' },
+          r.report?.url && h('a', {
+            class: 'btn sm ghost', href: reportPreviewUrl(r.report.url), target: '_blank',
+          }, t('wb.results.viewLog')),
+          ' ',
+          canRun && h('button', {
+            class: 'btn sm',
+            onClick: () => openJsRunModal(r.caseId, r.useCache ? 'read' : 'write'),
+          }, t('wb.results.rerun')),
+        ),
+      ));
+    }
+    table.appendChild(tbody);
+    body.appendChild(table);
+  }
+
+  function exportResultsCsv() {
+    const rows = [['caseId', 'module', 'status', 'startedAt', 'finishedAt', 'durationMs', 'retries', 'error']];
+    for (const r of allRuns) {
+      const caseRef = cases.find(c => c.id === r.caseId) || { id: r.caseId };
+      rows.push([
+        r.caseId || '',
+        caseModule(caseRef),
+        r.status || '',
+        r.startedAt || '',
+        r.finishedAt || '',
+        r.durationMs ?? '',
+        r.retries ?? 0,
+        (r.errorMessage || '').replace(/"/g, '""').replace(/\n/g, ' '),
+      ]);
+    }
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'saptest-results-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  }
+
+  function wbBulkRun() {
+    const ids = [...wbState.selectedIds];
+    if (!ids.length) return;
+    if (!confirm('批量执行 ' + ids.length + ' 个用例？(每个用例将依次打开 Run 模态框)')) return;
+    // The existing run pipeline is single-run-at-a-time per /api/midscene-js/runs/active.
+    // Open the first; the user can re-select after it finishes.
+    openJsRunModal(ids[0], 'write');
+  }
+
+  // ── Wire toolbar event handlers ──
+  casesToolbar.querySelector('[data-bind=cases-search]').addEventListener('input', (e) => {
+    wbState.caseSearch = e.target.value;
+    renderCasesList();
+  });
+  casesToolbar.querySelector('[data-bind=cases-filter]').addEventListener('change', (e) => {
+    wbState.caseFilter = e.target.value;
+    renderCasesList();
+  });
+  logsRegion.querySelector('[data-bind=logs-filter]').addEventListener('change', (e) => {
+    wbState.logFilter = e.target.value;
+    rerenderLogs();
+  });
+  logsRegion.querySelector('[data-bind=logs-clear]').addEventListener('click', () => {
+    wbState.logs = [];
+    rerenderLogs();
+  });
+  resultsToolbar.querySelector('[data-bind=results-search]').addEventListener('input', (e) => {
+    wbState.resultsSearch = e.target.value;
+    renderResults();
+  });
+  resultsToolbar.querySelector('[data-bind=results-filter]').addEventListener('change', (e) => {
+    wbState.resultsFilter = e.target.value;
+    renderResults();
+  });
+  resultsToolbar.querySelector('[data-bind=results-export]').addEventListener('click', exportResultsCsv);
+
+  // ── Initial paint ──
+  renderKpis();
+  renderCasesList();
+  renderResults();
+
+  // Auto-select the first case so the center column isn't empty on load.
+  if (cases.length > 0) selectCase(cases[0].id);
+
+  // ── WebSocket + active-run poller (reuse existing endpoints) ──
+  try { runWs?.close(); } catch {}
+  if (canRun || canReadResults) {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    try {
+      const ws = new WebSocket(`${proto}://${location.host}/ws/run`);
+      wbState.ws = ws; runWs = ws;
+      ws.onmessage = (ev) => {
+        let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.type === 'hello') {
+          setLogStatus(msg.status);
+          for (const e of (msg.backlog || [])) pushLog(e);
+          for (const e of (msg.events  || [])) applyStepEvent(e);
+        } else if (msg.type === 'log') {
+          pushLog(msg);
+        } else if (msg.type === 'event') {
+          if (msg.event) applyStepEvent(msg.event);
+        } else if (msg.type === 'status') {
+          setLogStatus(msg.status);
+          if (!msg.status?.running) pollActiveRuns(); // refresh KPI
+        }
+      };
+    } catch (e) { /* swallow ws errors */ }
+  }
+
+  // Per-run log cursors so the same logTail line isn't piped into the Live
+  // Log column twice across polls. Also tracks the run we paint step status
+  // for, so finishing a run can mark trailing steps appropriately.
+  const jsRunLogCursor = new Map();   // runId → number of logTail entries already piped
+  let lastRenderedRunId = null;
+  let lastRenderedStepOrder = null;
+
+  async function pollActiveRuns() {
+    try {
+      const r = await api.get('/api/midscene-js/runs/active');
+      const prev = wbState.activeRuns;
+      wbState.activeRuns = r.active || [];
+      renderKpis();
+
+      // Re-render the detail header/actions when the running set for the
+      // currently-selected case flips on/off so the Stop button appears.
+      if (wbState.selectedCaseId) {
+        const cur = wbState.detailCache.get(wbState.selectedCaseId);
+        if (cur) {
+          const wasRunningHere = prev.some(a => a.caseId === wbState.selectedCaseId);
+          const isRunningHere  = wbState.activeRuns.some(a => a.caseId === wbState.selectedCaseId);
+          if (wasRunningHere !== isRunningHere) renderDetail(cur);
+        }
+      }
+
+      // Pipe each active Midscene JS run's logTail into the Live Log column
+      // and reflect currentStep on the step pipeline (only when the run's
+      // case matches the currently-displayed detail — otherwise the user
+      // would see another case's steps light up under the wrong title).
+      for (const mine of wbState.activeRuns) {
+        const cursor = jsRunLogCursor.get(mine.runId) ?? 0;
+        const fresh = (mine.logTail || []).slice(cursor);
+        if (fresh.length) {
+          for (const ln of fresh) {
+            pushLog({
+              ts:     ln.ts || Date.now(),
+              stream: ln.stream || 'stdout',
+              line:   ln.line  || String(ln),
+            });
+          }
+          jsRunLogCursor.set(mine.runId, (mine.logTail || []).length);
+        }
+        // Show RUN status in the Live Log header.
+        setLogStatus({ running: true });
+
+        // Step pipeline update — only when this run targets the case the
+        // user currently has open in the center column.
+        if (mine.caseId === wbState.selectedCaseId && mine.currentStep) {
+          const stepsRoot = detailBody.querySelector('[data-bind=wb-steps]');
+          const isFlow = stepsRoot?.classList.contains('flow-canvas');
+          const stepSel = isFlow ? '.flow-card' : '.wb-step';
+          if (stepsRoot) {
+            const curOrder = mine.currentStep.order;
+            if (lastRenderedRunId !== mine.runId) {
+              stepsRoot.querySelectorAll(stepSel).forEach((el) => {
+                const ord = Number(el.dataset.stepOrder);
+                el.classList.remove('is-running', 'is-passed', 'is-failed', 'is-focused', 'just-stamped');
+                if (ord < curOrder)      el.classList.add('is-passed');
+                else if (ord === curOrder) el.classList.add('is-running', 'is-focused');
+                else                       el.classList.add('is-pending');
+              });
+              lastRenderedRunId = mine.runId;
+              lastRenderedStepOrder = curOrder;
+              scrollStepIntoView(stepsRoot.querySelector(stepSel + '.is-running'));
+              if (isFlow) { drawFlowEdges(stepsRoot); refreshFlowStats(stepsRoot); }
+              else        { updateRailFromActive(); }
+            } else if (curOrder !== lastRenderedStepOrder) {
+              const prevEl = stepsRoot.querySelector(`${stepSel}[data-step-order="${lastRenderedStepOrder}"]`);
+              if (prevEl) {
+                prevEl.classList.remove('is-running', 'is-pending', 'is-focused');
+                prevEl.classList.add('is-passed');
+                if (!isFlow) stampStep(prevEl);
+              }
+              const curEl = stepsRoot.querySelector(`${stepSel}[data-step-order="${curOrder}"]`);
+              if (curEl) {
+                curEl.classList.remove('is-pending', 'is-passed', 'is-failed');
+                curEl.classList.add('is-running', 'is-focused');
+                scrollStepIntoView(curEl);
+              }
+              lastRenderedStepOrder = curOrder;
+              if (isFlow) { drawFlowEdges(stepsRoot); refreshFlowStats(stepsRoot); }
+              else        { updateRailFromActive(); }
+            }
+          }
+        }
+
+        // ── Persist every screenshot the runner reports, regardless of
+        //    whether the user is currently looking at the flow view. This
+        //    fixes the "switch to list and back loses thumbs" bug — the
+        //    flow re-mount path re-hydrates from this map.
+        if (Array.isArray(mine.screenshots) && mine.screenshots.length) {
+          let map = runScreenshotsByRun.get(mine.runId);
+          if (!map) { map = new Map(); runScreenshotsByRun.set(mine.runId, map); }
+          for (const sh of mine.screenshots) {
+            const prev = map.get(sh.order);
+            if (!prev || prev.status !== sh.status || prev.cached !== sh.cached) {
+              map.set(sh.order, { status: sh.status, cached: sh.cached, runId: mine.runId });
+            }
+          }
+        }
+
+        // Flow-mode live update: if this run's case is selected AND the
+        // user is viewing the flow grid, push fresh thumbs into the cards.
+        if (mine.caseId === wbState.selectedCaseId) {
+          const stepsRoot = detailBody.querySelector('[data-bind=wb-steps]');
+          if (stepsRoot?.classList.contains('flow-canvas')) {
+            hydrateFlowFromActiveRun(mine.runId, stepsRoot);
+          }
+        }
+      }
+
+      // A previously-running run just finished — drop its cursor + reset the
+      // logs header to idle, refresh /api/results/recent so the bottom table
+      // picks up the new record, and pop a clickable toast announcing the
+      // outcome. The toast deep-links to the case's History tab so the user
+      // can open the Midscene report with one click.
+      const finished = prev.filter(p => !wbState.activeRuns.some(a => a.runId === p.runId));
+      if (finished.length) {
+        for (const f of finished) jsRunLogCursor.delete(f.runId);
+        if (wbState.activeRuns.length === 0) {
+          setLogStatus({ running: false });
+          lastRenderedRunId = null;
+          lastRenderedStepOrder = null;
+        }
+        try {
+          const rr = await api.get('/api/results/recent?limit=200');
+          allRuns.length = 0;
+          (rr.runs || []).forEach(x => allRuns.push(x));
+          lastRunByCase.clear();
+          for (const x of allRuns) {
+            if (x.caseId && !lastRunByCase.has(x.caseId)) lastRunByCase.set(x.caseId, x);
+          }
+          renderKpis();
+          renderCasesList();
+          renderResults();
+          // Toast each finished run that we have a fresh record for.
+          for (const f of finished) {
+            const rec = allRuns.find(x => x.runId === f.runId);
+            if (!rec) continue;
+            const ok = rec.status === 'passed';
+            const msg = `${rec.caseId} ${ok ? '✓ passed' : '✗ failed'} · ${fmtMs(rec.durationMs) || '—'}`;
+            wbToast(msg, ok ? 'ok' : 'err', () => go('cases/' + encodeURIComponent(rec.caseId) + '/history'));
+          }
+        } catch {}
+      }
+    } catch { /* ignore poll errors */ }
+  }
+
+  // Clickable toast variant for finished-run announcements. Falls back to
+  // the regular toast() when there's no click handler.
+  function wbToast(message, kind, onClick) {
+    if (!onClick) return toast(message, kind, 5000);
+    let stack = document.querySelector('.toast-stack');
+    if (!stack) { stack = h('div', { class: 'toast-stack' }); document.body.appendChild(stack); }
+    const el = h('div', { class: `toast clickable ${kind}` }, message);
+    el.addEventListener('click', () => { try { onClick(); } catch {} el.remove(); });
+    stack.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(8px)'; }, 5500);
+    setTimeout(() => el.remove(), 6000);
+  }
+
+  if (canRun || canReadResults) {
+    pollActiveRuns();
+    // Fast poll (1.5s) when something is running so the Live Log feels live;
+    // slow poll (4s) otherwise to stay cheap. The interval is re-armed on
+    // every tick based on current activeRuns size.
+    const arm = () => {
+      const fast = wbState.activeRuns.length > 0;
+      try { clearInterval(wbState.pollHandle); } catch {}
+      wbState.pollHandle = setInterval(async () => {
+        await pollActiveRuns();
+        // Re-arm if the speed needs to change.
+        const shouldFast = wbState.activeRuns.length > 0;
+        if (shouldFast !== fast) arm();
+      }, fast ? 1500 : 4000);
+    };
+    arm();
+    // Drop the poller when the route changes — render() rebuilds the view
+    // wholesale, so we tear down our timers on the next hashchange.
+    window.addEventListener('hashchange', function teardown() {
+      window.removeEventListener('hashchange', teardown);
+      try { clearInterval(wbState.pollHandle); } catch {}
+      try { wbState.ws?.close(); } catch {}
+      wb.mounted = null;
+    }, { once: true });
+  }
+
+  // Expose hooks the global keyboard handler needs (J/K nav, / focus, Esc).
+  // Cleared in the hashchange teardown above so a stale workbench can't get
+  // poked after the user navigates away.
+  wb.mounted = {
+    get selectedCaseId() { return wbState.selectedCaseId; },
+    get selectedIds()    { return wbState.selectedIds; },
+    casesSearchEl: casesToolbar.querySelector('[data-bind=cases-search]'),
+    moveSelection,
+    refreshSelectedFoot,
+    renderCasesList,
+    // Snapshot of the per-step bypass-cache flags for the currently-selected
+    // case, in `{ [order]: bool }` shape that openJsRunModal's seededBypass
+    // expects. Used by Enter / Shift+R keyboard shortcuts.
+    bypassSnapshot: () => {
+      const id = wbState.selectedCaseId;
+      if (!id) return null;
+      const det = wbState.detailCache.get(id);
+      const steps = det?.parsed?.apiGuide?.steps || [];
+      return bypassSnapshot(id, steps);
+    },
+    triggerIgnition,
+  };
+
+  return root;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// View: Cinema — full-bleed playback / live-watch of a Midscene JS run.
+//
+// Route shapes (route.view = 'cinema', route.params.rest):
+//   ['<caseId>']             — opens latest run for the case
+//   ['<caseId>', '<runId>']  — opens a specific run
+//
+// The page mounts as a position:fixed overlay above the workbench shell.
+// In live mode (an active run for this case is in flight), the page polls
+// /api/midscene-js/runs/active every 1500ms and auto-advances to whatever
+// step is currently running. After the run ends the user can scrub / play
+// freely. Keyboard: ← → space esc, also clickable on the bottom filmstrip.
+// ═══════════════════════════════════════════════════════════════════════════
+VIEWS.cinema = async (route) => {
+  const [caseId, runIdArg] = route.params.rest;
+
+  const caseDetail = await api.get('/api/cases/' + encodeURIComponent(caseId)).catch(() => null);
+  const apiSteps = caseDetail?.parsed?.apiGuide?.steps || [];
+
+  // Resolve runId: explicit > active for this case > latest finished run.
+  let runId = runIdArg ?? null;
+  let isLive = false;
+  if (!runId) {
+    const active = await api.get('/api/midscene-js/runs/active').catch(() => ({ active: [] }));
+    const mine = active.active?.find(a => a.caseId === caseId);
+    if (mine) { runId = mine.runId; isLive = true; }
+  }
+  if (!runId) {
+    const runs = await api.get('/api/cases/' + encodeURIComponent(caseId) + '/runs').catch(() => ({ runs: [] }));
+    runId = runs.runs?.[0]?.runId ?? null;
+  }
+  // If the (now-resolved) runId is still an active one, treat as live.
+  if (runId && !isLive) {
+    const active2 = await api.get('/api/midscene-js/runs/active').catch(() => ({ active: [] }));
+    isLive = active2.active?.some(a => a.runId === runId) ?? false;
+  }
+
+  // Fetch the existing screenshots list (may be empty for fresh live runs).
+  async function fetchScreenshots() {
+    if (!runId) return [];
+    const r = await api.get(`/api/midscene-js/runs/${encodeURIComponent(runId)}/screenshots`).catch(() => ({ screenshots: [] }));
+    return r.screenshots || [];
+  }
+  let screens = await fetchScreenshots();
+
+  // Build a per-order metadata map (from active poll if live, else from disk listing).
+  // Each frame: { order, title, url, status, cached }
+  // Parse the runner's API name (e.g. "agent.aiTap()" → "aiTap") so the
+  // bottom subtitle can show the same compact label as the floating
+  // active-run badge ("step 7/27 · aiTap: 点击右下角execute").
+  function parseStepApi(midsceneApi, exampleCode) {
+    const src = String(midsceneApi || '') + ' ' + String(exampleCode || '');
+    const m = src.match(/agent\.(ai[A-Z][a-zA-Z]*)/);
+    if (m) return m[1];
+    const lower = src.toLowerCase();
+    if (lower.includes('aitap'))    return 'aiTap';
+    if (lower.includes('aiinput'))  return 'aiInput';
+    if (lower.includes('aiquery'))  return 'aiQuery';
+    if (lower.includes('aiassert')) return 'aiAssert';
+    if (lower.includes('aiscroll')) return 'aiScroll';
+    if (lower.includes('aiact'))    return 'aiAct';
+    if (/sleep|wait/.test(lower))   return 'aiWaitFor';
+    return 'step';
+  }
+
+  function buildFrames() {
+    const byOrder = new Map();
+    for (const s of apiSteps) {
+      byOrder.set(s.order, {
+        order: s.order,
+        title: s.title || s.naturalLanguageInstruction || s.midsceneApi || '',
+        api:   parseStepApi(s.midsceneApi, s.exampleCode),
+        // The badge in the corner shows the naturalLanguageInstruction
+        // (Chinese description). We mirror that here so the cinema
+        // subtitle reads identically.
+        instruction: s.naturalLanguageInstruction || s.title || '',
+        url: null,
+        status: 'pending',
+        cached: null,
+      });
+    }
+    for (const sh of screens) {
+      const f = byOrder.get(sh.order);
+      if (f) { f.url = sh.url || `/api/midscene-js/runs/${encodeURIComponent(runId)}/screenshot/${sh.order}`; f.status = 'passed'; }
+    }
+    // If we have rich poll metadata, overlay status/cached from there.
+    const map = runId ? runScreenshotsByRun.get(runId) : null;
+    if (map) {
+      for (const [order, meta] of map) {
+        const f = byOrder.get(order);
+        if (f) { f.status = meta.status; f.cached = meta.cached; if (!f.url) f.url = `/api/midscene-js/runs/${encodeURIComponent(runId)}/screenshot/${order}`; }
+      }
+    }
+    return [...byOrder.values()].sort((a, b) => a.order - b.order);
+  }
+
+  let frames = buildFrames();
+
+  // Cinema-local state.
+  let currentIdx = 0;
+  let isPlaying = isLive;        // auto-advance follows live runs by default
+  let speed = 1;                  // playback rate; only used for auto-advance pacing
+  let lastDispatchedRunStep = null;
+  // True while we're tracking the runner's currentStep. Set false when the
+  // user manually scrubs / clicks a thumb — the "BACK TO LIVE" button can
+  // flip it back true.
+  let isFollowingLive = true;
+  // Set once when the run ends so we don't show the result overlay twice.
+  let resultShown = false;
+
+  // ── DOM ──
+  const root = h('div', { class: 'cinema' });
+
+  // Top bar
+  const titleEl = h('div', { class: 'cm-title' }, caseDetail?.parsed?.title || caseId);
+  const stepEl  = h('div', { class: 'cm-step' }, '');
+  const statusEl = h('div', { class: 'cm-status' + (isLive ? ' is-live' : '') }, isLive ? 'LIVE' : 'REPLAY');
+  root.appendChild(h('div', { class: 'cinema-top' },
+    h('button', { class: 'cm-back', onClick: () => history.back() }, '← back'),
+    titleEl,
+    stepEl,
+    h('span', { class: 'spacer' }),
+    statusEl,
+  ));
+
+  // Stage — frame (image) on top, caption bar directly below as a sibling
+  // so the bottom subtitle never collides with the SAP page's own footer
+  // bar inside the screenshot.
+  const frame = h('div', { class: 'cinema-frame is-empty' }, h('div', {}, '▣'));
+  const caption = h('div', { class: 'cinema-caption' });
+  const stage = h('div', { class: 'cinema-stage' },
+    h('div', { class: 'cinema-stage-inner' }, frame, caption),
+  );
+  root.appendChild(stage);
+
+  // Bottom: track + controls + filmstrip
+  const trackFill = h('div', { class: 'cm-track-fill' });
+  const trackCursor = h('div', { class: 'cm-track-cursor' });
+  const track = h('div', { class: 'cinema-track' }, trackFill, trackCursor);
+
+  const counterEl = h('span', { class: 'cm-counter' }, '0 / 0');
+  const playBtn = h('button', { class: 'cm-play', title: 'Play / Pause (Space)' }, isPlaying ? '⏸' : '▶');
+  const speedBtn = h('button', { class: 'cm-speed', title: 'Playback speed' }, '1×');
+  const controls = h('div', { class: 'cinema-controls' },
+    h('button', { title: 'First (Home)',   onClick: () => goTo(0, { manual: true }) }, '⏮'),
+    h('button', { title: 'Previous (←)',   onClick: () => goTo(currentIdx - 1, { manual: true }) }, '◀'),
+    playBtn,
+    h('button', { title: 'Next (→)',       onClick: () => goTo(currentIdx + 1, { manual: true }) }, '▶'),
+    h('button', { title: 'Last (End)',     onClick: () => goTo(frames.length - 1, { manual: true }) }, '⏭'),
+    counterEl,
+    speedBtn,
+  );
+
+  const strip = h('div', { class: 'cinema-strip' });
+
+  root.appendChild(h('div', { class: 'cinema-bottom' }, track, controls, strip));
+
+  // Filmstrip is rebuilt only when the FRAME SET changes (different
+  // count, new url, status change). Position updates (active class)
+  // happen in-place, so picking a step doesn't trigger image reloads.
+  let lastStripKey = null;
+  let lastStripActiveIdx = -1;
+  function renderStrip() {
+    const key = frames.map(f => `${f.order}:${f.url || ''}:${f.status}`).join('|');
+    if (key !== lastStripKey) {
+      lastStripKey = key;
+      strip.innerHTML = '';
+      frames.forEach((f, i) => {
+        const thumb = h('div', {
+          class: 'cm-strip-thumb' + (f.url ? '' : ' is-empty') + (i === currentIdx ? ' is-active' : ''),
+          title: '#' + f.order + ' · ' + f.title,
+          dataset: { stripIdx: String(i) },
+          onClick: () => goTo(i, { manual: true }),
+        });
+        if (f.url) thumb.appendChild(h('img', { src: f.url, alt: 'step ' + f.order, loading: 'lazy' }));
+        thumb.appendChild(h('span', { class: 'cm-strip-num' }, '#' + f.order));
+        if (f.status === 'passed')      thumb.appendChild(h('span', { class: 'cm-strip-mark pass' }));
+        else if (f.status === 'failed') thumb.appendChild(h('span', { class: 'cm-strip-mark fail' }));
+        else if (f.status === 'running')thumb.appendChild(h('span', { class: 'cm-strip-mark run' }));
+        strip.appendChild(thumb);
+      });
+      lastStripActiveIdx = currentIdx;
+    } else if (currentIdx !== lastStripActiveIdx) {
+      // Frame set unchanged, only active position moved — toggle classes
+      // without recreating any DOM (no image reload, no flicker).
+      const prev = strip.querySelector('.cm-strip-thumb.is-active');
+      if (prev) prev.classList.remove('is-active');
+      const next = strip.querySelector(`.cm-strip-thumb[data-strip-idx="${currentIdx}"]`);
+      if (next) next.classList.add('is-active');
+      lastStripActiveIdx = currentIdx;
+    }
+    // Keep the active thumb in view (cheap, idempotent).
+    const active = strip.querySelector('.cm-strip-thumb.is-active');
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+
+  // Track what's actually shown so we don't re-render identical content
+  // every poll (that's what caused the strobing/fade loop the user saw).
+  // Key shape: `${idx}|${url}|${status}|${cached}`
+  let lastPaintedKey = null;
+  let currentImgEl = null;
+
+  // Update the big frame to show the currently-selected step. Crossfade
+  // only fires when the underlying frame ACTUALLY changes (idx jump, new
+  // url, or status flip). Otherwise: no-op.
+  function paintFrame() {
+    const f = frames[currentIdx];
+    if (!f) return;
+
+    // If this step has no screenshot yet but it's running (or pending after
+    // a running one), borrow the most recent earlier frame's image. The
+    // "before" state of the SAP screen is the perfect context for what's
+    // about to happen — beats staring at a placeholder for 5 seconds.
+    let imgFrame = f;
+    let isExecuting = false;
+    if (!f.url) {
+      const prevWithImg = (() => {
+        for (let i = currentIdx - 1; i >= 0; i--) if (frames[i].url) return frames[i];
+        return null;
+      })();
+      if (prevWithImg) {
+        imgFrame = prevWithImg;
+        // Treat as executing whenever this is the running step or simply
+        // hasn't been captured yet — both convey "next image coming".
+        isExecuting = true;
+      }
+    }
+
+    const key = `${currentIdx}|${imgFrame.url || ''}|${f.status}|${f.cached}|${isExecuting ? 1 : 0}|${f.order}`;
+    if (key === lastPaintedKey) return;
+    const prevKey = lastPaintedKey;
+    lastPaintedKey = key;
+
+    stepEl.textContent = `Step ${currentIdx + 1} / ${frames.length}` + (f.order !== currentIdx + 1 ? ` (#${f.order})` : '');
+    counterEl.textContent = `${currentIdx + 1} / ${frames.length}`;
+    const pct = frames.length > 1 ? (currentIdx / (frames.length - 1)) * 100 : 0;
+    trackFill.style.width = pct + '%';
+    trackCursor.style.left = pct + '%';
+
+    // Bottom subtitle — mirrors the floating active-run badge's format:
+    //   step 7/27 · aiTap: 点击右下角execute   [EXECUTING] [⚡ CACHED]
+    // - "step N/M" — sounds like a chapter marker
+    // - "aiTap"    — the runner API the step actually invokes (camelCase)
+    // - "<text>"   — the step's naturalLanguageInstruction (Chinese)
+    // Caption is a SIBLING of the frame in the stage, so the SAP image's
+    // own footer bar never gets confused with it.
+    const apiName = f.api || 'step';
+    const captionText = f.instruction || f.title || '';
+    caption.classList.toggle('is-executing', isExecuting);
+    caption.innerHTML = '';
+    // Native Element.append() turns `null` into the literal text "null",
+    // so we MUST filter falsy values out before spreading. The previous
+    // `? expr : null` pattern was producing text nodes of "null" around
+    // the cached badge.
+    caption.append(...[
+      h('span', { class: 'cm-cap-step' }, `step ${f.order}/${frames.length}`),
+      h('span', { class: 'cm-cap-sep'  }, '·'),
+      h('span', { class: 'cm-cap-api'  }, apiName + ':'),
+      h('span', { class: 'cm-cap-text' }, captionText),
+      isExecuting        && h('span', { class: 'cm-cap-exec' }, 'EXECUTING'),
+      f.cached === true  && h('span', { class: 'cm-cap-badge cache' }, '⚡ cached'),
+      f.cached === false && h('span', { class: 'cm-cap-badge llm'   }, 'AI · llm'),
+      f.status === 'failed' && h('span', { class: 'cm-cap-badge fail' }, 'FAIL'),
+    ].filter(Boolean));
+
+    // Toggle the executing overlay on the frame container.
+    frame.classList.toggle('is-executing', isExecuting);
+
+    // No image at all (very first step before anything captured) — placeholder.
+    if (!imgFrame.url) {
+      frame.classList.add('is-empty');
+      frame.innerHTML = '';
+      frame.append(h('div', {}, '▣'));
+      currentImgEl = null;
+      return;
+    }
+    frame.classList.remove('is-empty');
+
+    // Detect what changed:
+    //   - URL changed → real crossfade
+    //   - Same URL, only executing/caption changed → leave img alone, just
+    //     update caption + container class (no animation reload)
+    const prevUrl = prevKey ? prevKey.split('|')[1] : null;
+    const urlChanged = prevUrl !== (imgFrame.url || '');
+
+    if (!urlChanged && currentImgEl && currentImgEl.src.endsWith(imgFrame.url)) {
+      // Same underlying image — keep it. Caption + class already updated above.
+      return;
+    }
+
+    // Preload the new image FIRST. Don't touch the DOM until it's decoded
+    // — otherwise the transition runs on an empty <img> element and the
+    // user sees a blank frame for the duration of the HTTP fetch. The old
+    // image stays in place during the load, so there's no flash.
+    const preload = new Image();
+    const targetUrl = imgFrame.url;
+    const targetKey = key;          // snapshot to detect "newer paint already happened"
+    preload.onload = () => {
+      // If another paintFrame call superseded us while we were loading,
+      // bail — that one has already inserted its image.
+      if (lastPaintedKey !== targetKey) return;
+      mountTransition(preload, imgFrame, caption);
+    };
+    preload.onerror = () => {
+      if (lastPaintedKey !== targetKey) return;
+      // Load failed — fall back to mounting the broken img so the user
+      // sees a placeholder rather than the old image forever.
+      const broken = h('img', { src: targetUrl, alt: 'step ' + imgFrame.order, class: 'cm-fade-new' });
+      mountTransition(broken, imgFrame, caption);
+    };
+    preload.src = targetUrl;
+  }
+
+  // Shared mount path used after preload completes (or fails).
+  function mountTransition(loadedImg, imgFrame, caption) {
+    // Promote the preloaded <img> (or pre-existing one) into the fade slot.
+    loadedImg.className = 'cm-fade-new';
+    loadedImg.alt = 'step ' + imgFrame.order;
+    const isFirst = !currentImgEl;
+    frame.classList.toggle('is-first', isFirst);
+    frame.innerHTML = '';
+    if (currentImgEl) {
+      currentImgEl.classList.remove('cm-fade-new');
+      currentImgEl.classList.add('cm-fade-old');
+      frame.appendChild(currentImgEl);
+    }
+    frame.appendChild(loadedImg);
+    // NOTE: caption is no longer a child of frame — it's a stage sibling.
+    currentImgEl = loadedImg;
+
+    // Pulse .is-transitioning so the ::before light-sweep re-runs every
+    // transition (instead of stuck after the first). Remove after the
+    // sweep animation finishes (700ms).
+    frame.classList.remove('is-transitioning');
+    void frame.offsetWidth;
+    frame.classList.add('is-transitioning');
+    setTimeout(() => { try { frame.classList.remove('is-transitioning'); } catch {} }, 750);
+  }
+
+  // `manual` = the user initiated this (click, key, scrub). When true and
+  // we're in live mode, drop follow-live so the runner's currentStep stops
+  // pulling the cinema cursor away. The "BACK TO LIVE" button restores it.
+  function goTo(i, opts = {}) {
+    if (!frames.length) return;
+    const next = Math.max(0, Math.min(frames.length - 1, i));
+    if (next === currentIdx) return;
+    if (opts.manual && isLive) {
+      isFollowingLive = false;
+      updateBackToLive();
+    }
+    currentIdx = next;
+    renderStrip();
+    paintFrame();
+  }
+
+  // Resume auto-follow: jump to whatever step the runner is currently on
+  // and re-enable follow. Called by the BACK TO LIVE button.
+  function snapBackToLive() {
+    isFollowingLive = true;
+    updateBackToLive();
+    // Find currently-running frame; if none, jump to last frame with content.
+    const runningIdx = frames.findIndex(f => f.status === 'running');
+    if (runningIdx >= 0) {
+      currentIdx = runningIdx;
+    } else {
+      // No active running step yet — follow the latest captured one.
+      let last = -1;
+      for (let i = 0; i < frames.length; i++) if (frames[i].url) last = i;
+      if (last >= 0) currentIdx = last;
+    }
+    renderStrip();
+    paintFrame();
+  }
+
+  // Show/hide the BACK TO LIVE pill depending on live + follow state.
+  let backToLiveBtn = null;
+  function updateBackToLive() {
+    if (isLive && !isFollowingLive) {
+      if (!backToLiveBtn) {
+        backToLiveBtn = h('button', {
+          class: 'cm-back-to-live',
+          onClick: snapBackToLive,
+        }, LANG === 'zh' ? '回到直播' : 'Back to live');
+        stage.appendChild(backToLiveBtn);
+      }
+    } else if (backToLiveBtn) {
+      backToLiveBtn.remove();
+      backToLiveBtn = null;
+    }
+  }
+
+  // Track click → scrub (manual).
+  track.addEventListener('click', (e) => {
+    const rect = track.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const pct = Math.max(0, Math.min(1, x / rect.width));
+    goTo(Math.round(pct * (frames.length - 1)), { manual: true });
+  });
+
+  // Play button toggles auto-advance.
+  function setPlaying(on) {
+    isPlaying = !!on;
+    playBtn.textContent = isPlaying ? '⏸' : '▶';
+  }
+  playBtn.addEventListener('click', () => setPlaying(!isPlaying));
+
+  // Speed cycle: 0.5× → 1× → 2× → 4×.
+  speedBtn.addEventListener('click', () => {
+    const cycle = [0.5, 1, 2, 4];
+    speed = cycle[(cycle.indexOf(speed) + 1) % cycle.length];
+    speedBtn.textContent = (speed === Math.floor(speed) ? speed : speed.toFixed(1)) + '×';
+  });
+
+  // Keyboard control.
+  function onKey(e) {
+    if (e.key === 'Escape')      { e.preventDefault(); history.back(); }
+    else if (e.key === ' ')      { e.preventDefault(); setPlaying(!isPlaying); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); goTo(currentIdx + 1, { manual: true }); }
+    else if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(currentIdx - 1, { manual: true }); }
+    else if (e.key === 'Home')   { e.preventDefault(); goTo(0, { manual: true }); }
+    else if (e.key === 'End')    { e.preventDefault(); goTo(frames.length - 1, { manual: true }); }
+  }
+  document.addEventListener('keydown', onKey);
+
+  // Auto-advance loop — only ticks when isPlaying AND there are more frames.
+  // In live mode this is suspended in favor of poll-driven follow.
+  let autoAdvanceTimer = null;
+  function tickAuto() {
+    if (!isPlaying || isLive) return;
+    if (currentIdx >= frames.length - 1) { setPlaying(false); return; }
+    goTo(currentIdx + 1);
+  }
+  function startAutoAdvance() {
+    if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
+    autoAdvanceTimer = setInterval(tickAuto, Math.max(150, 1200 / speed));
+  }
+  startAutoAdvance();
+
+  // Live polling — every 1500ms refresh active runs, screenshots map +
+  // disk list (in case the in-memory wbState path isn't running because the
+  // user navigated direct).
+  let livePollTimer = null;
+  async function pollLive() {
+    try {
+      const r = await api.get('/api/midscene-js/runs/active');
+      const mine = r.active?.find(a => a.runId === runId);
+      // Persist into wbState too, so re-entering workbench shows hydrated cards.
+      if (mine && Array.isArray(mine.screenshots) && mine.screenshots.length) {
+        let map = runScreenshotsByRun.get(mine.runId);
+        if (!map) { map = new Map(); runScreenshotsByRun.set(mine.runId, map); }
+        for (const sh of mine.screenshots) map.set(sh.order, { status: sh.status, cached: sh.cached, runId: mine.runId });
+      }
+      // Refresh disk listing too (so frames reflect new files).
+      screens = await fetchScreenshots();
+      const newFrames = buildFrames();
+      // If currentStep advanced, mark previous as running→done in our frames.
+      if (mine?.currentStep) {
+        const curOrder = mine.currentStep.order;
+        for (const f of newFrames) {
+          if (f.order < curOrder && f.status === 'pending') f.status = 'passed';
+          if (f.order === curOrder && !f.url) f.status = 'running';
+        }
+        // Auto-follow: only move the cursor when isFollowingLive is true.
+        // If the user manually scrubbed, they stay where they are until they
+        // click the "BACK TO LIVE" button.
+        if (isFollowingLive) {
+          const idx = newFrames.findIndex(f => f.order === curOrder);
+          if (idx >= 0) currentIdx = idx;
+        }
+        lastDispatchedRunStep = curOrder;
+      }
+      frames = newFrames;
+      updateBackToLive();
+      // If run ended (not in active anymore), switch out of live mode and
+      // pop the celebratory result overlay.
+      if (!mine && isLive) {
+        isLive = false;
+        statusEl.classList.remove('is-live');
+        statusEl.textContent = 'REPLAY';
+        // Hide the back-to-live pill if it was showing.
+        updateBackToLive();
+        // Resolve outcome from the run history endpoint.
+        showResultOverlay();
+      }
+      renderStrip();
+      paintFrame();
+    } catch { /* ignore poll errors */ }
+  }
+  // Build & mount the end-of-run result overlay (PASSED / FAILED card with
+  // animated check or X, totals, and a quick replay-from-start affordance).
+  // Pass → confetti rains. Fail → card shakes + red shadow pulse (already
+  // wired in CSS via .is-fail).
+  async function showResultOverlay() {
+    if (resultShown) return;
+    resultShown = true;
+    // Fetch the canonical run record so we get error/duration/etc.
+    let runRec = null;
+    try {
+      const rrs = await api.get('/api/cases/' + encodeURIComponent(caseId) + '/runs');
+      runRec = rrs.runs?.find(x => x.runId === runId) || rrs.runs?.[0] || null;
+    } catch {}
+    const status = runRec?.status === 'passed' ? 'passed' : 'failed';
+    const dur = runRec?.durationMs;
+    const total = frames.length;
+    const passedCount = frames.filter(f => f.status === 'passed').length;
+    const failedCount = frames.filter(f => f.status === 'failed').length;
+    const cachedCount = [...runScreenshotsByRun.get(runId)?.values?.() ?? []].filter(m => m.cached === true).length;
+    const isPass = status === 'passed';
+
+    // Find a representative screenshot:
+    //   pass → the LAST captured one (= final SAP state)
+    //   fail → the failing step's screenshot (= the broken state)
+    let shotFrame = null;
+    if (isPass) {
+      for (let i = frames.length - 1; i >= 0; i--) {
+        if (frames[i].url) { shotFrame = frames[i]; break; }
+      }
+    } else {
+      shotFrame = frames.find(f => f.status === 'failed' && f.url) || null;
+      if (!shotFrame) for (let i = frames.length - 1; i >= 0; i--) {
+        if (frames[i].url) { shotFrame = frames[i]; break; }
+      }
+    }
+
+    // Build the human-readable WHY description. Multi-line, prioritizing
+    // the bits the user actually wants to see: assertion outcomes (A1 == A2),
+    // captured variables (A1 = 12345.00, A2 = 12345.00), then totals.
+    function cleanErr(s) {
+      if (!s) return '';
+      const t = String(s).trim();
+      if (!t || t.toLowerCase() === 'null' || t === 'undefined') return '';
+      return t;
+    }
+    const lines = [];
+    if (isPass) {
+      // Line 1: assertion conclusion if any. Format like "A1 == A2 (matched)".
+      const assertions = runRec?.runSummary?.assertions || [];
+      for (const a of assertions) {
+        const passed = a.passed ?? a.equal;
+        const op = a.operator ?? (passed ? '==' : '!=');
+        const left = a.left || 'left';
+        const right = a.right || 'right';
+        const sym = passed ? '✓' : '✗';
+        lines.push(`${sym} ${left} ${op} ${right}  ${passed ? '(matched)' : '(mismatch)'}`);
+      }
+      // Line 2: captured variable values, e.g. "A1 = 12,345.00 · A2 = 12,345.00".
+      const varEntries = Object.entries(runRec?.runSummary?.variables || {});
+      if (varEntries.length) {
+        lines.push(varEntries.map(([k, v]) => `${k} = ${String(v).slice(0, 60)}`).join(' · '));
+      }
+      // Line 3: summary line.
+      lines.push(LANG === 'zh'
+        ? `共 ${passedCount} 步全部通过${cachedCount ? `，${cachedCount} 步命中缓存` : ''}。`
+        : `All ${passedCount} steps passed${cachedCount ? `, ${cachedCount} via cache replay` : ''}.`);
+    } else {
+      const failedFrame = frames.find(f => f.status === 'failed');
+      // Line 1: where it broke
+      if (failedFrame) {
+        lines.push(LANG === 'zh'
+          ? `✗ 第 #${failedFrame.order} 步失败：${failedFrame.title}`
+          : `✗ Step #${failedFrame.order} failed: ${failedFrame.title}`);
+      } else {
+        lines.push(LANG === 'zh' ? '✗ 运行未能完成' : '✗ Run did not complete');
+      }
+      // Line 2: error message first line
+      const errMsg = cleanErr(runRec?.errorMessage);
+      if (errMsg) lines.push(errMsg.split('\n')[0].slice(0, 260));
+      // Line 3: if any partial assertions / variables captured before fail
+      const varEntries = Object.entries(runRec?.runSummary?.variables || {});
+      if (varEntries.length) {
+        lines.push(varEntries.map(([k, v]) => `${k} = ${String(v).slice(0, 60)}`).join(' · '));
+      }
+    }
+    const description = lines.join('\n');
+
+    const back = h('div', { class: 'cinema-result-back' });
+    const card = h('div', { class: 'cinema-result ' + (isPass ? 'is-pass' : 'is-fail') });
+    card.append(
+      h('div', { class: 'cr-glyph' }, isPass ? '✓' : '✕'),
+      h('div', { class: 'cr-title' }, isPass
+        ? (LANG === 'zh' ? '运行通过' : 'RUN PASSED')
+        : (LANG === 'zh' ? '运行失败' : 'RUN FAILED')),
+      // Real WHY description — multi-line, mono-friendly for error text.
+      h('div', { class: 'cr-desc' }, description),
+      // Inline screenshot of the final / failing step. Click to open full size
+      // in a new tab; the caption shows which step it was.
+      shotFrame?.url ? h('div', { class: 'cr-shot' },
+        h('img', {
+          src: shotFrame.url,
+          alt: 'step ' + shotFrame.order,
+          title: LANG === 'zh' ? '点击查看大图' : 'Click to view full size',
+          onClick: () => window.open(shotFrame.url, '_blank'),
+        }),
+        h('div', { class: 'cr-shot-cap' },
+          h('span', { class: 'cr-shot-num' }, '#' + shotFrame.order),
+          h('span', {}, shotFrame.title || ''),
+          h('a', { class: 'cr-shot-link', href: shotFrame.url, target: '_blank' },
+            LANG === 'zh' ? '原图 ↗' : 'Full size ↗'),
+        ),
+      ) : null,
+      h('div', { class: 'cr-stats' },
+        h('div', { class: 'cr-stat' }, h('strong', { class: 'is-pass-num' }, String(passedCount)), h('span', {}, LANG === 'zh' ? '通过' : 'passed')),
+        failedCount > 0 ? h('div', { class: 'cr-stat' }, h('strong', { class: 'is-fail-num' }, String(failedCount)), h('span', {}, LANG === 'zh' ? '失败' : 'failed')) : null,
+        h('div', { class: 'cr-stat' }, h('strong', {}, String(total)), h('span', {}, LANG === 'zh' ? '总数' : 'total')),
+        h('div', { class: 'cr-stat' }, h('strong', {}, fmtMs(dur) || '—'), h('span', {}, LANG === 'zh' ? '耗时' : 'duration')),
+        cachedCount > 0 ? h('div', { class: 'cr-stat' }, h('strong', {}, String(cachedCount)), h('span', {}, LANG === 'zh' ? '缓存命中' : 'cached')) : null,
+      ),
+      h('div', { class: 'cr-actions' },
+        h('button', { class: 'primary', onClick: () => { back.remove(); currentIdx = 0; renderStrip(); paintFrame(); setPlaying(true); } },
+          LANG === 'zh' ? '重看回放' : 'Watch replay'),
+        h('button', { onClick: () => back.remove() }, LANG === 'zh' ? '关闭' : 'Close'),
+        runRec?.report?.url ? h('button', {
+          onClick: () => window.open(runRec.report.url, '_blank'),
+        }, LANG === 'zh' ? '打开报告 ↗' : 'Open report ↗') : null,
+      ),
+    );
+    back.appendChild(card);
+    // Confetti canvas on pass — sits behind the card content.
+    if (isPass) {
+      const cv = h('canvas', { class: 'cinema-result-confetti' });
+      back.insertBefore(cv, card);
+      requestAnimationFrame(() => { runConfetti(cv); });
+    }
+    stage.appendChild(back);
+  }
+
+  // Tiny canvas confetti — 60 paper pieces fall with rotation and drift.
+  function runConfetti(canvas) {
+    const rect = stage.getBoundingClientRect();
+    canvas.width = rect.width; canvas.height = rect.height;
+    const ctx = canvas.getContext('2d');
+    const colors = ['#0070F2', '#1F7A39', '#E0660D', '#B00020', '#9333ea', '#22d3ee', '#facc15'];
+    const N = 70;
+    const pieces = Array.from({ length: N }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      vx: (Math.random() - 0.5) * 2.4,
+      vy: 2 + Math.random() * 3,
+      rot: Math.random() * Math.PI * 2,
+      vRot: (Math.random() - 0.5) * 0.18,
+      w: 8 + Math.random() * 6,
+      h: 4 + Math.random() * 5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    }));
+    let frameCount = 0;
+    function tick() {
+      frameCount++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of pieces) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.04;
+        p.rot += p.vRot;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      if (frameCount < 180) requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  if (runId) {
+    pollLive();   // initial paint
+    livePollTimer = setInterval(pollLive, 1500);
+  } else {
+    frame.innerHTML = '';
+    frame.appendChild(h('div', { class: 'cinema-empty-msg' }, LANG === 'zh' ? '这个用例还没有运行记录' : 'No run records for this case yet.'));
+  }
+
+  // Initial paint
+  if (frames.length) { renderStrip(); paintFrame(); }
+
+  // Teardown on hashchange — render() rebuilds the view so we need to cancel
+  // our timers + keyboard listener.
+  window.addEventListener('hashchange', function teardown() {
+    window.removeEventListener('hashchange', teardown);
+    document.removeEventListener('keydown', onKey);
+    try { clearInterval(autoAdvanceTimer); } catch {}
+    try { clearInterval(livePollTimer); } catch {}
+  }, { once: true });
+
+  return root;
+};
+
+// ───────── View: Dashboard (legacy — superseded by Workbench but kept for
+// backwards compatibility / explicit /dashboard-legacy linking). ─────────
+VIEWS.dashboardLegacy = async () => {
   const wrap = h('div', { class: 'grid' });
   const stats = h('div', { class: 'grid cols-4' });
   wrap.appendChild(stats);
@@ -3405,15 +6587,22 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
     return /\bagent\.(aiAct|aiScroll)\s*\(/.test(code);
   }
   const stepBypassChecks = new Map(); // step.order → checkbox element
+  // `opts.initialBypass`: a plain object `{ [stepOrder]: boolean }` letting the
+  // caller seed the per-step bypass checkboxes. The workbench passes its
+  // step-list checkbox state through here so what the user ticked on the
+  // workbench preview shows up pre-applied in this modal.
+  const seededBypass = opts.initialBypass && typeof opts.initialBypass === 'object' ? opts.initialBypass : null;
   const stepsList = h('ol', { class: 'mono', style: { fontSize: '12px', maxHeight: '320px', overflow: 'auto', paddingLeft: '44px' } },
     ...apiGuide.steps.map((s) => {
       const actual = displayApiFromStep(s);
       const planned = plannedApiTagIfDifferent(s);
       const defaultBypass = isDragLikeStep(s);
+      const seededVal = seededBypass && (s.order in seededBypass) ? !!seededBypass[s.order] : null;
+      const initialChecked = seededVal !== null ? seededVal : defaultBypass;
       const bypassChk = cacheMode === 'read'
         ? h('input', {
             type: 'checkbox',
-            checked: defaultBypass,
+            checked: initialChecked,
             style: { marginLeft: '8px', verticalAlign: 'middle' },
             title: defaultBypass
               ? 'Drag/scroll step — defaulting to bypass cache (cache is fragile here). Uncheck to use cache anyway.'
@@ -3532,7 +6721,7 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
     });
   }
 
-  startBtn.addEventListener('click', async () => {
+  startBtn.addEventListener('click', () => {
     startBtn.disabled = true;
     abortBtn.disabled = true;
     abortBtn.textContent = 'Abort';
@@ -3540,44 +6729,40 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
     consoleEl.textContent = '';
     activeRunId = null;
     lastLogIdx = 0;
-    startPolling();
 
-    try {
-      const noCacheSteps = [];
-      for (const [order, chk] of stepBypassChecks.entries()) {
-        if (chk.checked) noCacheSteps.push(order);
-      }
-      const r = await api.post(
-        '/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/run?cache=' + encodeURIComponent(cacheMode),
-        { headed: headedChk.checked, noCacheSteps },
-      );
-      clearInterval(pollHandle);
-      const run = r.run;
-      statusEl.textContent =
-        (run.status === 'passed' ? 'PASSED ✓' : 'FAILED ✗') +
-        ' · ' + Math.round(run.durationMs / 100) / 10 + 's · ' +
-        (run.errorMessage || '');
-      // Append final logs
-      consoleEl.textContent = (run.logTail ?? []).map((l) => l.line).join('\n');
-      consoleEl.scrollTop = consoleEl.scrollHeight;
-      if (run.report?.url) {
-        reportLinkBox.appendChild(h('a', {
-          href: run.report.url, target: '_blank',
-          style: { color: 'var(--accent)' },
-        }, 'Open Midscene report ↗'));
-      }
-      toast(run.status === 'passed' ? 'Run passed' : 'Run failed', run.status === 'passed' ? 'ok' : 'err');
-    } catch (e) {
-      clearInterval(pollHandle);
-      statusEl.textContent = 'ERROR: ' + e.message;
-      toast(e.message, 'err');
-    } finally {
-      startBtn.disabled = false;
-      startBtn.textContent = 'Run again';
-      abortBtn.disabled = true;
-      abortBtn.textContent = 'Abort';
-      activeRunId = null;
+    // Collect per-step bypass-cache choices before we close the modal.
+    const noCacheSteps = [];
+    for (const [order, chk] of stepBypassChecks.entries()) {
+      if (chk.checked) noCacheSteps.push(order);
     }
+
+    // Fire the run POST in the background and switch immediately to the
+    // Cinema view. The server starts the run + writes to
+    // /api/midscene-js/runs/active, where Cinema's own polling picks it up
+    // and follows step-by-step. We don't await here so the user lands in
+    // the cinema page as soon as they click Run, instead of staring at this
+    // modal for the full run duration.
+    const runPromise = api.post(
+      '/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/run?cache=' + encodeURIComponent(cacheMode),
+      { headed: headedChk.checked, noCacheSteps },
+    );
+
+    // Tear down the modal and open cinema in a NAMED tab. If a cinema tab
+    // is already open from a previous run, it will be focused + navigated
+    // to this case (no new tab spawned). Original workbench tab stays put.
+    m.close();
+    openCinemaTab(caseId);
+    toast(LANG === 'zh' ? '已开始运行 · 直播标签页已打开' : 'Run started · live tab opened/focused', 'info', 2800);
+
+    // Still await the result in the background so a finish-toast pops once
+    // the server returns the final record. No DOM updates needed — modal
+    // is detached, cinema handles its own UI.
+    runPromise
+      .then((r) => {
+        const run = r.run;
+        toast(run.status === 'passed' ? 'Run passed' : 'Run failed', run.status === 'passed' ? 'ok' : 'err');
+      })
+      .catch((e) => toast(e.message, 'err'));
   });
 }
 
@@ -3632,7 +6817,10 @@ async function pollActiveRuns() {
   const badge = ensureActiveBadge();
   try {
     const r = await api.get('/api/midscene-js/runs/active');
-    if (!r.active.length) {
+    // Hide the floating badge while cinema is open — it overlaps the
+    // filmstrip and the cinema view already has its own LIVE indicator.
+    const inCinema = location.hash.startsWith('#/cinema/');
+    if (!r.active.length || inCinema) {
       badge.style.display = 'none';
       return;
     }

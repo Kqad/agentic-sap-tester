@@ -158,6 +158,64 @@ router.delete('/:id', requirePermission('cases:delete'), async (req, res) => {
   }
 });
 
+// Rename a case: caseId is the filename, so a "rename" is really:
+//   1. mv e2e/cases/<old>.json e2e/cases/<new>.json
+//   2. mv run-history/cases/<old>/ run-history/cases/<new>/  (if present)
+//   3. rename any midscene_run/cache/saptest-js-<old>-*.cache.yaml so the
+//      cache continues to apply to the renamed case
+// Spec files (e2e/<id>.spec.ts) are NOT renamed automatically — they
+// belong to the Playwright fleet, not the Midscene-JS case shape. If a
+// spec exists it's left in place and the UI flags the mismatch.
+router.patch('/:id/rename', requirePermission('cases:write'), async (req, res) => {
+  const oldId = safeId(req.params.id);
+  const newId = safeId(req.body?.newId);
+  if (!oldId || !newId) return res.status(400).json({ error: 'invalid id (letters, digits, - and _ only)' });
+  if (oldId === newId) return res.status(400).json({ error: 'new id is the same as old id' });
+
+  const oldFile = path.join(CASES_DIR, `${oldId}.json`);
+  const newFile = path.join(CASES_DIR, `${newId}.json`);
+  if (!existsSync(oldFile)) return res.status(404).json({ error: 'case not found' });
+  if (existsSync(newFile)) return res.status(409).json({ error: 'a case with that id already exists' });
+
+  try {
+    await fs.rename(oldFile, newFile);
+  } catch (e) {
+    return res.status(500).json({ error: 'rename failed: ' + e.message });
+  }
+
+  // Best-effort secondary renames — failures don't abort the case rename,
+  // they're just logged. The case rename itself already succeeded.
+  const secondary = [];
+  // a) run-history directory
+  try {
+    const oldRunDir = path.join(RUNS_DIR, 'cases', oldId);
+    const newRunDir = path.join(RUNS_DIR, 'cases', newId);
+    if (existsSync(oldRunDir)) {
+      await fs.rename(oldRunDir, newRunDir);
+      secondary.push({ kind: 'run-history', oldPath: oldRunDir, newPath: newRunDir });
+    }
+  } catch (e) { secondary.push({ kind: 'run-history', error: e.message }); }
+  // b) Midscene cache files — filename pattern `saptest-js-<id>-<hash>.cache.yaml`
+  try {
+    const CACHE_DIR = path.join(path.dirname(CASES_DIR), '..', 'midscene_run', 'cache');
+    if (existsSync(CACHE_DIR)) {
+      const entries = await fs.readdir(CACHE_DIR);
+      const re = new RegExp('^saptest-js-' + oldId.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '-(.+)\\.cache\\.yaml$');
+      for (const name of entries) {
+        const m = re.exec(name);
+        if (!m) continue;
+        const oldPath = path.join(CACHE_DIR, name);
+        const newName = `saptest-js-${newId}-${m[1]}.cache.yaml`;
+        await fs.rename(oldPath, path.join(CACHE_DIR, newName));
+        secondary.push({ kind: 'cache', oldName: name, newName });
+      }
+    }
+  } catch (e) { secondary.push({ kind: 'cache', error: e.message }); }
+
+  await audit(req, 'cases.rename', { oldId, newId, secondary });
+  res.json({ ok: true, oldId, newId, secondary });
+});
+
 // Spec discovery: list e2e/*.spec.ts so the UI can show what specs exist.
 router.get('/_specs/list', requirePermission('cases:read'), async (_req, res) => {
   const entries = await fs.readdir(E2E_DIR, { withFileTypes: true });

@@ -30,6 +30,7 @@ import {
   setActiveRunStep,
   appendActiveRunLog,
   attachActiveRunCleanup,
+  recordActiveRunScreenshot,
 } from './active-runs.js';
 import {
   sleep, safeStringify, truncate, withTimeout,
@@ -41,7 +42,29 @@ import { captureQueryVariable, tryLocalComparison } from './variables.js';
 import { resolveDynamicInputValue } from './llm.js';
 import { isDownloadCheckInstruction, waitForDownloadedFile } from './downloads.js';
 import { executeStepWithRecovery } from './recovery.js';
-import { ROOT, RUNS_DIR } from '../paths.js';
+import { ROOT, RUNS_DIR, SCREENSHOTS_DIR } from '../paths.js';
+
+// Capture a JPEG screenshot for the active run and persist it under
+// midscene_run/screenshots/<runId>/step-<order>.jpg. Best-effort: any failure
+// is logged but doesn't abort the run — this is purely UI ornament.
+//
+// `cached` is a best-effort signal we surface in the workbench flow view:
+//   true  → step's locator was served from Midscene cache (cache hit)
+//   false → cache miss, the LLM was called
+//   null  → unknown / not applicable (no aiInput/aiTap-style action)
+async function captureStepScreenshot(page, runId, step, status, cached) {
+  if (!page || page.isClosed?.()) return;
+  const dir = path.join(SCREENSHOTS_DIR, runId);
+  const file = path.join(dir, `step-${step.order}.jpg`);
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    await page.screenshot({ path: file, type: 'jpeg', quality: 60, fullPage: false });
+    recordActiveRunScreenshot(runId, { order: step.order, status, cached });
+  } catch (e) {
+    // Don't let a screenshot failure kill the run.
+    appendActiveRunLog(runId, `(screenshot capture failed for step ${step.order}: ${e?.message ?? e})`);
+  }
+}
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 
@@ -658,15 +681,41 @@ export async function runJavascript(caseObj, opts = {}) {
         if (active.aborted) throw new Error('Aborted by user');
       }
 
+      // Snapshot Midscene's cache.log size BEFORE the step. After the step,
+      // we read the appended bytes and look for "cache hit" / "cache updated"
+      // markers to classify this step as a cache HIT, MISS, or unknown
+      // (no locator was needed, e.g. aiAssert). Best-effort: any read error
+      // just leaves cached=null and the UI shows a neutral badge.
+      const cacheLogPath = path.join(ROOT, 'midscene_run', 'log', 'cache.log');
+      let cacheLogBytesBefore = 0;
+      try { cacheLogBytesBefore = fs.statSync(cacheLogPath).size; } catch { /* file may not exist yet */ }
+      let stepStatus = 'passed';
       try {
         const result = await executeStepWithRecovery(agent, step, ctx, dispatchStep);
         if (result !== undefined) {
           log(`  → ${truncate(safeStringify(result), 280)}`);
         }
       } catch (err) {
+        stepStatus = 'failed';
         log(`Step ${step.order} FAILED: ${err?.message ?? err}`);
+        try { await captureStepScreenshot(page, runId, step, 'failed', null); }
+        catch { /* swallow — error path */ }
         throw err;
       }
+      let cached = null;
+      try {
+        const sz = fs.statSync(cacheLogPath).size;
+        if (sz > cacheLogBytesBefore) {
+          const fd = fs.openSync(cacheLogPath, 'r');
+          const buf = Buffer.alloc(sz - cacheLogBytesBefore);
+          fs.readSync(fd, buf, 0, buf.length, cacheLogBytesBefore);
+          fs.closeSync(fd);
+          const appended = buf.toString('utf8');
+          if (/cache hit/.test(appended))                          cached = true;
+          else if (/will call updateFn|cache updated/.test(appended)) cached = false;
+        }
+      } catch { /* leave cached = null */ }
+      await captureStepScreenshot(page, runId, step, stepStatus, cached);
 
       if (idx < caseObj.apiGuide.steps.length - 1) {
         const delayMs = delayAfterStepMs(step);

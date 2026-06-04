@@ -20,6 +20,11 @@ export function registerActiveRun({ runId, caseId, caseTitle, mode, totalSteps }
     cleanupTasks: [],
     aborted: false,
     logTail: [],
+    // Screenshots captured by the runner per step. Each entry:
+    //   { order, capturedAt, status: 'passed'|'failed', cached: bool|null }
+    // The actual JPEG sits on disk at midscene_run/screenshots/<runId>/step-<order>.jpg
+    // served by /api/midscene-js/runs/:runId/screenshot/:order (see api/midscene-js.js).
+    screenshots: [],
   };
   registry.set(runId, entry);
   return entry;
@@ -43,6 +48,17 @@ export function appendActiveRunLog(runId, line) {
   if (!e) return;
   e.logTail.push({ ts: Date.now(), line });
   if (e.logTail.length > 200) e.logTail.splice(0, e.logTail.length - 200);
+}
+
+// Record that a step's screenshot was just written to disk. Dedup by order —
+// subsequent calls for the same order overwrite the entry (e.g. retry path).
+export function recordActiveRunScreenshot(runId, { order, status, cached }) {
+  const e = registry.get(runId);
+  if (!e) return;
+  const existing = e.screenshots.findIndex((s) => s.order === order);
+  const entry = { order, capturedAt: Date.now(), status, cached: cached ?? null };
+  if (existing >= 0) e.screenshots[existing] = entry;
+  else e.screenshots.push(entry);
 }
 
 export function attachActiveRunCleanup(runId, tasks) {
@@ -76,6 +92,7 @@ export function listActiveRuns() {
       currentStep: e.currentStep,
       aborted: e.aborted,
       logTail: e.logTail.slice(-30),
+      screenshots: e.screenshots.slice(),
     }))
     .sort((a, b) => a.startedAt - b.startedAt);
 }

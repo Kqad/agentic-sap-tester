@@ -20,7 +20,7 @@ import express from 'express';
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
-import { ROOT, CASES_DIR, RUNS_DIR } from '../paths.js';
+import { ROOT, CASES_DIR, RUNS_DIR, SCREENSHOTS_DIR } from '../paths.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 import { audit } from '../audit.js';
 import { runJavascript } from '../midscene/runner.js';
@@ -173,6 +173,69 @@ router.get(
   requirePermission('results:read'),
   (_req, res) => {
     res.json({ active: listActiveRuns() });
+  },
+);
+
+// ───────── Flow-view: per-step screenshots ─────────
+// Step screenshots are written to disk by the runner after each apiGuide
+// step (see captureStepScreenshot in server/midscene/runner.js). Layout:
+//   midscene_run/screenshots/<runId>/step-<order>.jpg
+// These three endpoints expose them to the workbench flow view:
+//   GET  /runs/:runId/screenshots        → list of available steps
+//   GET  /runs/:runId/screenshot/:order  → the JPEG bytes for one step
+// runId is treated as a safe-id (kebab + base32-ish characters), order
+// is a 1–3 digit integer.
+
+function isSafeRunId(id) {
+  return typeof id === 'string' && /^[A-Za-z0-9_\-]+$/.test(id);
+}
+
+router.get(
+  '/runs/:runId/screenshots',
+  requirePermission('results:read'),
+  async (req, res) => {
+    const runId = req.params.runId;
+    if (!isSafeRunId(runId)) return res.status(400).json({ error: 'invalid runId' });
+    const dir = path.join(SCREENSHOTS_DIR, runId);
+    let entries = [];
+    try {
+      const names = await fs.readdir(dir);
+      for (const n of names) {
+        const m = /^step-(\d+)\.jpg$/.exec(n);
+        if (!m) continue;
+        const order = Number(m[1]);
+        const stat = await fs.stat(path.join(dir, n));
+        entries.push({
+          order,
+          url: `/api/midscene-js/runs/${encodeURIComponent(runId)}/screenshot/${order}`,
+          modifiedAt: stat.mtime.toISOString(),
+          bytes: stat.size,
+        });
+      }
+      entries.sort((a, b) => a.order - b.order);
+    } catch (e) {
+      // No directory yet (run hasn't captured anything) — return empty list.
+    }
+    res.json({ runId, screenshots: entries });
+  },
+);
+
+router.get(
+  '/runs/:runId/screenshot/:order',
+  requirePermission('results:read'),
+  async (req, res) => {
+    const runId = req.params.runId;
+    const order = Number(req.params.order);
+    if (!isSafeRunId(runId) || !Number.isInteger(order) || order < 1 || order > 999) {
+      return res.status(400).json({ error: 'invalid runId / order' });
+    }
+    const file = path.join(SCREENSHOTS_DIR, runId, `step-${order}.jpg`);
+    if (!existsSync(file)) return res.status(404).json({ error: 'no screenshot' });
+    res.setHeader('Content-Type', 'image/jpeg');
+    // Short cache so the workbench can re-fetch when a step is re-run, but
+    // doesn't hammer the disk on every poll for already-loaded thumbs.
+    res.setHeader('Cache-Control', 'private, max-age=30');
+    res.sendFile(file);
   },
 );
 

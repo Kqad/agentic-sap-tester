@@ -1,0 +1,18 @@
+import { chromium } from 'playwright';
+const TOKEN = process.env.SAPTEST_TOKEN;
+const browser = await chromium.launch({ headless: true });
+const ctx = await browser.newContext({ viewport: { width: 1600, height: 1100 } });
+await ctx.addCookies([{name:'saptest_session',value:TOKEN,domain:'localhost',path:'/',httpOnly:true,sameSite:'Lax'}]);
+const page = await ctx.newPage();
+page.on('pageerror', e => console.log('PAGEERR:', e.message));
+page.on('console', m => console.log('CONSOLE:', m.type(), m.text().slice(0, 300)));
+await page.goto('http://localhost:5174/#/cinema/saptest1', { waitUntil: 'networkidle' });
+await page.waitForTimeout(3000);
+const url = page.url();
+console.log('URL:', url);
+const cinemaExists = await page.locator('.cinema').count();
+const viewExists = await page.locator('[data-bind=view]').count();
+console.log('Cinema?', cinemaExists, 'view container?', viewExists);
+const innerHtml = await page.evaluate(() => document.querySelector('[data-bind=view]')?.innerHTML?.slice(0, 600));
+console.log('Inner:', innerHtml);
+await browser.close();

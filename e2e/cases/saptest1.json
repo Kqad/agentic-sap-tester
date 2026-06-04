@@ -4,7 +4,7 @@
   "description": "BP_IT_B2P_GUI_Report Asset HistorySheet. (Row 2/3)\nCalling up and evaluating the report data",
   "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
   "transactionCode": "S_ALR_87011990",
-  "naturalLanguage": "1.进入 Menu， 点击setting，点击visualization  并启用show Ok code field, 并保存。\n2.在 左上角矩形输入框 输入 S_ALR_87011990 ，点击右下角execute\n3. company code输入8540， Asset number 输入1010001732\n4. 点击跳出栏目的第一个。 \n5.Report date 输入上个月的最后一个自然日, 并勾选List assets, 执行Execute 查询。\n6.在查询到的Asset History Sheet页面中，滑动到最右边，查找Curr.bk.val.列的值记录为变量A1.\n7. 返回 SAP 主页, 选择Favorites文件夹下面的Asset Balances, 执行Execute。\n8.company code处输入8540, Asset number输入1010001732。\n9. 点击跳出栏目的第一个。  \n10. Report date输入30.04.2026, 勾选List assets, 执行Execute。 \n11. 记录查询到的数据表格 第一行Book val.l列的值为变量A2.\n12. 如果A1和A2相等则测试用例执行成功。\n\n\n ",
+  "naturalLanguage": "1.进入 Menu， 点击setting，点击visualization  并启用show Ok code field, 并保存。\n2.在 左上角矩形输入框 输入 S_ALR_87011990 ，点击右下角execute\n3. company code输入8540， Asset number 输入1010001732\n4. 点击跳出栏目的第一个。 \n5.Report date 输入上个月的最后一个自然日, 并勾选List assets, 执行Execute 查询。\n6.在查询到的Asset History Sheet页面中，滑动到最右边，查找Curr.bk.val.列的值记录为变量A1.\n7. 返回 SAP 主页, 选择Favorites文件夹下面的Asset Balances, 执行Execute。\n8.company code处输入8540, Asset number输入1010001732。\n9. 点击跳出栏目的第一个。  \n10. Report date输入31.05.2026, 勾选List assets, 执行Execute。 \n11. 记录查询到的数据表格 第一行Book val.l列的值为变量A2.\n12. 如果A1和A2相等则测试用例执行成功。\n\n\n ",
   "jsSource": "async function run(agent) {\r\n  await agent.aiTap(\"进入 Menu\");\r\n  await agent.aiTap(\"点击setting\");\r\n  await agent.aiTap(\"点击visualization\");\r\n  await agent.aiTap(\"启用show Ok code field\");\r\n  await agent.aiTap(\"保存\");\r\n  await agent.aiInput(\"矩形\", { value: \"S_ALR_87011990\" });\r\n  await agent.aiTap(\"点击右下角execute\");\r\n  await agent.aiInput(\"company code\", { value: \"8540\" });\r\n  await agent.aiInput(\"Asset number\", { value: \"1010001732\" });\r\n  await agent.aiTap(\"点击跳出栏目的第一个\");\r\n  await agent.aiInput(\"Report date\", { value: \"30.04.2026\" });\r\n  await agent.aiTap(\"勾选 List assets 复选框\");\r\n  await agent.aiTap(\"点击 Execute 按钮执行查询\");\r\n  await agent.aiTap(\"在查询到的Asset History Sheet页面中\");\r\n  await agent.aiAct(\"按住底部的横向滚动条的滑块，拖到最右端\");\r\n  const result = await agent.aiQuery(\"string, 从查询结果表格中读取 Curr.bk.val.列，保存为变量 A1\");\r\n  await agent.aiTap(\"返回 SAP 主页\");\r\n  await agent.aiTap(\"展开 Favorites 文件夹并选择 Asset Balances\");\r\n  await agent.aiInput(\"company code\", { value: \"8540\" });\r\n  await agent.aiInput(\"Asset number\", { value: \"1010001732\" });\r\n  await agent.aiTap(\"点击跳出栏目的第一个\");\r\n  await agent.aiInput(\"Report date\", { value: \"30.04.2026\" });\r\n  await agent.aiTap(\"勾选 List assets 复选框\");\r\n  await agent.aiTap(\"点击 Execute 按钮执行查询\");\r\n  const result = await agent.aiQuery(\"string, 记录查询到的数据表格 第一行\");\r\n  const result = await agent.aiQuery(\"string, Book val.l列的值为变量A2.\");\r\n  await agent.aiAssert(\"如果 A1 和 A2 相等，则判定测试用例执行成功；否则判定失败\");\r\n}",
   "apiGuide": {
     "summary": "SAP TEST 1",
@@ -245,5 +245,8 @@
     "desktopCaseId": "7d4fd62c-ef24-4dfb-8fdc-e5dc639f5fd4",
     "consolidatedAt": "2026-05-25T10:40:49.337Z",
     "txtSource": "SAP TEST DEMO 5.21 1/SAP TEST DEMO 5.21/SAP test 1 自然语言+JS.txt"
+  },
+  "params": {
+    "23": "31.05.2026"
   }
 }

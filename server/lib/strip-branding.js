@@ -25,7 +25,7 @@ const BLANK_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAA
 
 // Bump this whenever the injected style/script needs to change. Existing
 // reports on disk will be re-themed on the next sweep.
-const THEME_VERSION = '3';
+const THEME_VERSION = '4';
 const THEME_TAG_RE = /\n?<(style|script) data-saptest-themed="\d+">[\s\S]*?<\/\1>/g;
 
 // JS string literals visible in the rendered UI (panel headings, error
@@ -123,15 +123,15 @@ function buildThemeBlock(version) {
     }
   `.replace(/\s+/g, ' ').trim();
 
-  // Script: (1) read `?theme=` from the URL (set by the SAPTest SPA when it
-  // embeds the report) and fall back to prefers-color-scheme; (2) follow the
-  // currently-playing step — MutationObserver-watch .task-row class changes
-  // and scrollIntoView({block:'center'}) the .playing/.selected row; (3)
-  // inline data:image attachment links as <img> previews so users can SEE
-  // the screenshot without clicking (Chrome blocks navigating to data:
-  // URLs from <a href> for security, but <img src="data:..."> works fine).
-  // Works in both iframe embed and direct new-tab open since it's inlined
-  // into the report HTML itself.
+  // Script: (1) read `?theme=` from URL or prefers-color-scheme; (2) follow
+  // the currently-playing step (scrollIntoView .task-row.playing/.selected);
+  // (3) inline data:image attachments as <img> previews (Chrome blocks data:
+  // URL navigation but allows <img src=data:>); (4) translate all Chinese
+  // text nodes to English via POST /api/translate (cached on server, so
+  // most strings round-trip in milliseconds after the first run; includes
+  // video-overlay subtitles since they're regular DOM text). Ported from
+  // Desktop saptest's ReplayReportFrame.tsx but runs inline in the report
+  // HTML itself — no iframe wrapper needed.
   const js = `
     (function () {
       try {
@@ -145,6 +145,7 @@ function buildThemeBlock(version) {
         document.documentElement.setAttribute('data-saptest-theme', 'light');
       }
 
+      var CHINESE_RE = /[\\u4e00-\\u9fff]/;
       var rafId = null;
       function scrollActive() {
         rafId = null;
@@ -158,9 +159,7 @@ function buildThemeBlock(version) {
         rafId = requestAnimationFrame(scrollActive);
       }
 
-      // Inline data:image attachments as visible thumbnails. Default 420x300
-      // contain-fit; click toggles fullsize. Uses dataset flag to stay
-      // idempotent across MutationObserver firings.
+      /* Inline data:image attachments as visible thumbnails. */
       function inlineDataImages() {
         var anchors = document.querySelectorAll('a[href^="data:image"]');
         for (var i = 0; i < anchors.length; i++) {
@@ -173,14 +172,11 @@ function buildThemeBlock(version) {
           img.title = (a.textContent || 'image') + ' (click to toggle full size)';
           img.style.cssText = 'max-width:420px;max-height:300px;display:block;margin:6px 0;border:1px solid hsl(var(--saptest-border, 240 5.9% 90%));border-radius:4px;cursor:zoom-in;';
           img.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            e.preventDefault(); e.stopPropagation();
             if (this.style.maxWidth === 'none') {
-              this.style.maxWidth = '420px'; this.style.maxHeight = '300px';
-              this.style.cursor = 'zoom-in';
+              this.style.maxWidth = '420px'; this.style.maxHeight = '300px'; this.style.cursor = 'zoom-in';
             } else {
-              this.style.maxWidth = 'none'; this.style.maxHeight = 'none';
-              this.style.cursor = 'zoom-out';
+              this.style.maxWidth = 'none';  this.style.maxHeight = 'none';  this.style.cursor = 'zoom-out';
             }
           });
           a.parentNode.insertBefore(img, a);
@@ -188,23 +184,166 @@ function buildThemeBlock(version) {
         }
       }
 
+      /* Translation client */
+      var dict = {};                  /* accumulated zh→en */
+      var pendingSet = {};            /* Set-like: strings waiting on next /api/translate call */
+      var pendingCount = 0;
+      var handled = new WeakSet();    /* Text nodes already translated */
+      var flushTimer = null;
+      var flushInFlight = false;
+      var statusBadge = null;
+
+      function showStatus(text, isError) {
+        if (!statusBadge) {
+          statusBadge = document.createElement('div');
+          statusBadge.style.cssText = 'position:fixed;top:16px;right:16px;z-index:99999;padding:6px 12px;border-radius:999px;font-size:12px;font-family:system-ui,sans-serif;border:1px solid;background:rgba(255,255,255,0.95);backdrop-filter:blur(4px);pointer-events:none;';
+          document.body.appendChild(statusBadge);
+        }
+        statusBadge.textContent = text;
+        statusBadge.style.borderColor = isError ? '#fda4af' : '#cbd5e1';
+        statusBadge.style.color = isError ? '#9f1239' : '#475569';
+        statusBadge.style.display = text ? 'block' : 'none';
+      }
+
+      function shouldSkipNode(node) {
+        var cur = node.parentNode;
+        while (cur && cur.nodeType === 1) {
+          var tag = cur.tagName;
+          if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'TEXTAREA') return true;
+          if (cur.isContentEditable) return true;
+          cur = cur.parentNode;
+        }
+        return false;
+      }
+
+      function collectChineseTextNodes(root) {
+        var doc = root.ownerDocument || root;
+        var walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+          acceptNode: function (n) {
+            if (!n.nodeValue || !CHINESE_RE.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
+            if (handled.has(n)) return NodeFilter.FILTER_REJECT;
+            if (shouldSkipNode(n)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        });
+        var out = []; var cur = walker.nextNode();
+        while (cur) { out.push(cur); cur = walker.nextNode(); }
+        return out;
+      }
+
+      function applyTranslations(nodes) {
+        for (var i = 0; i < nodes.length; i++) {
+          var n = nodes[i];
+          if (handled.has(n)) continue;
+          var orig = n.nodeValue || '';
+          var trimmed = orig.trim();
+          if (!trimmed) continue;
+          var direct = dict[trimmed];
+          if (direct && direct !== trimmed) {
+            var lead = orig.match(/^\\s*/)[0];
+            var trail = orig.match(/\\s*$/)[0];
+            n.nodeValue = lead + direct + trail;
+            handled.add(n);
+            continue;
+          }
+          /* Substring replacement for mixed strings (zh + numbers + en mixed) */
+          var updated = orig; var changed = false;
+          for (var key in dict) {
+            if (!key || !dict[key] || key === dict[key]) continue;
+            if (updated.indexOf(key) !== -1) {
+              updated = updated.split(key).join(dict[key]);
+              changed = true;
+            }
+          }
+          if (changed && updated !== orig) {
+            n.nodeValue = updated;
+            handled.add(n);
+          }
+        }
+      }
+
+      function scheduleTranslate() {
+        if (!document.body) return;
+        var nodes = collectChineseTextNodes(document.body);
+        if (nodes.length === 0) return;
+        applyTranslations(nodes);
+        var remaining = [];
+        for (var i = 0; i < nodes.length; i++) if (!handled.has(nodes[i])) remaining.push(nodes[i]);
+        if (remaining.length === 0) return;
+        for (var j = 0; j < remaining.length; j++) {
+          var txt = (remaining[j].nodeValue || '').trim();
+          if (!txt || dict[txt]) continue;
+          if (!pendingSet[txt]) { pendingSet[txt] = 1; pendingCount++; }
+        }
+        if (pendingCount === 0) return;
+        if (flushInFlight) return;
+        if (flushTimer) clearTimeout(flushTimer);
+        flushTimer = setTimeout(flush, 150);
+      }
+
+      function flush() {
+        if (flushInFlight || pendingCount === 0) return;
+        flushInFlight = true; flushTimer = null;
+        showStatus('Translating to English…', false);
+        var lastError = null;
+        function loop() {
+          if (pendingCount === 0) { done(); return; }
+          var slice = Object.keys(pendingSet);
+          pendingSet = {}; pendingCount = 0;
+          fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ strings: slice })
+          }).then(function (r) { return r.json().catch(function () { return null; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+            .then(function (res) {
+              var translations = (res.j && res.j.translations) || {};
+              for (var k in translations) dict[k] = translations[k];
+              if (!res.ok) lastError = (res.j && res.j.error) || ('HTTP ' + res.j);
+              applyTranslations(collectChineseTextNodes(document.body));
+              loop();
+            }).catch(function (err) {
+              lastError = err && err.message ? err.message : String(err);
+              loop();
+            });
+        }
+        function done() {
+          flushInFlight = false;
+          if (lastError && Object.keys(dict).length === 0) {
+            showStatus('Translation unavailable: ' + lastError, true);
+          } else {
+            showStatus('', false);
+          }
+          if (pendingCount > 0) { if (flushTimer) clearTimeout(flushTimer); flushTimer = setTimeout(flush, 150); }
+        }
+        loop();
+      }
+
       function arm() {
         if (!document.body) { setTimeout(arm, 50); return; }
         new MutationObserver(function (records) {
           var classChanged = false;
+          var textOrTreeChanged = false;
           for (var i = 0; i < records.length; i++) {
             var r = records[i];
             if (r.type === 'attributes' && r.attributeName === 'class' &&
                 r.target.classList && r.target.classList.contains('task-row')) {
               classChanged = true;
+            } else if (r.type === 'characterData') {
+              /* Text mutated — if it now contains Chinese, retranslate. */
+              if (CHINESE_RE.test(r.target.nodeValue || '')) {
+                handled.delete(r.target);
+                textOrTreeChanged = true;
+              }
+            } else if (r.type === 'childList') {
+              textOrTreeChanged = true;
             }
           }
           if (classChanged) requestScroll();
-          // Re-inline any newly-mounted data: anchors. Cheap (dataset gate).
-          inlineDataImages();
-        }).observe(document.body, { attributes: true, attributeFilter: ['class'], childList: true, subtree: true });
+          if (textOrTreeChanged) { inlineDataImages(); scheduleTranslate(); }
+        }).observe(document.body, { attributes: true, attributeFilter: ['class'], childList: true, subtree: true, characterData: true });
         requestScroll();
         inlineDataImages();
+        scheduleTranslate();
       }
       arm();
     })();
