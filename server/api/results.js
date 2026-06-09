@@ -4,7 +4,7 @@
 import express from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { REPORT_DIR, RESULTS_DIR, RUNS_DIR } from '../paths.js';
+import { CASES_DIR, REPORT_DIR, RESULTS_DIR, RUNS_DIR } from '../paths.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 
 const router = express.Router();
@@ -30,11 +30,46 @@ function tryParseTimestampFromMerged(name) {
 router.get('/', async (_req, res) => {
   await fs.mkdir(REPORT_DIR, { recursive: true });
   const entries = await fs.readdir(REPORT_DIR, { withFileTypes: true });
+
+  // Per-call cache so multiple reports for the same case only re-read the
+  // case JSON once. Missing cases (renamed/deleted) are remembered as null
+  // so the disk lookup isn't repeated either.
+  const titleCache = new Map();
+  async function lookupCaseTitle(caseId) {
+    if (!caseId) return null;
+    if (titleCache.has(caseId)) return titleCache.get(caseId);
+    let title = null;
+    try {
+      const raw = await fs.readFile(path.join(CASES_DIR, `${caseId}.json`), 'utf8');
+      const parsed = JSON.parse(raw);
+      title = typeof parsed?.title === 'string' ? parsed.title : null;
+    } catch { /* case file gone — show caseId as fallback */ }
+    titleCache.set(caseId, title);
+    return title;
+  }
+
   const items = [];
   for (const e of entries) {
     if (!e.isFile() || !e.name.endsWith('.html')) continue;
     const file = path.join(REPORT_DIR, e.name);
     const stat = await fs.stat(file);
+    // Reports written by the jsrun runner share a base name with their
+    // run-history record (<runId>.html ↔ <runId>.json). Playwright merged /
+    // single reports use other naming → no matching record, run stays null.
+    const runId = e.name.replace(/\.html$/, '');
+    let run = null;
+    try {
+      const raw = await fs.readFile(path.join(RUNS_DIR, `${runId}.json`), 'utf8');
+      const rec = JSON.parse(raw);
+      const caseId = typeof rec?.caseId === 'string' ? rec.caseId : null;
+      const caseTitle = await lookupCaseTitle(caseId);
+      run = {
+        caseId,
+        caseTitle,
+        status: typeof rec?.status === 'string' ? rec.status : null,
+        durationMs: typeof rec?.durationMs === 'number' ? rec.durationMs : null,
+      };
+    } catch { /* no matching run record */ }
     items.push({
       name: e.name,
       kind: classify(e.name),
@@ -42,6 +77,7 @@ router.get('/', async (_req, res) => {
       modifiedAt: stat.mtime.toISOString(),
       timestamp: tryParseTimestampFromMerged(e.name) || stat.mtime.toISOString(),
       url: `/reports/${encodeURIComponent(e.name)}`,
+      run,
     });
   }
   items.sort((a, b) => b.modifiedAt.localeCompare(a.modifiedAt));

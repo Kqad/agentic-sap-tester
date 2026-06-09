@@ -25,7 +25,7 @@ const BLANK_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAA
 
 // Bump this whenever the injected style/script needs to change. Existing
 // reports on disk will be re-themed on the next sweep.
-const THEME_VERSION = '4';
+const THEME_VERSION = '5';
 const THEME_TAG_RE = /\n?<(style|script) data-saptest-themed="\d+">[\s\S]*?<\/\1>/g;
 
 // JS string literals visible in the rendered UI (panel headings, error
@@ -121,6 +121,22 @@ function buildThemeBlock(version) {
     .task-row.selected * {
       color: #1f2937 !important;
     }
+    /* Preserve newlines / whitespace in the report's text-rendering panels
+       (act context, params, descriptions, logs). Without this the recovery
+       prompts that contain "\\n" and indentation collapse into one giant
+       paragraph, making the structured bullets unreadable. */
+    html[data-saptest-theme] .description,
+    html[data-saptest-theme] .description-content,
+    html[data-saptest-theme] .detail-content,
+    html[data-saptest-theme] .structured-params,
+    html[data-saptest-theme] .structured-params-container,
+    html[data-saptest-theme] .log-content,
+    html[data-saptest-theme] .info-content,
+    html[data-saptest-theme] .summary-text,
+    html[data-saptest-theme] .blackboard-main-content {
+      white-space: pre-wrap !important;
+      word-break: break-word;
+    }
   `.replace(/\s+/g, ' ').trim();
 
   // Script: (1) read `?theme=` from URL or prefers-color-scheme; (2) follow
@@ -184,11 +200,17 @@ function buildThemeBlock(version) {
         }
       }
 
-      /* Translation client */
+      /* Translation client — gated behind the 中/EN toggle. Default = 中
+         (untranslated). Click EN → collect Chinese text nodes, post to
+         /api/translate, replace. Click 中 → restore original text from
+         the per-node WeakMap. */
+      var langMode = 'zh';            /* 'zh' (original) | 'en' (translated) */
       var dict = {};                  /* accumulated zh→en */
       var pendingSet = {};            /* Set-like: strings waiting on next /api/translate call */
       var pendingCount = 0;
       var handled = new WeakSet();    /* Text nodes already translated */
+      var originals = new WeakMap();  /* TextNode → original nodeValue for revert */
+      var allTouchedNodes = [];       /* All text nodes we've ever rewritten (for revert pass) */
       var flushTimer = null;
       var flushInFlight = false;
       var statusBadge = null;
@@ -242,6 +264,7 @@ function buildThemeBlock(version) {
           if (direct && direct !== trimmed) {
             var lead = orig.match(/^\\s*/)[0];
             var trail = orig.match(/\\s*$/)[0];
+            if (!originals.has(n)) { originals.set(n, orig); allTouchedNodes.push(n); }
             n.nodeValue = lead + direct + trail;
             handled.add(n);
             continue;
@@ -256,14 +279,29 @@ function buildThemeBlock(version) {
             }
           }
           if (changed && updated !== orig) {
+            if (!originals.has(n)) { originals.set(n, orig); allTouchedNodes.push(n); }
             n.nodeValue = updated;
             handled.add(n);
           }
         }
       }
 
+      /* Revert: restore originalText for every node we touched. Used when
+         the user flips the toggle back to 中. */
+      function revertTranslations() {
+        for (var i = 0; i < allTouchedNodes.length; i++) {
+          var n = allTouchedNodes[i];
+          var orig = originals.get(n);
+          if (typeof orig === 'string') {
+            try { n.nodeValue = orig; } catch (e) {}
+          }
+          handled.delete(n);
+        }
+      }
+
       function scheduleTranslate() {
         if (!document.body) return;
+        if (langMode !== 'en') return; /* only translate when user opted in */
         var nodes = collectChineseTextNodes(document.body);
         if (nodes.length === 0) return;
         applyTranslations(nodes);
@@ -318,6 +356,41 @@ function buildThemeBlock(version) {
         loop();
       }
 
+      /* Floating 中/EN toggle. Default = 中 (original Chinese text shown,
+         no fetch to /api/translate). Click to flip — switches to EN and
+         kicks off the on-demand translate pipeline; click again returns
+         to 中 by restoring original node values. */
+      function buildLangToggle() {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Toggle 中 / EN');
+        btn.style.cssText = [
+          'position:fixed', 'bottom:16px', 'right:16px', 'z-index:99999',
+          'padding:8px 14px', 'border-radius:999px', 'font:600 13px system-ui,sans-serif',
+          'border:1px solid #cbd5e1', 'background:rgba(255,255,255,0.95)',
+          'color:#1f2937', 'cursor:pointer', 'backdrop-filter:blur(4px)',
+          'box-shadow:0 4px 14px rgba(0,0,0,0.08)',
+        ].join(';');
+        function render() {
+          btn.textContent = langMode === 'zh' ? '中 → EN' : 'EN → 中';
+          btn.title = langMode === 'zh' ? 'Translate all Chinese to English' : '恢复原始中文';
+        }
+        btn.addEventListener('click', function () {
+          if (langMode === 'zh') {
+            langMode = 'en';
+            render();
+            scheduleTranslate();
+          } else {
+            langMode = 'zh';
+            render();
+            revertTranslations();
+            showStatus('', false);
+          }
+        });
+        render();
+        document.body.appendChild(btn);
+      }
+
       function arm() {
         if (!document.body) { setTimeout(arm, 50); return; }
         new MutationObserver(function (records) {
@@ -343,7 +416,8 @@ function buildThemeBlock(version) {
         }).observe(document.body, { attributes: true, attributeFilter: ['class'], childList: true, subtree: true, characterData: true });
         requestScroll();
         inlineDataImages();
-        scheduleTranslate();
+        buildLangToggle();
+        /* No auto-translate at boot — user opts in via the toggle. */
       }
       arm();
     })();

@@ -70,7 +70,7 @@ caches:
     prompt: 在查询到的Asset History Sheet页面中
     cache:
       xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[normalize-space()="Asset History Sheet"]
+        - /html/body/div[1]
   - type: locate
     prompt: 底部横向滚动条的滑块（当前在左下角附近）
     cache:
@@ -105,7 +105,7 @@ caches:
     prompt: 底部横向滚动条的滑块
     cache:
       xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
+        - /html/body/div[1]
   - type: locate
     prompt: 点击 Execute 按钮执行查询
     cache:
@@ -141,3 +141,33 @@ caches:
     cache:
       xpaths:
         - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 底部横向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/div[1]
+  - type: locate
+    prompt: 底部横向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/div[1]
+  - type: locate
+    prompt: Asset History Sheet 的数据表格区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/table[1]/thead[1]/tr[2]/th[1]/div[1]/div[1]/div[normalize-space()="Line 1"]
+  - type: locate
+    prompt: Asset History Sheet 的数据表格区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/table[1]/thead[1]/tr[2]/th[1]/div[1]/div[1]/div[normalize-space()="Line 1"]
+  - type: locate
+    prompt: Change Layout 对话框右上角的关闭按钮（×）
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/header[1]/div[4]/button[1]
+  - type: locate
+    prompt: Asset History Sheet 主数据表格区域（含资产编号和描述行）
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[151]

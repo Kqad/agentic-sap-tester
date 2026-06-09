@@ -62,7 +62,14 @@ export function isAiConnectionError(err) {
 
 // aiQuery result classification — Midscene sometimes returns "not found"
 // style strings rather than throwing. Treat as missing so recovery kicks in.
-export function isMissingQueryResult(result) {
+//
+// `instruction` is optional. When supplied we also flag the "model hallucinated
+// the variable name" case: an instruction like "查找...记录为A2" wants the
+// data value, but a stuck model sometimes returns the literal "A2" (the
+// variable name itself). Without this check the runner happily stores "A2" as
+// the value, then the downstream aiAssert sees A1==A2 trivially because both
+// are placeholder strings. Treat that as missing so recovery fires.
+export function isMissingQueryResult(result, instruction) {
   if (result == null) return true;
   if (typeof result !== 'string') {
     if (typeof result === 'object') {
@@ -73,18 +80,30 @@ export function isMissingQueryResult(result) {
   }
   const n = result.trim().toLowerCase();
   if (!n) return true;
-  return [
+  const verbatimMiss = [
     'n/a', 'na', 'not found', 'not visible', 'missing', 'no data',
     'cannot find', 'could not find', 'unable to find', 'unable to locate',
     'cannot extract',
     '无法找到', '未找到', '没有找到', '找不到', '不存在',
     '无法读取', '无法提取', '无法获取',
   ].some((f) => n === f || n.includes(f));
+  if (verbatimMiss) return true;
+  if (instruction) {
+    const varName =
+      instruction.match(/(?:记录|保存|记|存)\s*(?:为|作为|成|到|进)?\s*([A-Za-z][A-Za-z0-9_]*)\b/i)?.[1] ||
+      instruction.match(/\b(?:save|record|store)\s*(?:as|to|into)?\s*([A-Za-z][A-Za-z0-9_]*)\b/i)?.[1] ||
+      '';
+    if (varName && result.trim() === varName) return true;
+  }
+  return false;
 }
 
 export function canReplanApiGuideStep(step) {
   const api = normalizeApiName(step);
-  return api === 'aiTap' || api === 'aiInput' || api === 'aiScroll';
+  // aiQuery is now eligible too — the replan layer does an aiAct with the
+  // full case context (which can scroll / focus the right region) and then
+  // re-runs the aiQuery to actually extract the data.
+  return api === 'aiTap' || api === 'aiInput' || api === 'aiScroll' || api === 'aiQuery';
 }
 
 export function canUseScrollRecovery(step) {
@@ -101,16 +120,23 @@ export function safeStringify(v) {
   try { return JSON.stringify(v); } catch { return String(v); }
 }
 
-// Step-execution timeouts / retry knobs (copied from Desktop).
-export const STEP_TIMEOUT_MS = 120 * 1000;
+// Step-execution timeouts / retry knobs.
+// Bumped from 120s → 300s so the slower SAP screens (heavy reports, large
+// drop-downs) and the model's own planning latency don't trip the outer
+// timeout while the step is genuinely making progress.
+export const STEP_TIMEOUT_MS = 600 * 1000;
 // Scroll-extreme steps need extra headroom: aiAct drag (up to
 // SCROLL_DRAG_TIMEOUT_MS) + aiBoolean verify (also up to SCROLL_DRAG_TIMEOUT_MS
 // if the LLM is slow / hangs internally before erroring out). Without this,
-// the outer recovery layer can time out at 120s while the inner work is still
-// finishing — so the runner retries even though the drag actually succeeded.
-export const SCROLL_EXTREME_STEP_TIMEOUT_MS = 240 * 1000;
-export const STEP_MAX_ATTEMPTS = 2;
-export const STEP_RETRY_DELAY_MS = 3000;
+// the outer recovery layer would time out while the inner work is still
+// finishing — so the runner would "retry" a step that actually succeeded.
+export const SCROLL_EXTREME_STEP_TIMEOUT_MS = 900 * 1000;
+// Each step now gets exactly ONE attempt before falling into the recovery
+// cascade. The previous 2-attempt loop ate ~10s + a second full step timeout
+// before recovery kicked in; we now spend that budget on aiAct replan (which
+// has full case context) and scroll recovery instead.
+export const STEP_MAX_ATTEMPTS = 1;
+export const STEP_RETRY_DELAY_MS = 10000;
 export const SCROLL_DRAG_TIMEOUT_MS = 90 * 1000;
 export const SCROLL_RECOVERY_DELAY_MS = 500;
 export const RIGHT_SCROLL_RECOVERY_DELAY_MS = 5000;

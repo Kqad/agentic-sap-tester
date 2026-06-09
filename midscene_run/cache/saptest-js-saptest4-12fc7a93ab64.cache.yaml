@@ -9,6 +9,60 @@ caches:
           flow:
             - aiTap: ''
               locate: Add Apps link in the Apps section
+  - type: plan
+    prompt: |-
+      🔁 Cache Miss 兜底 · 第28步 · 在 company code 字段 输入 8540
+
+      📋 已注入上下文:
+        · 完整流程 (32 步,标记当前卡住步)
+        · 研判思路 (流程 = ground truth,对照屏幕判定偏离了几步)
+        · 常见型态参考 (弹窗 / 元素折叠 / 路径偏离 / 控件改名)
+        · 硬性约束 (准备状态,不替 runner 做第28步)
+        · 多步操作时,每步之间插 Sleep 10s 让屏幕过渡
+        · action 词表 (Tap / Input / Scroll / Hover / KeyboardPress / Drag / Sleep)
+
+      🎯 目标: 让第28步能正常 cache hit,runner 自动重试,你不直接执行
+    yamlWorkflow: |
+      tasks:
+        - name: |-
+            🔁 Cache Miss 兜底 · 第28步 · 在 company code 字段 输入 8540
+
+            📋 已注入上下文:
+              · 完整流程 (32 步,标记当前卡住步)
+              · 研判思路 (流程 = ground truth,对照屏幕判定偏离了几步)
+              · 常见型态参考 (弹窗 / 元素折叠 / 路径偏离 / 控件改名)
+              · 硬性约束 (准备状态,不替 runner 做第28步)
+              · 多步操作时,每步之间插 Sleep 10s 让屏幕过渡
+              · action 词表 (Tap / Input / Scroll / Hover / KeyboardPress / Drag / Sleep)
+
+            🎯 目标: 让第28步能正常 cache hit,runner 自动重试,你不直接执行
+          flow:
+            - aiClearInput: ''
+              locate: Company Code input field in Vendor Selection section
+  - type: plan
+    prompt: |-
+      🏠 Stage 2 · 回主页 + cache 重放 · 第8步 · 在 company code 字段 输入 8540
+
+      📋 已注入上下文:
+        · 完整流程 (32 步,标记当前卡住步 + 🏠 事务码入口)
+        · 唯一操作: 点击屏幕左上角 SAP logo 回主页
+        · 回到主页后立即 <complete>,runner 会自动从第1步用 cache 重放到第7步,再重试第8步
+
+      🎯 目标: 把屏幕重置到主页,后续重放交给 runner
+    yamlWorkflow: |
+      tasks:
+        - name: |-
+            🏠 Stage 2 · 回主页 + cache 重放 · 第8步 · 在 company code 字段 输入 8540
+
+            📋 已注入上下文:
+              · 完整流程 (32 步,标记当前卡住步 + 🏠 事务码入口)
+              · 唯一操作: 点击屏幕左上角 SAP logo 回主页
+              · 回到主页后立即 <complete>,runner 会自动从第1步用 cache 重放到第7步,再重试第8步
+
+            🎯 目标: 把屏幕重置到主页,后续重放交给 runner
+          flow:
+            - aiTap: ''
+              locate: 左上角的 SAP logo
   - type: locate
     prompt: 进入 Menu
     cache:
@@ -208,3 +262,13 @@ caches:
     cache:
       xpaths:
         - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]
+  - type: locate
+    prompt: Company Code input field in Vendor Selection section
+    cache:
+      xpaths:
+        - /html/body/div[2]/div[3]/div[2]/div[3]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]/main[1]/div[2]/iframe[1]|>>|/html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[normalize-space()="Vendor AccountAccount Number of SuppliertoAccount Number of Supplier Company CodeCompany CodetoCompany Code"]
+  - type: locate
+    prompt: 左上角的 SAP logo
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[2]/span[1]

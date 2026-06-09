@@ -151,6 +151,9 @@ const I18N = {
     'results.kind.other': '其他',
     'results.summary': '显示 {shown} / {total} 条',
     'results.col.kind': '类型',
+    'results.col.case': '用例',
+    'results.col.status': '结果',
+    'results.col.duration': '耗时',
     'results.col.name': '文件名',
     'results.col.when': '生成时间',
     'results.col.size': '体积',
@@ -472,6 +475,9 @@ const I18N = {
     'results.kind.other': 'Other',
     'results.summary': 'Showing {shown} of {total}',
     'results.col.kind': 'Type',
+    'results.col.case': 'Case',
+    'results.col.status': 'Result',
+    'results.col.duration': 'Duration',
     'results.col.name': 'Filename',
     'results.col.when': 'Created',
     'results.col.size': 'Size',
@@ -776,6 +782,12 @@ function openCinemaTab(caseId) {
     return null;
   }
   try { win.focus(); } catch {}
+  // If the tab already existed (named target reuses it), the browser will
+  // NOT reload — same hash → no navigation → VIEWS.cinema never re-runs and
+  // the page keeps showing the previous run's frames. Force a fresh remount
+  // so each LIVE click rebinds to the CURRENT active run. On a brand-new
+  // tab this just retriggers the (already in-flight) load — harmless.
+  try { win.location.reload(); } catch {}
   return win;
 }
 
@@ -1314,15 +1326,19 @@ function installGlobalKeyboard() {
       if (e.key === 'Enter' && wb.mounted.selectedCaseId) {
         e.preventDefault();
         wb.mounted.triggerIgnition?.();
-        openJsRunModal(wb.mounted.selectedCaseId, e.shiftKey ? 'read' : 'write',
-          { initialBypass: wb.mounted.bypassSnapshot?.() });
+        openJsRunModal(wb.mounted.selectedCaseId, e.shiftKey ? 'read' : 'write', {
+          initialBypass: wb.mounted.bypassSnapshot?.(),
+          onBypassChange: wb.mounted.bypassSync?.(wb.mounted.selectedCaseId),
+        });
         return;
       }
       if ((e.key === 'r' || e.key === 'R') && e.shiftKey && wb.mounted.selectedCaseId) {
         e.preventDefault();
         wb.mounted.triggerIgnition?.();
-        openJsRunModal(wb.mounted.selectedCaseId, 'read',
-          { initialBypass: wb.mounted.bypassSnapshot?.() });
+        openJsRunModal(wb.mounted.selectedCaseId, 'read', {
+          initialBypass: wb.mounted.bypassSnapshot?.(),
+          onBypassChange: wb.mounted.bypassSync?.(wb.mounted.selectedCaseId),
+        });
         return;
       }
     }
@@ -1616,6 +1632,9 @@ VIEWS.dashboard = async () => {
     h('span', { class: 'region-title' }, t('wb.logs.title')),
     h('span', { class: 'region-sub', dataset: { bind: 'logs-status' } }, t('run.status.idle')),
     h('div', { class: 'region-actions' },
+      h('select', { dataset: { bind: 'logs-case-filter' }, title: LANG === 'zh' ? '按用例过滤（并行跑时分开看）' : 'Filter by case (separates parallel runs)' },
+        h('option', { value: 'all' }, LANG === 'zh' ? '全部用例' : 'All cases'),
+      ),
       h('select', { dataset: { bind: 'logs-filter' } },
         h('option', { value: 'all'  }, t('wb.logs.filter.all')),
         h('option', { value: 'info' }, t('wb.logs.filter.info')),
@@ -1664,6 +1683,7 @@ VIEWS.dashboard = async () => {
     selectedIds:    new Set(),   // multi-select checkboxes (bulk run)
     activeRuns:     [],          // /api/midscene-js/runs/active poll result
     logFilter:      'all',
+    logCaseFilter:  'all',       // 'all' or a specific caseId — narrows log to one case
     logs:           [],          // raw log entries (we filter at render time)
     resultsSearch:  '',
     resultsFilter:  'all',
@@ -2083,7 +2103,39 @@ VIEWS.dashboard = async () => {
     if (/saptest[78]/.test(c.id))  return 'MM';
     return '—';
   }
+  /* Status badge for a case row. Priority:
+     1) If active (live run for this caseId in wbState.activeRuns) → show
+        live "Running X/N · cache K/M (P%)" pill with a pulse animation.
+     2) Otherwise fall back to last-run status (pass / fail / pend).
+     Cache hit math: screenshots[].cached can be true / false / null.
+     We only count entries where cached !== null in the denominator —
+     null means "not a cacheable step" (sleep / aiQuery / etc) so it
+     would deflate the % unfairly. */
+  function caseStatusBadge(caseId) {
+    const active = wbState.activeRuns?.find((a) => a.caseId === caseId);
+    if (active) {
+      const total = active.totalSteps ?? 0;
+      const shots = Array.isArray(active.screenshots) ? active.screenshots : [];
+      const doneCount = shots.length;
+      const cacheable = shots.filter((s) => s.cached === true || s.cached === false);
+      const hits = cacheable.filter((s) => s.cached === true).length;
+      const denom = cacheable.length;
+      const pct = denom > 0 ? Math.round((hits / denom) * 100) : null;
+      const cacheText = denom > 0 ? `  cache ${hits}/${denom}${pct != null ? ' (' + pct + '%)' : ''}` : '';
+      return h('span', {
+        class: 'tag running',
+        title: 'Run in progress · ' + (active.currentStep?.title ?? 'step ' + (active.currentStep?.order ?? '?')),
+      }, '▶ ' + doneCount + '/' + total + cacheText);
+    }
+    const r = lastRunByCase.get(caseId);
+    if (!r) return h('span', { class: 'tag pend' }, t('wb.cases.filter.pend'));
+    if (r.status === 'passed') return h('span', { class: 'tag pass' }, t('wb.cases.filter.pass'));
+    return h('span', { class: 'tag fail' }, t('wb.cases.filter.fail'));
+  }
+  /* Back-compat shim — renderCasesList still uses lastRunCellTag(r). Route
+     it through caseStatusBadge so the running state shows up. */
   function lastRunCellTag(r) {
+    if (r && r.caseId) return caseStatusBadge(r.caseId);
     if (!r) return h('span', { class: 'tag pend' }, t('wb.cases.filter.pend'));
     if (r.status === 'passed') return h('span', { class: 'tag pass' }, t('wb.cases.filter.pass'));
     return h('span', { class: 'tag fail' }, t('wb.cases.filter.fail'));
@@ -2160,10 +2212,12 @@ VIEWS.dashboard = async () => {
         title: LANG === 'zh' ? '打开完整用例详情' : 'Open full case detail',
         onClick: (e) => e.stopPropagation(),
       }, '↗');
+      const isRunning = wbState.activeRuns?.some((a) => a.caseId === c.id);
       const row = h('li', {
         class: 'wb-case-item'
           + (wbState.selectedCaseId === c.id ? ' is-active' : '')
-          + (rangeAnchorIdx === visIdx ? ' is-range-anchor' : ''),
+          + (rangeAnchorIdx === visIdx ? ' is-range-anchor' : '')
+          + (isRunning ? ' is-running' : ''),
         dataset: { caseId: c.id, visIdx: String(visIdx) },
         onClick: () => selectCase(c.id),
         // Double-click anywhere on the row opens the full case detail page
@@ -2186,6 +2240,37 @@ VIEWS.dashboard = async () => {
     // Keep the selected row in view after re-renders (e.g. J/K navigation).
     const active = casesListEl.querySelector('.wb-case-item.is-active');
     if (active) active.scrollIntoView({ block: 'nearest' });
+  }
+
+  /* Surgically refresh the status badge for any case row whose state could
+   * change between renderCasesList() calls — i.e. anything currently running,
+   * or anything that *was* running on the previous tick and just finished.
+   * Avoids a full list re-render on each poll (which would lose checkbox
+   * focus, scroll position, etc). */
+  function updateRunningRowBadges() {
+    if (!casesListEl) return;
+    const runningIds = new Set((wbState.activeRuns || []).map((a) => a.caseId));
+    casesListEl.querySelectorAll('.wb-case-item').forEach((row) => {
+      const cid = row.dataset.caseId;
+      if (!cid) return;
+      const oldTag = row.querySelector(':scope > .tag:last-child');
+      if (!oldTag) return;
+      const wasRunning = oldTag.classList.contains('running');
+      const isRunning = runningIds.has(cid);
+      if (!wasRunning && !isRunning) return; // no state change → skip
+      // Transition in/out of running → swap the whole element so class+style
+      // change cleanly. Still-running → just rewrite text to keep the CSS
+      // pulse animation continuous (replacing the node resets the animation).
+      if (wasRunning !== isRunning) {
+        oldTag.replaceWith(caseStatusBadge(cid));
+        row.classList.toggle('is-running', isRunning);
+      } else if (isRunning) {
+        const newTag = caseStatusBadge(cid);
+        if (oldTag.textContent !== newTag.textContent) oldTag.textContent = newTag.textContent;
+        const newTitle = newTag.getAttribute('title');
+        if (newTitle && oldTag.getAttribute('title') !== newTitle) oldTag.setAttribute('title', newTitle);
+      }
+    });
   }
 
   // Move keyboard selection up/down across the currently-filtered list.
@@ -2285,15 +2370,30 @@ VIEWS.dashboard = async () => {
       onClick: () => openCinemaTab(detail.id),
     }, LANG === 'zh' ? '直播' : 'LIVE') : null;
 
+    // Two-way bypass-cache sync between the workbench step list and the
+    // openJsRunModal modal. When a checkbox is toggled inside the modal,
+    // this callback writes back to wbState.stepBypass AND flips the
+    // matching list-mode checkbox + label class so both views stay in
+    // step at all times.
+    const syncBypassFromModal = (order, checked) => {
+      setBypass(detail.id, order, checked);
+      const row = document.querySelector(`.wb-step[data-step-order="${order}"]`);
+      if (!row) return;
+      const cb = row.querySelector('.wb-step-bypass input[type="checkbox"]');
+      if (cb && cb.checked !== checked) cb.checked = checked;
+      const lbl = row.querySelector('.wb-step-bypass');
+      if (lbl) lbl.classList.toggle('is-on', checked);
+    };
+
     const actionsBar = h('div', { class: 'wb-actions-bar' },
       canRun && h('button', {
         class: 'btn run-raw sm', disabled: !apiSteps.length || isRunningHere,
-        onClick: () => { triggerIgnition(); openJsRunModal(detail.id, 'write', { initialBypass: bypassSnapshot(detail.id, apiSteps) }); },
+        onClick: () => { triggerIgnition(); openJsRunModal(detail.id, 'write', { initialBypass: bypassSnapshot(detail.id, apiSteps), onBypassChange: syncBypassFromModal }); },
         title: LANG === 'zh' ? 'write-only cache — 重新询问模型并录制新 locator' : 'write-only cache — re-ask the model and record fresh locators',
       }, t('wb.detail.runJs')),
       canRun && h('button', {
         class: 'btn run-cached sm', disabled: !apiSteps.length || isRunningHere,
-        onClick: () => { triggerIgnition(); openJsRunModal(detail.id, 'read', { initialBypass: bypassSnapshot(detail.id, apiSteps) }); },
+        onClick: () => { triggerIgnition(); openJsRunModal(detail.id, 'read', { initialBypass: bypassSnapshot(detail.id, apiSteps), onBypassChange: syncBypassFromModal }); },
         title: LANG === 'zh' ? 'read-write cache — 回放已有 locator（更快）' : 'read-write cache — replay existing locators (faster)',
       }, t('wb.detail.runJsCache')),
       // When LIVE is present: center it with spacers on both sides.
@@ -2820,10 +2920,20 @@ VIEWS.dashboard = async () => {
 
 
   // ── Live log ──
+  /* Stable per-case color for the inline caseId chip. Cheap hash → HSL hue,
+   * fixed saturation/lightness so chips read consistently in light theme. */
+  function caseColor(caseId) {
+    if (!caseId) return null;
+    let h = 0;
+    for (let i = 0; i < caseId.length; i++) h = ((h << 5) - h + caseId.charCodeAt(i)) | 0;
+    const hue = Math.abs(h) % 360;
+    return { bg: `hsl(${hue} 80% 92%)`, fg: `hsl(${hue} 60% 30%)`, border: `hsl(${hue} 70% 70%)` };
+  }
   function pushLog(entry) {
     wbState.logs.push(entry);
     if (wbState.logs.length > 500) wbState.logs.shift();
     appendLogEntry(entry);
+    if (entry.caseId) refreshLogCaseFilterOptions();
   }
   function classifyLog(line) {
     if (!line) return 'info';
@@ -2836,17 +2946,38 @@ VIEWS.dashboard = async () => {
   function appendLogEntry(entry, opts = {}) {
     const kind = entry.stream === 'stderr' ? 'err' : classifyLog(entry.line);
     if (wbState.logFilter !== 'all' && wbState.logFilter !== kind) return;
+    if (wbState.logCaseFilter !== 'all' && entry.caseId !== wbState.logCaseFilter) return;
     const empty = logsBody.querySelector('.wb-log-empty');
     if (empty) empty.remove();
     const ts = new Date(entry.ts || Date.now()).toLocaleTimeString(LANG === 'zh' ? 'zh-CN' : 'en-US', { hour12: false });
     const glyph = kind === 'err' ? '✗' : kind === 'warn' ? '⚠' : kind === 'ok' ? '✓' : '·';
-    // `opts.flash` (default true for live appends, false for rerender) gates
-    // the entrance animation — we don't want to flash 200 backlog lines.
     const flashCls = opts.flash === false ? '' : ' is-new';
+    /* Per-case chip — clicking it filters the log to just that case (the
+     * fastest way to focus on one of N parallel runs). Hash-based color
+     * makes consecutive lines from the same case visually group together. */
+    const caseChip = entry.caseId ? (() => {
+      const c = caseColor(entry.caseId);
+      const short = entry.caseId.replace(/^saptest-js-/, '').replace(/^saptest1-/, '');
+      return h('span', {
+        class: 'wb-log-case-chip',
+        style: { background: c.bg, color: c.fg, borderColor: c.border },
+        title: 'Filter log to ' + entry.caseId,
+        onClick: (ev) => {
+          ev.stopPropagation();
+          wbState.logCaseFilter = entry.caseId;
+          const sel = logsRegion.querySelector('[data-bind=logs-case-filter]');
+          if (sel) sel.value = entry.caseId;
+          rerenderLogs();
+        },
+      }, short);
+    })() : null;
     const row = h('div', { class: 'wb-log-entry kind-' + kind + flashCls },
       h('span', { class: 'wb-log-ts' }, ts),
       h('span', { class: 'wb-log-glyph' }, glyph),
-      h('span', { class: 'wb-log-msg' }, entry.line || ''),
+      h('span', { class: 'wb-log-msg' },
+        caseChip,
+        entry.line || '',
+      ),
     );
     logsBody.appendChild(row);
     if (flashCls) setTimeout(() => row.classList.remove('is-new'), 600);
@@ -2861,6 +2992,33 @@ VIEWS.dashboard = async () => {
     }
     for (const e of wbState.logs) appendLogEntry(e, { flash: false });
   }
+  /* Keep the case-filter dropdown's options in sync with whichever caseIds
+   * we've actually seen in the log buffer this session. Cheap (rebuilds only
+   * when the set changes). Preserves the currently-selected value. */
+  let lastLogCaseFilterKey = '';
+  function refreshLogCaseFilterOptions() {
+    const sel = logsRegion.querySelector('[data-bind=logs-case-filter]');
+    if (!sel) return;
+    const seen = new Set();
+    for (const e of wbState.logs) if (e.caseId) seen.add(e.caseId);
+    const sorted = [...seen].sort();
+    const key = sorted.join('|');
+    if (key === lastLogCaseFilterKey) return;
+    lastLogCaseFilterKey = key;
+    const prev = sel.value;
+    sel.innerHTML = '';
+    sel.appendChild(h('option', { value: 'all' }, LANG === 'zh' ? '全部用例' : 'All cases'));
+    for (const cid of sorted) {
+      sel.appendChild(h('option', { value: cid }, cid.replace(/^saptest-js-/, '').replace(/^saptest1-/, '')));
+    }
+    /* Restore the previously-selected case if it's still in the list,
+     * otherwise fall back to "all". */
+    sel.value = seen.has(prev) ? prev : 'all';
+    if (wbState.logCaseFilter !== sel.value) {
+      wbState.logCaseFilter = sel.value;
+      rerenderLogs();
+    }
+  }
   function setLogStatus(s) {
     const sub = logsRegion.querySelector('[data-bind=logs-status]');
     if (!sub) return;
@@ -2868,6 +3026,23 @@ VIEWS.dashboard = async () => {
     if (s.running) {
       sub.innerHTML = '';
       sub.append(h('span', { class: 'tag run' }, t('run.status.running').replace('…', '').trim() || 'RUN'));
+      /* Aggregated cache-hit across every currently-running case — sum of
+       * each run's shots[].cached (true = hit, false = miss; null skipped).
+       * Updates each poll tick so the user sees the number tick up live. */
+      let hits = 0, denom = 0, runs = 0;
+      for (const a of (wbState.activeRuns || [])) {
+        runs++;
+        for (const sh of (a.screenshots || [])) {
+          if (sh.cached === true)  { hits++; denom++; }
+          else if (sh.cached === false) { denom++; }
+        }
+      }
+      if (runs > 0) {
+        const pct = denom > 0 ? Math.round((hits / denom) * 100) : null;
+        const label = (runs > 1 ? (runs + ' running · ') : '')
+          + (denom > 0 ? `cache ${hits}/${denom}${pct != null ? ' (' + pct + '%)' : ''}` : 'cache 0/0');
+        sub.append(' ', h('span', { class: 'wb-log-agg-cache', title: 'Aggregated cache hits across all running cases' }, label));
+      }
     } else {
       sub.textContent = s.exitCode === 0 ? t('run.status.passed') : (s.exitCode != null ? t('run.status.failed', { code: s.exitCode }) : t('run.status.idle'));
     }
@@ -3082,13 +3257,104 @@ VIEWS.dashboard = async () => {
     setTimeout(() => URL.revokeObjectURL(a.href), 1500);
   }
 
-  function wbBulkRun() {
+  async function wbBulkRun() {
     const ids = [...wbState.selectedIds];
     if (!ids.length) return;
-    if (!confirm('批量执行 ' + ids.length + ' 个用例？(每个用例将依次打开 Run 模态框)')) return;
-    // The existing run pipeline is single-run-at-a-time per /api/midscene-js/runs/active.
-    // Open the first; the user can re-select after it finishes.
-    openJsRunModal(ids[0], 'write');
+    if (!confirm(
+      '并行执行 ' + ids.length + ' 个用例？\n' +
+      '\n' +
+      '每个用例会自己起一个 Chromium 窗口同时跑。\n' +
+      '注意：所有用例使用同一个 SAP 账号，可能因为 session 冲突而互相踢出。' +
+      '资源占用也会显著上升（每个浏览器约 500MB 内存）。'
+    )) return;
+
+    /* Floating live-status panel. Pin top-right, lists each case with a
+       pending/running/passed/failed pill that updates as Promises resolve. */
+    const panel = h('div', {
+      style: {
+        position: 'fixed', top: '70px', right: '20px', zIndex: '9999',
+        background: 'var(--surface, white)', border: '1px solid var(--border, #e2e8f0)',
+        borderRadius: '12px', padding: '12px 16px',
+        boxShadow: '0 12px 28px rgba(15,23,42,0.12)', minWidth: '300px', maxWidth: '420px',
+        fontFamily: 'inherit', fontSize: '13px',
+      },
+    });
+    const title = h('div', { style: { fontWeight: '600', marginBottom: '8px' } },
+      'Parallel run · 0/' + ids.length + ' done');
+    const list = h('div', { style: { display: 'flex', flexDirection: 'column', gap: '4px' } });
+    const rowByCaseId = new Map();
+    for (const id of ids) {
+      const pill = h('span', {
+        style: {
+          padding: '1px 8px', borderRadius: '999px', fontSize: '11px',
+          background: '#e2e8f0', color: '#475569', fontFamily: 'inherit',
+        },
+      }, 'pending');
+      const row = h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' } },
+        h('span', { class: 'mono', style: { fontSize: '12px' } }, id),
+        pill,
+      );
+      list.appendChild(row);
+      rowByCaseId.set(id, { pill });
+    }
+    panel.appendChild(title);
+    panel.appendChild(list);
+    document.body.appendChild(panel);
+
+    const setPill = (id, label, bg, color) => {
+      const r = rowByCaseId.get(id);
+      if (!r) return;
+      r.pill.textContent = label;
+      r.pill.style.background = bg;
+      r.pill.style.color = color;
+    };
+    /* Mark all as "starting" then immediately fire POSTs. */
+    for (const id of ids) setPill(id, 'starting', '#fef3c7', '#92400e');
+
+    let doneCount = 0;
+    const updateTitle = () => { title.textContent = 'Parallel run · ' + doneCount + '/' + ids.length + ' done'; };
+
+    /* Fire all in parallel — each /run POST holds the connection open until
+       the run finishes, so the .then/.catch fires per-case as each completes.
+       Default to cache=read (replay existing locators) — bulk run is usually
+       a regression check, not a re-record session. Cache writes go through
+       the per-case "Run raw" button instead. */
+    const promises = ids.map((id) => {
+      setPill(id, 'running', '#dbeafe', '#1e40af');
+      return api.post(
+        '/api/midscene-js/cases/' + encodeURIComponent(id) + '/run?cache=read',
+        { headed: true },
+      ).then((r) => {
+        const passed = r?.run?.status === 'passed';
+        setPill(id, passed ? 'passed' : 'failed',
+          passed ? '#dcfce7' : '#fee2e2',
+          passed ? '#166534' : '#991b1b');
+        return { id, passed, record: r?.run, error: null };
+      }).catch((err) => {
+        setPill(id, 'error', '#fee2e2', '#991b1b');
+        return { id, passed: false, record: null, error: err?.message ?? String(err) };
+      }).finally(() => { doneCount++; updateTitle(); });
+    });
+
+    const results = await Promise.all(promises);
+    const passed = results.filter((r) => r.passed).length;
+
+    /* Add a Close button to the panel + summary toast. */
+    const closeBtn = h('button', {
+      class: 'btn sm',
+      style: { marginTop: '10px', width: '100%' },
+      onClick: () => panel.remove(),
+    }, 'Close');
+    panel.appendChild(closeBtn);
+
+    toast(
+      'Bulk run done: ' + passed + '/' + ids.length + ' passed',
+      passed === ids.length ? 'ok' : (passed === 0 ? 'err' : 'warn'),
+      8000,
+    );
+
+    /* Refresh KPIs / results / runs so the workbench reflects the new state. */
+    try { renderKpis(); renderResults(); } catch { /* render fns may be out of scope */ }
   }
 
   // ── Wire toolbar event handlers ──
@@ -3102,6 +3368,10 @@ VIEWS.dashboard = async () => {
   });
   logsRegion.querySelector('[data-bind=logs-filter]').addEventListener('change', (e) => {
     wbState.logFilter = e.target.value;
+    rerenderLogs();
+  });
+  logsRegion.querySelector('[data-bind=logs-case-filter]').addEventListener('change', (e) => {
+    wbState.logCaseFilter = e.target.value;
     rerenderLogs();
   });
   logsRegion.querySelector('[data-bind=logs-clear]').addEventListener('click', () => {
@@ -3163,7 +3433,22 @@ VIEWS.dashboard = async () => {
       const r = await api.get('/api/midscene-js/runs/active');
       const prev = wbState.activeRuns;
       wbState.activeRuns = r.active || [];
-      renderKpis();
+
+      // Wipe the live log on every fresh batch — i.e. when the active set
+      // transitions from empty (idle) to non-empty. Launching another case
+      // WHILE something is running does NOT clear (would wipe the ongoing
+      // run's logs); for that, the operator can hit the "Clear" button.
+      if (prev.length === 0 && wbState.activeRuns.length > 0 && wbState.logs.length > 0) {
+        wbState.logs = [];
+        rerenderLogs();
+      }
+
+      // NOTE: renderKpis() is deferred until AFTER the screenshot-merge loop
+      // below — otherwise the Cache Hit KPI tile would draw from last poll's
+      // runScreenshotsByRun snapshot and lag a full tick behind.
+      // Live-update the "Running" badge on the cases list — the badge shows
+      // step progress and cache-hit ratio that ticks up as the run advances.
+      updateRunningRowBadges();
 
       // Re-render the detail header/actions when the running set for the
       // currently-selected case flips on/off so the Stop button appears.
@@ -3189,11 +3474,14 @@ VIEWS.dashboard = async () => {
               ts:     ln.ts || Date.now(),
               stream: ln.stream || 'stdout',
               line:   ln.line  || String(ln),
+              caseId: mine.caseId,
+              runId:  mine.runId,
             });
           }
           jsRunLogCursor.set(mine.runId, (mine.logTail || []).length);
         }
-        // Show RUN status in the Live Log header.
+        // Show RUN status in the Live Log header, with aggregated cache-hit
+        // progress across all currently-running cases.
         setLogStatus({ running: true });
 
         // Step pipeline update — only when this run targets the case the
@@ -3261,6 +3549,10 @@ VIEWS.dashboard = async () => {
           }
         }
       }
+      // Now that runScreenshotsByRun is fully refreshed from this poll's
+      // active-runs data, repaint KPIs so the Cache Hit tile reflects the
+      // latest hit/miss counts (instead of lagging a tick).
+      renderKpis();
 
       // A previously-running run just finished — drop its cursor + reset the
       // logs header to idle, refresh /api/results/recent so the bottom table
@@ -3357,6 +3649,18 @@ VIEWS.dashboard = async () => {
       const det = wbState.detailCache.get(id);
       const steps = det?.parsed?.apiGuide?.steps || [];
       return bypassSnapshot(id, steps);
+    },
+    // Factory for openJsRunModal's onBypassChange callback. Mirrors the
+    // syncBypassFromModal closure inside renderDetail so the keyboard
+    // shortcut path (Enter / Shift+R) gets the same two-way sync.
+    bypassSync: (caseId) => (order, checked) => {
+      setBypass(caseId, order, checked);
+      const row = document.querySelector(`.wb-step[data-step-order="${order}"]`);
+      if (!row) return;
+      const cb = row.querySelector('.wb-step-bypass input[type="checkbox"]');
+      if (cb && cb.checked !== checked) cb.checked = checked;
+      const lbl = row.querySelector('.wb-step-bypass');
+      if (lbl) lbl.classList.toggle('is-on', checked);
     },
     triggerIgnition,
   };
@@ -3888,56 +4192,67 @@ VIEWS.cinema = async (route) => {
       }
     }
 
-    // Build the human-readable WHY description. Multi-line, prioritizing
-    // the bits the user actually wants to see: assertion outcomes (A1 == A2),
-    // captured variables (A1 = 12345.00, A2 = 12345.00), then totals.
+    // Pass overlay is split into 3 visual layers (see CSS .cr-headline /
+    // .cr-evidence / .cr-summary):
+    //   (1) headline   — the LAST step's natural-language intent. That's the
+    //                    actual "pass criterion" the user wrote, e.g.
+    //                    "查看excel是否下载成功". Rendered big & bold.
+    //   (2) evidence[] — concrete proof (downloads, assertions, vars). The
+    //                    一针见血 bit: tells the user WHAT was verified.
+    //   (3) summary    — small footer with step totals.
     function cleanErr(s) {
       if (!s) return '';
       const t = String(s).trim();
       if (!t || t.toLowerCase() === 'null' || t === 'undefined') return '';
       return t;
     }
-    const lines = [];
+    function fmtBytes(n) {
+      if (!Number.isFinite(n) || n <= 0) return '—';
+      if (n < 1024) return n + ' B';
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+      if (n < 1024 * 1024 * 1024) return (n / (1024 * 1024)).toFixed(1) + ' MB';
+      return (n / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+    }
+    let headline = '';
+    const evidence = [];
+    let summary = '';
     if (isPass) {
-      // Line 1: assertion conclusion if any. Format like "A1 == A2 (matched)".
+      const last = [...frames].reverse().find(f => f.status === 'passed') || frames[frames.length - 1];
+      const headlineText = last?.instruction || last?.title || '';
+      headline = headlineText ? '✓ ' + headlineText : (LANG === 'zh' ? '✓ 通过' : '✓ Passed');
+      const downloads = runRec?.runSummary?.downloads || [];
+      for (const d of downloads) {
+        const when = d.modifiedAt ? new Date(d.modifiedAt).toLocaleTimeString(LANG === 'zh' ? 'zh-CN' : 'en-US', { hour12: false }) : '';
+        evidence.push((LANG === 'zh' ? '📥 下载  ' : '📥 Download  ')
+          + d.fileName + '  ·  ' + fmtBytes(d.sizeBytes) + (when ? '  ·  ' + when : ''));
+      }
       const assertions = runRec?.runSummary?.assertions || [];
       for (const a of assertions) {
-        const passed = a.passed ?? a.equal;
-        const op = a.operator ?? (passed ? '==' : '!=');
-        const left = a.left || 'left';
-        const right = a.right || 'right';
-        const sym = passed ? '✓' : '✗';
-        lines.push(`${sym} ${left} ${op} ${right}  ${passed ? '(matched)' : '(mismatch)'}`);
+        const ok = a.passed ?? a.equal;
+        const op = a.operator ?? (ok ? '==' : '!=');
+        evidence.push(`${ok ? '✓' : '✗'} ${a.left || 'left'} ${op} ${a.right || 'right'}`);
       }
-      // Line 2: captured variable values, e.g. "A1 = 12,345.00 · A2 = 12,345.00".
-      const varEntries = Object.entries(runRec?.runSummary?.variables || {});
-      if (varEntries.length) {
-        lines.push(varEntries.map(([k, v]) => `${k} = ${String(v).slice(0, 60)}`).join(' · '));
+      for (const [k, v] of Object.entries(runRec?.runSummary?.variables || {})) {
+        evidence.push(`${k} = ${String(v).slice(0, 80)}`);
       }
-      // Line 3: summary line.
-      lines.push(LANG === 'zh'
-        ? `共 ${passedCount} 步全部通过${cachedCount ? `，${cachedCount} 步命中缓存` : ''}。`
-        : `All ${passedCount} steps passed${cachedCount ? `, ${cachedCount} via cache replay` : ''}.`);
+      summary = LANG === 'zh'
+        ? `共 ${passedCount} 步全部通过${cachedCount ? `，${cachedCount} 步命中缓存` : ''}`
+        : `All ${passedCount} steps passed${cachedCount ? `, ${cachedCount} via cache replay` : ''}`;
     } else {
       const failedFrame = frames.find(f => f.status === 'failed');
-      // Line 1: where it broke
-      if (failedFrame) {
-        lines.push(LANG === 'zh'
-          ? `✗ 第 #${failedFrame.order} 步失败：${failedFrame.title}`
-          : `✗ Step #${failedFrame.order} failed: ${failedFrame.title}`);
-      } else {
-        lines.push(LANG === 'zh' ? '✗ 运行未能完成' : '✗ Run did not complete');
-      }
-      // Line 2: error message first line
+      headline = failedFrame
+        ? ((LANG === 'zh' ? `✗ 第 #${failedFrame.order} 步失败：` : `✗ Step #${failedFrame.order} failed: `)
+            + (failedFrame.instruction || failedFrame.title || ''))
+        : (LANG === 'zh' ? '✗ 运行未能完成' : '✗ Run did not complete');
       const errMsg = cleanErr(runRec?.errorMessage);
-      if (errMsg) lines.push(errMsg.split('\n')[0].slice(0, 260));
-      // Line 3: if any partial assertions / variables captured before fail
-      const varEntries = Object.entries(runRec?.runSummary?.variables || {});
-      if (varEntries.length) {
-        lines.push(varEntries.map(([k, v]) => `${k} = ${String(v).slice(0, 60)}`).join(' · '));
+      if (errMsg) evidence.push(errMsg.split('\n')[0].slice(0, 260));
+      for (const [k, v] of Object.entries(runRec?.runSummary?.variables || {})) {
+        evidence.push(`${k} = ${String(v).slice(0, 80)}`);
       }
+      summary = LANG === 'zh'
+        ? `${passedCount} 通过 · ${failedCount} 失败 · 共 ${total}`
+        : `${passedCount} passed · ${failedCount} failed · ${total} total`;
     }
-    const description = lines.join('\n');
 
     const back = h('div', { class: 'cinema-result-back' });
     const card = h('div', { class: 'cinema-result ' + (isPass ? 'is-pass' : 'is-fail') });
@@ -3946,8 +4261,13 @@ VIEWS.cinema = async (route) => {
       h('div', { class: 'cr-title' }, isPass
         ? (LANG === 'zh' ? '运行通过' : 'RUN PASSED')
         : (LANG === 'zh' ? '运行失败' : 'RUN FAILED')),
-      // Real WHY description — multi-line, mono-friendly for error text.
-      h('div', { class: 'cr-desc' }, description),
+      /* WHY block: big headline = pass criterion ("查看excel是否下载成功"),
+       * evidence list = concrete proof, small footer = step totals. */
+      h('div', { class: 'cr-headline' }, headline),
+      evidence.length ? h('div', { class: 'cr-evidence' },
+        ...evidence.map((e) => h('div', { class: 'cr-evidence-row' }, e)),
+      ) : null,
+      summary ? h('div', { class: 'cr-summary' }, summary) : null,
       // Inline screenshot of the final / failing step. Click to open full size
       // in a new tab; the caption shows which step it was.
       shotFrame?.url ? h('div', { class: 'cr-shot' },
@@ -4734,9 +5054,22 @@ VIEWS.results = async () => {
     );
     tbody.innerHTML = '';
     emptyEl.style.display = filtered.length ? 'none' : 'block';
+    // Inline status tag — module-level statusTag() lives inside the
+    // workbench closure and isn't reachable here.
+    const statusCell = (st) => {
+      if (st === 'passed') return h('span', { class: 'tag pass' }, 'PASS');
+      if (st === 'failed') return h('span', { class: 'tag fail' }, 'FAIL');
+      if (st === 'running') return h('span', { class: 'tag run' }, 'RUN');
+      return h('span', { class: 'muted' }, '—');
+    };
     for (const it of filtered) {
+      const run = it.run || {};
+      const caseLabel = run.caseTitle || run.caseId || '—';
       tbody.appendChild(h('tr', {},
         h('td', {}, h('span', { class: kindTagClass(it.kind) }, t('results.kind.' + it.kind))),
+        h('td', { style: { maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, title: run.caseId || '' }, caseLabel),
+        h('td', {}, statusCell(run.status)),
+        h('td', { class: 'mono' }, run.durationMs != null ? fmtMs(run.durationMs) : '—'),
         h('td', { class: 'mono', style: { wordBreak: 'break-all', maxWidth: '520px' } }, it.name),
         h('td', {}, fmtDate(it.modifiedAt)),
         h('td', { class: 'mono' }, fmtBytes(it.bytes)),
@@ -4777,6 +5110,9 @@ VIEWS.results = async () => {
     h('table', { class: 'tbl' },
       h('thead', {}, h('tr', {},
         h('th', {}, t('results.col.kind')),
+        h('th', {}, t('results.col.case')),
+        h('th', {}, t('results.col.status')),
+        h('th', {}, t('results.col.duration')),
         h('th', {}, t('results.col.name')),
         h('th', {}, t('results.col.when')),
         h('th', {}, t('results.col.size')),
@@ -6607,6 +6943,12 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
             title: defaultBypass
               ? 'Drag/scroll step — defaulting to bypass cache (cache is fragile here). Uncheck to use cache anyway.'
               : 'Force re-plan: strip this step\'s cache entry before run, so it re-LLMs even though cache is enabled',
+            // Live-sync back to the workbench's per-step state so toggles
+            // made here immediately reflect in the list-mode step rows
+            // (and any future bypassSnapshot reads from this case).
+            onChange: (e) => {
+              try { opts.onBypassChange?.(s.order, !!e.target.checked); } catch {}
+            },
           })
         : null;
       if (bypassChk) stepBypassChecks.set(s.order, bypassChk);

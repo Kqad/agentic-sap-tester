@@ -133,6 +133,13 @@ async function dragSliderToExtreme(agent, page, direction, log) {
   const cx = Math.round(center[0]);
   const cy = Math.round(center[1]);
 
+  // Diagnostic: log the full locate result. The center sometimes comes
+  // back at a position that doesn't match the reported rect — useful for
+  // catching cases where aiLocate latched onto a wrapper element instead
+  // of the actual draggable thumb.
+  const rect = located?.rect;
+  log(`  …slider located: center=[${cx},${cy}] rect=${JSON.stringify(rect)}`);
+
   const viewport = page.viewportSize() ?? { width: 1920, height: 1080 };
   // Overshoot by MARGIN so the slider clamps at the true extreme.
   const MARGIN = 6;
@@ -145,7 +152,16 @@ async function dragSliderToExtreme(agent, page, direction, log) {
     default: throw new Error(`unknown scroll direction: ${direction}`);
   }
 
-  log(`  …slider drag (${direction}): from [${cx},${cy}] → [${targetX},${targetY}]`);
+  // Sanity check: a drag of < 30px almost certainly means either the
+  // slider is already at the extreme OR the locator mis-identified the
+  // target. Log it visibly so we can tell from the report which case
+  // it is (and so subsequent hash-verify failures are interpretable).
+  const dragDist = Math.abs(targetX - cx) + Math.abs(targetY - cy);
+  if (dragDist < 30) {
+    log(`  …⚠ slider drag (${direction}): tiny distance (${dragDist}px) — slider may already be at extreme, or locate returned wrong element. from=[${cx},${cy}] target=[${targetX},${targetY}] viewport=${viewport.width}x${viewport.height}`);
+  } else {
+    log(`  …slider drag (${direction}): from [${cx},${cy}] → [${targetX},${targetY}]`);
+  }
   const t0 = Date.now();
   await page.mouse.move(cx, cy);
   await page.mouse.down();
@@ -270,10 +286,21 @@ async function dispatchStep(agent, step, ctx) {
   // aiQuery: call agent directly so we can capture the result, then store it
   // under the variable name parsed from "记录为A2" / "save as X" etc.
   if (api === 'aiQuery') {
-    const result = await agent.aiQuery(`string, ${instruction}`, {
+    let result = await agent.aiQuery(`string, ${instruction}`, {
       domIncluded: true,
       screenshotIncluded: true,
     });
+    // Normalize array returns — the model sometimes returns
+    // ["97,57", "97,57"] when the user wanted a single string. The
+    // `string,` type hint is a request to the model, not a guarantee.
+    // We collapse to the first element (with a warn) so downstream
+    // assertions ("如果 A1 == A2") see a scalar, not an array.
+    if (Array.isArray(result)) {
+      const orig = result;
+      const first = result.find(v => v != null && v !== '');
+      result = first != null ? first : '';
+      ctx.log(`  ⚠ aiQuery returned array (${orig.length} item${orig.length === 1 ? '' : 's'}): ${truncate(JSON.stringify(orig), 120)} — collapsed to first non-empty: ${JSON.stringify(result)}`);
+    }
     captureQueryVariable(instruction, result, ctx.variables, ctx.log);
     return result;
   }
@@ -466,10 +493,69 @@ export async function runJavascript(caseObj, opts = {}) {
   const params = (caseObj.params && typeof caseObj.params === 'object' && !Array.isArray(caseObj.params))
     ? caseObj.params : {};
   const cachePath = resolveCachePath(cacheId);
+  // Pre-flight cache index — build Map<prompt, xpaths[]> from the cache
+  // YAML at run start. The recovery layer uses it to ask one question
+  // per step: do any of the recorded xpaths for this step's locator
+  // prompts resolve to an element on the live DOM right now?
+  //   · Yes → cache hit, run normally.
+  //   · No → cache miss → skip Midscene's context-less LLM fallback and
+  //          go straight to our case-context-rich aiAct replan.
+  // Set to null when cache mode is write-only (every step is a miss by
+  // design — let Midscene's LLM populate the cache normally).
+  let cachedXpaths = null;
+  if (cacheMode === 'read') {
+    try {
+      const raw = fs.existsSync(cachePath) ? fs.readFileSync(cachePath, 'utf8') : '';
+      cachedXpaths = new Map();
+      const lines = raw.split(/\r?\n/);
+      for (let i = 0; i < lines.length; i++) {
+        if (!/^\s*-\s*type:\s*locate\s*$/.test(lines[i])) continue;
+        // prompt line within the next few lines
+        let prompt = null;
+        for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+          const m = /^\s*prompt:\s*(.*?)\s*$/.exec(lines[j]);
+          if (m) { prompt = m[1]; break; }
+        }
+        if (!prompt) continue;
+        // collect xpaths under this entry (until next `- type:` or EOF)
+        const xpaths = [];
+        for (let j = i + 1; j < lines.length; j++) {
+          if (/^\s*-\s*type:\s*/.test(lines[j])) break;
+          const xm = /^\s*-\s*(\/[^\s].*?)\s*$/.exec(lines[j]);
+          if (xm) xpaths.push(xm[1]);
+        }
+        // Accumulate — the same prompt can appear multiple times in the
+        // cache YAML (when the step's NL is identical across two
+        // different contexts, e.g. step 10 + step 21 both labeled
+        // "点击跳出栏目的第一个" with different DOM paths). Using set()
+        // alone would overwrite earlier entries, so pre-flight tries
+        // ALL recorded xpaths and treats any match as a hit.
+        const existing = cachedXpaths.get(prompt) || [];
+        cachedXpaths.set(prompt, existing.concat(xpaths));
+      }
+      log(`Pre-flight cache index: ${cachedXpaths.size} locator entries loaded`);
+    } catch (e) {
+      log(`  …pre-flight cache index failed (continuing without it): ${e?.message ?? e}`);
+      cachedXpaths = null;
+    }
+  }
+
   const ctx = {
     log,
     params,
     variables: new Map(),
+    // Full case context — given to aiAct replan fallback so the model can see
+    // the whole flow, not just the stuck step in isolation. Steps stay by
+    // reference; the recovery layer reads .order / .title / .naturalLanguageInstruction.
+    caseTitle: caseObj.title,
+    caseSteps: caseObj.apiGuide.steps,
+    // Map<prompt, xpaths[]> — recovery layer's pre-flight evaluates these
+    // xpaths against the live DOM. If none resolve, declare cache miss.
+    cachedXpaths,
+    // Steps where the user explicitly asked for force-replan (bypass cache).
+    // Pre-flight skips these — they're meant to use Midscene's normal LLM
+    // planning to refresh the cache, not our recovery's case-context replan.
+    bypassStepOrders: new Set((opts.noCacheSteps || []).map(String)),
     summary: {
       assertions: [],
       downloads: [],
@@ -663,6 +749,16 @@ export async function runJavascript(caseObj, opts = {}) {
         strategy: cacheMode === 'read' ? 'read-write' : 'write-only',
       },
     });
+
+    // Forward Midscene's per-action tips ("now I'm about to tap X", "scrolling
+    // to Y") into our live log. Most useful during aiAct replan, where one
+    // aiAct call expands into many sub-actions the user otherwise only sees
+    // post-hoc in the report. Truncate so a chatty planner can't drown the log.
+    agent.onTaskStartTip = (tip) => {
+      const t = String(tip ?? '').trim();
+      if (!t) return;
+      log(`  ▸ ${truncate(t, 200)}`);
+    };
 
     attachActiveRunCleanup(runId, cleanupTasks);
 
