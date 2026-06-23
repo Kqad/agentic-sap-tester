@@ -1,0 +1,7 @@
+midsceneVersion: 1.8.1
+cacheId: saptest-js-saptest9-8c9a01be7aef
+caches:
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths: []

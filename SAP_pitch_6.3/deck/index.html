@@ -106,6 +106,47 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
   box-shadow: 0 4px 16px rgba(0,112,242,0.4);
 }
 .crown .meta { display: inline-flex; gap: 24px; }
+
+/* Back-to-Contents button — injected by JS into every .crown .logo
+ * (except the TOC slide itself). Small mono-typed chip with a "≡"
+ * glyph + label. Click jumps to slide 2 (Contents). Sits at the
+ * start of the logo flex row so it reads as a permanent nav anchor. */
+.crown .back-to-toc {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 11px 5px 9px;
+  background: rgba(0, 168, 255, 0.10);
+  border: 1px solid rgba(0, 168, 255, 0.32);
+  border-radius: 7px;
+  color: var(--accent-2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.crown .back-to-toc:hover {
+  background: rgba(0, 168, 255, 0.22);
+  border-color: var(--accent-2);
+  transform: translateX(-2px);
+  box-shadow: 0 4px 14px rgba(0,168,255,0.30);
+}
+.crown .back-to-toc:active { transform: translateX(0); }
+.crown .back-to-toc:focus-visible {
+  outline: none;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 2px rgba(0,168,255,0.35);
+}
+.crown .back-to-toc .glyph {
+  font-size: 12px;
+  line-height: 1;
+  transform: translateY(-0.5px);
+}
 .crown .meta span.lit::before {
   content: ""; display: inline-block; width: 6px; height: 6px;
   background: var(--ok); border-radius: 50%;
@@ -604,6 +645,48 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
   max-height: 100%;
 }
 
+/* ── KPI command-center legend — per-metric derivation key under the sub
+ * paragraph. Two columns to keep height manageable; small caps-ish label
+ * via <b> + accent dot at the start of each item. */
+.s-imgfirst .kpi-legend {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 28px;
+  row-gap: 5px;
+  max-width: 1780px;
+}
+.s-imgfirst .kpi-legend li {
+  font-size: 14.5px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+  padding-left: 14px;
+  position: relative;
+}
+.s-imgfirst .kpi-legend li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 8px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.7;
+}
+.s-imgfirst .kpi-legend li b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Light-background variant for KPI strip slide — strip image has a white
+ * background, so the .shot frame matches it. The image stays in `contain`
+ * mode so no cell is ever clipped; any letterbox space above/below blends
+ * invisibly with the white frame. */
+.s-imgfirst .shot.shot-light {
+  background: #ffffff;
+}
+
 /* ============================================================================
    SHARED · "Split" slide layout — text column + shot column (sidebar)
    ============================================================================ */
@@ -843,6 +926,757 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 }
 
 /* ============================================================================
+   SLIDE · TABLE OF CONTENTS (interactive — click any row to jump there)
+   Populated at runtime from SLIDE_META so it always stays in sync with
+   the deck's actual structure (no manual list to maintain).
+   ============================================================================ */
+.s-toc {
+  display: grid;
+  grid-template-rows: 110px auto 1fr 70px;
+  padding: 0 70px;
+}
+.s-toc .head { grid-row: 2; padding-top: 28px; max-width: 1500px; z-index: 4; }
+.s-toc .h-section { font-size: 76px; margin-bottom: 14px; line-height: 1; letter-spacing: -0.025em; }
+.s-toc .h-section em { color: var(--accent-2); }
+.s-toc .sub {
+  font-size: 17px; line-height: 1.5;
+  color: var(--ink-dim); max-width: 1300px; margin: 0;
+}
+.s-toc .sub b { color: var(--ink); font-weight: 600; }
+
+/* 3-column grid. JS partitions SLIDE_META into 3 ordered chunks and
+ * appends each chunk into one column. Top-to-bottom flow within each
+ * column matches the user's mental model of "left column = early
+ * slides, right column = late slides". */
+.s-toc .toc-grid {
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 56px;
+  padding: 24px 0 24px;
+  align-items: start;
+}
+.s-toc .toc-col {
+  display: flex; flex-direction: column;
+  gap: 2px;
+  position: relative;
+  padding-left: 18px;
+}
+.s-toc .toc-col::before {
+  /* a thin vertical accent that runs the full column height — light
+   * decorative cue that the column is one ordered list */
+  content: ""; position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 1.5px;
+  background: linear-gradient(180deg,
+    rgba(0,168,255,0.08) 0%,
+    rgba(0,168,255,0.32) 50%,
+    rgba(0,168,255,0.08) 100%);
+  border-radius: 1px;
+}
+
+/* Each TOC row — clickable, ~56px tall. Number badge on left, title in
+ * middle, soft chevron on right that appears on hover. */
+.s-toc .toc-item {
+  display: grid;
+  grid-template-columns: 56px 1fr 24px;
+  column-gap: 18px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: transparent;
+  text-align: left;
+  font-family: 'Geist', sans-serif;
+  color: var(--ink);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.22s cubic-bezier(.2,1,.3,1),
+    box-shadow 0.2s ease;
+}
+.s-toc .toc-item:hover {
+  background: rgba(0, 168, 255, 0.08);
+  border-color: rgba(0, 168, 255, 0.28);
+  transform: translateX(4px);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.32);
+}
+.s-toc .toc-item:focus-visible {
+  outline: none;
+  background: rgba(0, 168, 255, 0.12);
+  border-color: var(--accent-2);
+}
+.s-toc .toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ink-dim);
+  text-align: right;
+  padding-right: 12px;
+  border-right: 1px solid var(--line-2);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.s-toc .toc-item:hover .toc-num {
+  color: var(--accent-2);
+  border-right-color: rgba(0, 168, 255, 0.5);
+}
+.s-toc .toc-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.s-toc .toc-item.is-section-head .toc-title {
+  /* signature slides — Cover, Recovery, Closing — get an em-accent */
+  color: var(--accent-2);
+}
+.s-toc .toc-chevron {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--ink-faint);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+.s-toc .toc-item:hover .toc-chevron {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--accent-2);
+}
+/* The TOC's own entry — show with a subtle marker so the viewer sees
+ * "I am here." */
+.s-toc .toc-item.is-current {
+  background: rgba(0, 168, 255, 0.10);
+  border-color: rgba(0, 168, 255, 0.32);
+}
+.s-toc .toc-item.is-current .toc-num,
+.s-toc .toc-item.is-current .toc-title {
+  color: var(--accent-2);
+}
+
+/* Section header — sits above each chapter's group of toc-items. Slim,
+ * mono-typed eyebrow with a thin accent rule underneath. The first
+ * section in a column has no top spacing; later sections in the same
+ * column get breathing room. */
+.s-toc .toc-section-head {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 18px 14px 8px;
+  margin-top: 12px;
+  border-bottom: 1px solid var(--line-2);
+}
+.s-toc .toc-col > .toc-section-head:first-child { margin-top: 0; }
+.s-toc .toc-col > .toc-item:first-child + .toc-section-head,
+.s-toc .toc-col > .toc-item + .toc-section-head { margin-top: 20px; }
+.s-toc .toc-section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--accent-2);
+  text-transform: uppercase;
+}
+.s-toc .toc-section-title {
+  font-family: 'Geist', sans-serif;
+  font-size: 16px; font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+/* Starred entries — the ★ already shows in the title text, but tint the
+ * row's number slightly + give the title a small glow on hover so the
+ * audience can scan signature slides at a glance. */
+.s-toc .toc-item.is-starred .toc-num { color: var(--accent-2); }
+.s-toc .toc-item.is-starred .toc-title {
+  color: var(--ink);
+  text-shadow: 0 0 18px rgba(0,168,255,0.18);
+}
+.s-toc .toc-item.is-starred:hover .toc-title {
+  text-shadow: 0 0 22px rgba(0,168,255,0.42);
+}
+
+/* Bottom stat strip — total slides + approximate runtime. */
+.s-toc .toc-stat {
+  position: absolute;
+  left: 70px; right: 70px;
+  bottom: 88px;
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  pointer-events: none;
+  z-index: 2;
+}
+.s-toc .toc-stat b { color: var(--ink-dim); font-weight: 700; }
+
+/* ============================================================================
+   SLIDE · RECOVERY ARCHITECTURE (intro to the two recovery demos)
+   A 5-column horizontal flow: STUCK → Tier1 → Tier2 → Tier3 → PASSED.
+   An animated cursor traces the escalation path; each tier card lights up
+   when the cursor enters its zone. Loops every 14s.
+   ============================================================================ */
+.s-recover-intro {
+  display: grid;
+  grid-template-rows: 110px auto 1fr 70px;
+  padding: 0 70px;
+}
+.s-recover-intro .head { grid-row: 2; padding-top: 28px; max-width: 1720px; z-index: 4; }
+.s-recover-intro .h-section { font-size: 56px; margin-bottom: 14px; }
+.s-recover-intro .h-section em { color: var(--accent-2); }
+.s-recover-intro .sub { font-size: 18px; line-height: 1.5; color: var(--ink-dim); max-width: 1500px; margin: 0; }
+.s-recover-intro .sub b { color: var(--ink); font-weight: 600; }
+
+/* Main flow container — 5 columns aligned to one horizontal axis. */
+.s-recover-intro .flow-stage {
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 1fr 200px;
+  column-gap: 36px;
+  align-items: stretch;
+  padding: 56px 0 28px;
+  position: relative;
+}
+
+/* Endpoint pills — STUCK (red entry) and PASSED (green exit). Square-ish
+ * cards with a single big glyph + label. */
+.s-recover-intro .flow-end {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px;
+  background: rgba(13, 17, 23, 0.88);
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  padding: 26px 20px;
+  position: relative;
+  z-index: 2;
+}
+.s-recover-intro .flow-end.is-start { border-color: rgba(230,67,95,0.42); }
+.s-recover-intro .flow-end.is-end   { border-color: rgba(31,211,136,0.42); }
+.s-recover-intro .flow-end .end-glyph {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px; font-weight: 800;
+  letter-spacing: -0.05em;
+}
+.s-recover-intro .flow-end.is-start .end-glyph {
+  background: rgba(230,67,95,0.16);
+  color: var(--err);
+  border: 1.5px solid rgba(230,67,95,0.55);
+  box-shadow: 0 0 0 6px rgba(230,67,95,0.08);
+}
+.s-recover-intro .flow-end.is-end .end-glyph {
+  background: rgba(31,211,136,0.16);
+  color: var(--ok);
+  border: 1.5px solid rgba(31,211,136,0.55);
+  box-shadow: 0 0 0 6px rgba(31,211,136,0.08);
+}
+.s-recover-intro .flow-end .end-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.s-recover-intro .flow-end .end-title {
+  font-size: 22px; font-weight: 700; color: var(--ink);
+  text-align: center; line-height: 1.2;
+}
+.s-recover-intro .flow-end.is-end .end-title { color: var(--ok); }
+.s-recover-intro .flow-end.is-start .end-title { color: var(--err); }
+.s-recover-intro .flow-end .end-sub {
+  font-size: 13px; color: var(--ink-faint);
+  text-align: center; line-height: 1.35;
+  font-family: 'Geist', sans-serif;
+}
+
+/* Tier card — three sit between STUCK and PASSED. Sequential escalation;
+ * each card has a number badge, title, condition, action, and a tiny
+ * visual hint glyph. Cards are dim by default and brighten when the
+ * flow cursor enters their zone. */
+.s-recover-intro .flow-tier {
+  background: rgba(13, 17, 23, 0.78);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 26px 26px 24px;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 12px;
+  transition: border-color 0.4s ease, background 0.4s ease, transform 0.5s ease, box-shadow 0.4s ease;
+}
+.s-recover-intro .flow-tier::before {
+  /* glow halo when active */
+  content: ""; position: absolute; inset: -2px;
+  border-radius: 18px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(0,168,255,0);
+  transition: box-shadow 0.6s ease;
+}
+.s-recover-intro .flow-tier.is-active {
+  border-color: rgba(0,168,255,0.55);
+  background: rgba(15, 30, 50, 0.86);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+}
+.s-recover-intro .flow-tier.is-active::before {
+  box-shadow: 0 0 0 1px rgba(0,168,255,0.42), 0 0 60px rgba(0,168,255,0.32);
+}
+
+.s-recover-intro .tier-tag {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.s-recover-intro .tier-tag .tier-num {
+  display: inline-grid; place-items: center;
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  background: rgba(0, 168, 255, 0.10);
+  border: 1px solid rgba(0, 168, 255, 0.35);
+  color: var(--accent-2);
+  font-size: 14px;
+}
+.s-recover-intro .flow-tier.is-active .tier-tag { color: var(--accent-2); }
+.s-recover-intro .flow-tier.is-active .tier-tag .tier-num {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: var(--accent-2);
+  color: white;
+}
+
+.s-recover-intro .tier-title {
+  font-size: 26px; font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.18;
+}
+.s-recover-intro .tier-q {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent-2);
+  letter-spacing: 0.04em;
+  border-left: 2px solid rgba(0,168,255,0.45);
+  padding-left: 10px;
+}
+.s-recover-intro .tier-action {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+}
+.s-recover-intro .tier-action b { color: var(--ink); font-weight: 600; }
+
+/* Tier visual hint glyph — small inline SVG-friendly box with the tier's
+ * signature shape (popup-X, rollback arc, home-replay path). */
+.s-recover-intro .tier-viz {
+  margin-top: auto;
+  height: 64px;
+  display: flex; align-items: center; justify-content: center;
+  border-top: 1px dashed var(--line-2);
+  padding-top: 12px;
+  opacity: 0.7;
+  transition: opacity 0.4s ease;
+}
+.s-recover-intro .flow-tier.is-active .tier-viz { opacity: 1; }
+.s-recover-intro .tier-viz svg { width: 100%; height: 100%; }
+
+/* Cost strip at the bottom of each tier — tiny stat row. */
+.s-recover-intro .tier-stat {
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+.s-recover-intro .tier-stat b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Connector — SVG layer behind the cards, drawing horizontal arrows
+ * between each pair of columns. The animated cursor (a dot) rides along
+ * the same horizontal axis from STUCK to PASSED. */
+.s-recover-intro .flow-connectors {
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.s-recover-intro .flow-connectors svg {
+  width: 100%; height: 100%;
+  overflow: visible;
+}
+.s-recover-intro .flow-connectors .conn-line {
+  stroke: rgba(91, 103, 131, 0.55);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 5;
+  fill: none;
+}
+.s-recover-intro .flow-connectors .conn-arrow {
+  fill: rgba(91, 103, 131, 0.65);
+}
+
+/* The traveling cursor — small glowing dot that animates across the
+ * width of the flow. Loops every 14s; pauses briefly at each tier
+ * (via uneven keyframe spacing). */
+.s-recover-intro .flow-cursor {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow:
+    0 0 0 3px rgba(0,168,255,0.18),
+    0 0 22px rgba(0,168,255,0.85),
+    0 0 50px rgba(0,168,255,0.45);
+  z-index: 3;
+  animation: flow-cursor 14s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+.s-recover-intro .flow-cursor::after {
+  /* trailing afterglow */
+  content: ""; position: absolute; inset: -8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,168,255,0.35);
+  animation: cursor-pulse 1.4s ease-out infinite;
+}
+@keyframes cursor-pulse {
+  0%   { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+@keyframes flow-cursor {
+  /* Five horizontal stops along the flow row, with brief pauses at each
+   * tier. Percentages map to approximate column centers within the
+   * 1780-px-wide flow area. */
+  0%    { left: 5.6%;  background: var(--err);  box-shadow: 0 0 0 3px rgba(230,67,95,0.18), 0 0 22px rgba(230,67,95,0.8); }
+  8%    { left: 5.6%;  }
+  18%   { left: 28%;   background: var(--accent-2); box-shadow: 0 0 0 3px rgba(0,168,255,0.18), 0 0 22px rgba(0,168,255,0.85); }
+  30%   { left: 28%;   }
+  40%   { left: 50%;   background: var(--warn);  box-shadow: 0 0 0 3px rgba(245,166,35,0.18), 0 0 22px rgba(245,166,35,0.85); }
+  55%   { left: 50%;   }
+  65%   { left: 72%;   background: var(--accent-2); box-shadow: 0 0 0 3px rgba(0,168,255,0.18), 0 0 22px rgba(0,168,255,0.85); }
+  80%   { left: 72%;   }
+  92%   { left: 94.4%; background: var(--ok);   box-shadow: 0 0 0 3px rgba(31,211,136,0.18), 0 0 22px rgba(31,211,136,0.85); }
+  100%  { left: 94.4%; }
+}
+
+/* Tier auto-pulse — each tier card lights up when the cursor passes
+ * through. Animation timing matches the flow-cursor keyframes. */
+.s-recover-intro .flow-tier[data-tier="1"] { animation: tier-light 14s steps(1, end) infinite; animation-delay: 0s; }
+.s-recover-intro .flow-tier[data-tier="2"] { animation: tier-light 14s steps(1, end) infinite; animation-delay: 0s; }
+.s-recover-intro .flow-tier[data-tier="3"] { animation: tier-light 14s steps(1, end) infinite; animation-delay: 0s; }
+@keyframes tier-light {
+  /* Each tier owns a slice of the 14s loop where it should be highlighted.
+   * Outside its slice, the card sits in its default dimmed state.
+   * (Override the .is-active style during the active window.) */
+  0%, 100% { /* defaults */ }
+}
+/* Real per-tier highlight windows: keyframes per tier */
+.s-recover-intro .flow-tier[data-tier="1"] { animation-name: tier1-light; }
+.s-recover-intro .flow-tier[data-tier="2"] { animation-name: tier2-light; }
+.s-recover-intro .flow-tier[data-tier="3"] { animation-name: tier3-light; }
+@keyframes tier1-light {
+  0%, 7%, 33%, 100% {
+    border-color: var(--line);
+    background: rgba(13, 17, 23, 0.78);
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  9%, 31% {
+    border-color: rgba(0,168,255,0.55);
+    background: rgba(15, 30, 50, 0.86);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,168,255,0.42), 0 0 60px rgba(0,168,255,0.32);
+  }
+}
+@keyframes tier2-light {
+  0%, 31%, 58%, 100% {
+    border-color: var(--line);
+    background: rgba(13, 17, 23, 0.78);
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  33%, 56% {
+    border-color: rgba(245,166,35,0.55);
+    background: rgba(38, 28, 14, 0.86);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(245,166,35,0.42), 0 0 60px rgba(245,166,35,0.30);
+  }
+}
+@keyframes tier3-light {
+  0%, 56%, 83%, 100% {
+    border-color: var(--line);
+    background: rgba(13, 17, 23, 0.78);
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  58%, 81% {
+    border-color: rgba(0,168,255,0.55);
+    background: rgba(15, 30, 50, 0.86);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,168,255,0.42), 0 0 60px rgba(0,168,255,0.32);
+  }
+}
+
+/* Bottom legend row — gives the audience a quick "why three tiers" anchor. */
+.s-recover-intro .flow-legend {
+  position: absolute;
+  left: 70px; right: 70px;
+  bottom: 88px;
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 2;
+}
+.s-recover-intro .flow-legend b { color: var(--ink-dim); font-weight: 700; }
+
+/* ============================================================================
+   SLIDE · RECOVERY (graceful degradation — light + deep)
+   Two slides sit between Speed and Impact. Both extend .s-imgfirst (so they
+   share the crown / head / shot-wrap / rail grid), then add:
+     · a side card with the "engineer disappeared" two-state SVG
+     · a timeline strip overlaid on the bottom of the video, with one or two
+       recovery markers that pulse on cue (synced via JS to video time).
+   ============================================================================ */
+.s-recover .head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  column-gap: 56px;
+}
+.s-recover .head .head-text { min-width: 0; }
+.s-recover .h-section em { color: var(--accent-2); }
+
+/* Tier pill — small mono-typed chip below the eyebrow that names the
+ * recovery tier this slide demonstrates ("Tier 2 · partial rollback",
+ * "Tier 3 · full reset"). Sits inline-flex so the eyebrow stays on top. */
+.s-recover .tier-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 14px; padding: 6px 12px 6px 10px;
+  background: rgba(0, 168, 255, 0.10);
+  border: 1px solid rgba(0, 168, 255, 0.35);
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+  color: var(--accent-2);
+  text-transform: uppercase;
+}
+.s-recover .tier-pill::before {
+  content: ""; display: inline-block;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 10px rgba(0, 168, 255, 0.7);
+  animation: tier-pulse 2.4s ease-in-out infinite;
+}
+@keyframes tier-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+/* ── Engineer-disappeared card ───────────────────────────────────────
+ * Two-state SVG widget tucked into the right of the head row. The state
+ * loop (sit → leave → sit → leave) tells the unattended-operation story
+ * at a glance, without competing with the video. */
+.s-recover .engineer-card {
+  flex: 0 0 auto;
+  width: 320px;
+  background: rgba(13, 17, 23, 0.78);
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  padding: 16px 20px 14px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+.s-recover .engineer-card::before {
+  content: "Operator presence";
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+.s-recover .engineer-svg {
+  display: block;
+  width: 100%;
+  height: 78px;
+}
+.s-recover .engineer-svg .person {
+  animation: person-fade 8s ease-in-out infinite;
+  transform-origin: 50% 70%;
+}
+@keyframes person-fade {
+  /* 0-40% present, 40-50% fading out, 50-90% absent, 90-100% fading in */
+  0%, 40%       { opacity: 1; transform: translateY(0); }
+  50%, 90%      { opacity: 0; transform: translateY(6px); }
+  100%          { opacity: 1; transform: translateY(0); }
+}
+.s-recover .engineer-svg .desk-glow {
+  /* monitor glow pulses while present, dims when person leaves
+   * (run is still going — glow stays just dimmer) */
+  animation: monitor-pulse 8s ease-in-out infinite;
+}
+@keyframes monitor-pulse {
+  0%, 40%, 100% { opacity: 0.85; }
+  45%, 90%      { opacity: 0.55; }
+}
+.s-recover .engineer-caption {
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  position: relative;
+  height: 16px;
+}
+.s-recover .engineer-caption span {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; gap: 8px;
+  opacity: 0;
+  animation: caption-cycle 8s ease-in-out infinite;
+}
+.s-recover .engineer-caption span:last-child { animation-delay: 4s; }
+@keyframes caption-cycle {
+  0%, 5%          { opacity: 0; }
+  10%, 40%        { opacity: 1; }
+  45%, 100%       { opacity: 0; }
+}
+.s-recover .engineer-caption span .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ok);
+}
+.s-recover .engineer-caption span:last-child .dot {
+  background: var(--accent-2);
+}
+
+/* ── Timeline overlay on the video ─────────────────────────────────────
+ * Sits on the bottom 56px of .shot.live. Track + filled portion + one
+ * or two recovery markers. Filled portion is animated via JS by reading
+ * `video.currentTime / video.duration` (see deck JS at bottom of file).
+ * Markers are positioned absolutely as a percentage of total duration. */
+.s-recover .shot.live { overflow: hidden; }
+.s-recover .recovery-timeline {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 14px 24px 18px;
+  background: linear-gradient(to top,
+    rgba(5,6,8,0.92) 0%,
+    rgba(5,6,8,0.78) 60%,
+    rgba(5,6,8,0) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+.s-recover .rt-track {
+  position: relative;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.45);
+  overflow: visible;
+}
+.s-recover .rt-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, var(--accent) 0%, var(--accent-2) 100%);
+  border-radius: 3px;
+  transition: width 0.12s linear;
+  box-shadow: 0 0 8px rgba(0,168,255,0.55);
+}
+.s-recover .rt-marks {
+  position: absolute;
+  left: 0; right: 0; top: -2px; bottom: -2px;
+}
+.s-recover .rt-mark {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+}
+.s-recover .rt-mark .rt-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--ink-faint);
+  border: 2px solid #0a0e16;
+  margin: 0 auto;
+  position: relative;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.s-recover .rt-mark[data-kind="start"] .rt-dot { background: var(--ink); }
+.s-recover .rt-mark[data-kind="end"]   .rt-dot { background: var(--ok); }
+.s-recover .rt-mark[data-kind="recover"] .rt-dot {
+  background: var(--warn);
+  box-shadow: 0 0 0 0 rgba(245,166,35,0.65);
+}
+.s-recover .rt-mark[data-kind="recover"].is-hit .rt-dot {
+  animation: recover-pulse 1.6s ease-out;
+}
+@keyframes recover-pulse {
+  0%   { box-shadow: 0 0 0 0    rgba(245,166,35,0.85); transform: scale(1); }
+  60%  { box-shadow: 0 0 0 22px rgba(245,166,35,0.0);  transform: scale(1.4); }
+  100% { box-shadow: 0 0 0 0    rgba(245,166,35,0);    transform: scale(1); }
+}
+.s-recover .rt-mark .rt-label {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warn);
+  padding: 4px 10px;
+  background: rgba(245,166,35,0.10);
+  border: 1px solid rgba(245,166,35,0.45);
+  border-radius: 6px;
+  opacity: 0;
+  transform-origin: 50% 100%;
+}
+.s-recover .rt-mark .rt-label::after {
+  /* tiny arrow pointing at the dot */
+  content: ""; position: absolute;
+  bottom: -4px; left: 50%; transform: translateX(-50%) rotate(45deg);
+  width: 6px; height: 6px;
+  background: rgba(245,166,35,0.18);
+  border-right: 1px solid rgba(245,166,35,0.45);
+  border-bottom: 1px solid rgba(245,166,35,0.45);
+}
+.s-recover .rt-mark.is-hit .rt-label {
+  animation: label-pop 3s ease-out forwards;
+}
+@keyframes label-pop {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.9); }
+  20%  { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1.05); }
+  35%  { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
+  85%  { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-2px) scale(0.95); }
+}
+.s-recover .rt-tick-row {
+  display: flex; justify-content: space-between;
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+.s-recover .rt-tick-row b { color: var(--ink); font-weight: 700; }
+
+/* ============================================================================
    SLIDE · VISION (future direction — agent authoring)
    ============================================================================ */
 .s-vision .body { position: absolute; left: 80px; top: 140px; right: 80px; z-index: 3; }
@@ -1039,7 +1873,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
   transform: translateY(-50%);
   z-index: 900;
   display: flex; flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   padding: 8px 8px;
   background: rgba(13, 17, 23, 0.72);
   border: 1px solid var(--line);
@@ -1047,8 +1881,9 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 24px 60px rgba(0,0,0,0.55);
-  /* 20 items × (44 thumb + 3 gap) + 16 padding ≈ 956 px → fits inside a
-   * 1080-px viewport with margin to spare. */
+  /* 26 items × (36 thumb + 2 gap) + 16 padding ≈ 1004 px → still fits
+   * inside a 1080-px viewport. Reduce thumb height / gap further if the
+   * deck ever exceeds 28 slides. */
   max-height: calc(100vh - 24px);
   opacity: 0.45;
   transition: opacity 0.25s ease;
@@ -1065,7 +1900,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 .rail-thumb {
   position: relative;
   display: block;
-  width: 78px; height: 44px;
+  width: 68px; height: 36px;
   border-radius: 5px;
   overflow: hidden;
   cursor: pointer;
@@ -1107,7 +1942,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
   color: white;
 }
 .rail-thumb:hover {
-  transform: scale(2.1);                       /* smaller, less screen-eating */
+  transform: scale(1.55);                      /* smaller, less screen-eating */
   border-color: var(--accent-2);
   box-shadow:
     0 0 0 1px var(--accent-2),
@@ -1120,21 +1955,21 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
  * Now uses .rail-item adjacency since each thumb lives inside an item wrapper. */
 .rail-item:hover + .rail-item .rail-thumb,
 .rail-item:has(+ .rail-item:hover) .rail-thumb {
-  transform: scale(1.35);
+  transform: scale(1.18);
   z-index: 5;
 }
 
 /* Tooltip card appearing to the LEFT of the hovered thumbnail.
  *
  * Right offset is set so the tooltip clears the *magnified* thumb width.
- * Magnified thumb = 78 * 2.1 = ~164 px wide, growing ~86 px to the left
- * (transform-origin: right center). 100 px offset = thumb growth (86) +
- * 14 px breathing room. Otherwise the tooltip would slide under the
+ * Magnified thumb = 68 * 1.55 ≈ 105 px wide, growing ~37 px to the left
+ * (transform-origin: right center). 60 px offset = thumb growth (37) +
+ * ~23 px breathing room. Otherwise the tooltip would slide under the
  * magnified thumb. */
 .rail-tooltip {
   position: absolute;
   top: 50%;
-  right: calc(100% + 100px);
+  right: calc(100% + 60px);
   transform: translateY(-50%) translateX(12px);
   width: 380px;
   padding: 18px 20px 20px;
@@ -1315,11 +2150,41 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
       </footer>
     </section>
 
-    <!-- ============================== SLIDE 02 · PROBLEM ============================== -->
+    <!-- ============================== SLIDE 02 · CONTENTS (interactive TOC) ============================== -->
+    <section class="slide s-toc">
+      <header class="crown">
+        <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
+        <div class="meta"><span>Pitch · §00 / contents</span></div>
+      </header>
+
+      <div class="head reveal-1">
+        <div class="eyebrow">Navigate · click any row to jump</div>
+        <h2 class="h-section"><em>Contents</em>.</h2>
+        <p class="sub">A short tour of the platform — from the cost we're replacing, through the live demos, into the recovery story that makes unattended runs real, and out to the numbers and the roadmap. <b>Click any row in this list to jump straight to that slide.</b></p>
+      </div>
+
+      <div class="toc-grid reveal-2" id="toc-grid">
+        <div class="toc-col" data-col="0"></div>
+        <div class="toc-col" data-col="1"></div>
+        <div class="toc-col" data-col="2"></div>
+      </div>
+
+      <div class="toc-stat" aria-hidden="true">
+        <span><b>26 slides</b> · structured in five movements</span>
+        <span>Press <b>→</b> for the linear path · click here for any jump</span>
+      </div>
+
+      <footer class="rail">
+        <span>Index · interactive table of contents</span>
+        <span class="page">02 / 26</span>
+      </footer>
+    </section>
+
+    <!-- ============================== SLIDE 03 · PROBLEM ============================== -->
     <section class="slide s-problem">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §01 / status quo</span></div>
+        <div class="meta"><span>Pitch · §02 / status quo</span></div>
       </header>
 
       <div class="body">
@@ -1361,7 +2226,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>Why a new platform is needed</span>
-        <span class="page">02 / 20</span>
+        <span class="page">03 / 26</span>
       </footer>
     </section>
 
@@ -1369,7 +2234,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-cost">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §02 / cost today</span></div>
+        <div class="meta"><span>Pitch · §03 / cost today</span></div>
       </header>
 
       <div class="body">
@@ -1404,7 +2269,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>The cost we're going to erase</span>
-        <span class="page">03 / 20</span>
+        <span class="page">04 / 26</span>
       </footer>
     </section>
 
@@ -1412,7 +2277,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-thesis">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §03 / thesis</span></div>
+        <div class="meta"><span>Pitch · §04 / thesis</span></div>
       </header>
 
       <div class="quote">
@@ -1427,7 +2292,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>Thesis</span>
-        <span class="page">04 / 20</span>
+        <span class="page">05 / 26</span>
       </footer>
     </section>
 
@@ -1435,7 +2300,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-principles">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §04 / four principles</span></div>
+        <div class="meta"><span>Pitch · §05 / four principles</span></div>
       </header>
 
       <div class="body">
@@ -1476,7 +2341,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>What changes</span>
-        <span class="page">05 / 20</span>
+        <span class="page">06 / 26</span>
       </footer>
     </section>
 
@@ -1484,7 +2349,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-how">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §05 / how it works</span></div>
+        <div class="meta"><span>Pitch · §06 / how it works</span></div>
       </header>
 
       <div class="body">
@@ -1525,7 +2390,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>From journey to permanent asset</span>
-        <span class="page">06 / 20</span>
+        <span class="page">07 / 26</span>
       </footer>
     </section>
 
@@ -1533,13 +2398,47 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §06 / live demo</span></div>
+        <div class="meta"><span>Pitch · §07 / live demo</span></div>
       </header>
 
       <div class="head reveal-1">
         <div class="eyebrow">Live demo · Test Case 1</div>
         <h2 class="h-section">Asset balance verification — <em>watch it run.</em></h2>
         <p class="sub">27 steps · login → menu → asset history sheet → balance read-out · <b>fully unattended</b>.</p>
+      </div>
+
+      <div class="shot-wrap reveal-2">
+        <div class="shot live">
+          <div class="video-speed" data-speed-group data-default-rate="0.75" role="group" aria-label="Playback speed">
+            <span class="vs-label">Speed</span>
+            <button class="vs-btn"           data-rate="0.5"  type="button">0.5×</button>
+            <button class="vs-btn is-active" data-rate="0.75" type="button">0.75×</button>
+            <button class="vs-btn"           data-rate="1"    type="button">1×</button>
+            <button class="vs-btn"           data-rate="1.25" type="button">1.25×</button>
+            <button class="vs-btn"           data-rate="1.5"  type="button">1.5×</button>
+          </div>
+          <video src="assets/run-live.mp4" controls muted loop playsinline preload="metadata"
+                 controlsList="nodownload" data-autoplay-on-active data-default-rate="0.75"></video>
+        </div>
+      </div>
+
+      <footer class="rail">
+        <span>Real run · zero scripting</span>
+        <span class="page">08 / 26</span>
+      </footer>
+    </section>
+
+    <!-- ============================== SLIDE 08 · PARALLEL EXECUTION ============================== -->
+    <section class="slide s-imgfirst">
+      <header class="crown">
+        <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
+        <div class="meta"><span>Pitch · §08 / parallel execution</span></div>
+      </header>
+
+      <div class="head reveal-1">
+        <div class="eyebrow">Parallel execution · <span class="num">★</span> throughput multiplier</div>
+        <h2 class="h-section">Three cases. <em>One operator.</em><br>Run together — finish together.</h2>
+        <p class="sub">Each case launches in its own isolated browser. <b>One person fires the whole batch and reads the verdict.</b> A queue of sequential checks collapses into a single concurrent sweep — wall-clock time of the slowest case, not the sum of all of them. The team's daily smoke test runs once, finishes once.</p>
       </div>
 
       <div class="shot-wrap reveal-2">
@@ -1552,22 +2451,55 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
             <button class="vs-btn"           data-rate="1.25" type="button">1.25×</button>
             <button class="vs-btn"           data-rate="1.5"  type="button">1.5×</button>
           </div>
-          <video src="assets/run-live.mp4" controls muted loop playsinline preload="metadata"
+          <video src="assets/run-parallel.mp4" controls muted loop playsinline preload="metadata"
                  controlsList="nodownload" data-autoplay-on-active></video>
         </div>
       </div>
 
       <footer class="rail">
-        <span>Real run · zero scripting</span>
-        <span class="page">07 / 20</span>
+        <span>N cases · 1 operator · same wall-clock</span>
+        <span class="page">09 / 26</span>
       </footer>
     </section>
 
-    <!-- ============================== SLIDE 08 · LIVE BROADCAST ============================== -->
+    <!-- ============================== SLIDE 09 · COMMAND CENTER / KPI DASHBOARD ============================== -->
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §07 / live broadcast</span></div>
+        <div class="meta"><span>Pitch · §09 / command center</span></div>
+      </header>
+
+      <div class="head reveal-1">
+        <div class="eyebrow">Command center · live during every run</div>
+        <h2 class="h-section">The whole fleet, on <em>one panel</em>. Every number derivable.</h2>
+        <ul class="kpi-legend">
+          <li><b>Total · Passed · Failed · Running · Pending</b> — raw counts across the case library. Updated the moment a run starts, finishes, or is queued.</li>
+          <li><b>Pass rate</b> — passed ÷ (passed + failed). Excludes never-run cases so seeding new ones doesn't depress the number. Sparkline tracks the rolling window of recent runs.</li>
+          <li><b>Cache hit</b> — observed cached-step responses ÷ observed total steps in the current session. Each cached step replays a recorded xpath instead of re-asking the model.</li>
+          <li><b>7-day activity</b> — runs per local day for the trailing week, with today's bar highlighted.</li>
+          <li><b>Avg duration</b> — mean wall-clock duration across all completed runs.</li>
+          <li><b>Time saved</b> — (cache-enabled passed runs × ~27 steps × 75% typical hit rate × 4 s / hit) + (live-observed hits × 4 s). Click for the line-by-line derivation.</li>
+          <li><b>Fleet health</b> — weighted composite: <i>pass rate</i> (60%) + <i>cache efficiency</i> (25%) + <i>recency of last run</i> (15%). Green ≥ 80, amber 55–79, red below.</li>
+        </ul>
+      </div>
+
+      <div class="shot-wrap reveal-2">
+        <div class="shot shot-light">
+          <img src="assets/kpi-strip-live.png" alt="Workbench KPI strip — live during a 3-case parallel run, with cache-hit dial and fleet health composite">
+        </div>
+      </div>
+
+      <footer class="rail">
+        <span>Every tile · auditable · click-to-explain</span>
+        <span class="page">10 / 26</span>
+      </footer>
+    </section>
+
+    <!-- ============================== SLIDE 10 · LIVE BROADCAST ============================== -->
+    <section class="slide s-imgfirst">
+      <header class="crown">
+        <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
+        <div class="meta"><span>Pitch · §10 / live broadcast</span></div>
       </header>
 
       <div class="head reveal-1">
@@ -1584,7 +2516,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>Observability for non-engineers</span>
-        <span class="page">08 / 20</span>
+        <span class="page">11 / 26</span>
       </footer>
     </section>
 
@@ -1592,7 +2524,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §08 / live step log</span></div>
+        <div class="meta"><span>Pitch · §11 / live step log</span></div>
       </header>
 
       <div class="head reveal-1">
@@ -1609,7 +2541,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>What happened, in words</span>
-        <span class="page">09 / 20</span>
+        <span class="page">12 / 26</span>
       </footer>
     </section>
 
@@ -1617,7 +2549,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §09 / flow view</span></div>
+        <div class="meta"><span>Pitch · §12 / flow view</span></div>
       </header>
 
       <div class="head reveal-1">
@@ -1634,7 +2566,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>Every step is a frame</span>
-        <span class="page">10 / 20</span>
+        <span class="page">13 / 26</span>
       </footer>
     </section>
 
@@ -1642,7 +2574,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §10 / replay</span></div>
+        <div class="meta"><span>Pitch · §13 / replay</span></div>
       </header>
 
       <div class="head reveal-1">
@@ -1668,7 +2600,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>Yesterday's run, on demand</span>
-        <span class="page">11 / 20</span>
+        <span class="page">14 / 26</span>
       </footer>
     </section>
 
@@ -1676,7 +2608,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §11 / report</span></div>
+        <div class="meta"><span>Pitch · §14 / report</span></div>
       </header>
 
       <div class="head reveal-1">
@@ -1693,15 +2625,15 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>Evidence, automatic</span>
-        <span class="page">12 / 20</span>
+        <span class="page">15 / 26</span>
       </footer>
     </section>
 
-    <!-- ============================== SLIDE 13 · CASE LIBRARY ============================== -->
+    <!-- ============================== SLIDE 15 · CASE LIBRARY ============================== -->
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §12 / case library</span></div>
+        <div class="meta"><span>Pitch · §15 / case library</span></div>
       </header>
 
       <div class="head reveal-1">
@@ -1718,7 +2650,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>One library for the whole project</span>
-        <span class="page">13 / 20</span>
+        <span class="page">16 / 26</span>
       </footer>
     </section>
 
@@ -1726,7 +2658,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-imgfirst">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §13 / editing model</span></div>
+        <div class="meta"><span>Pitch · §16 / editing model</span></div>
       </header>
 
       <div class="head reveal-1">
@@ -1743,7 +2675,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>Words and inputs · no code in sight</span>
-        <span class="page">14 / 20</span>
+        <span class="page">17 / 26</span>
       </footer>
     </section>
 
@@ -1751,7 +2683,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-swap">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §14 / signature value</span></div>
+        <div class="meta"><span>Pitch · §17 / signature value</span></div>
       </header>
 
       <div class="head">
@@ -1807,7 +2739,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>The library multiplies itself</span>
-        <span class="page">15 / 20</span>
+        <span class="page">18 / 26</span>
       </footer>
     </section>
 
@@ -1815,7 +2747,7 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
     <section class="slide s-speed">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §15 / two run modes vs manual</span></div>
+        <div class="meta"><span>Pitch · §18 / two run modes vs manual</span></div>
       </header>
 
       <div class="body">
@@ -1852,15 +2784,329 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>One platform · three operating speeds</span>
-        <span class="page">16 / 20</span>
+        <span class="page">19 / 26</span>
       </footer>
     </section>
 
-    <!-- ============================== SLIDE 17 · QUANTIFIED IMPACT ============================== -->
+    <!-- ============================== SLIDE 19 · AI RECOVERY · ARCHITECTURE (3-tier graceful degradation) ============================== -->
+    <section class="slide s-recover-intro">
+      <header class="crown">
+        <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
+        <div class="meta"><span>Pitch · §19 / recovery · architecture</span></div>
+      </header>
+
+      <div class="head reveal-1">
+        <div class="eyebrow">Recovery architecture · graceful degradation</div>
+        <h2 class="h-section">Stuck? The platform <em>escalates</em> — never panics.</h2>
+        <p class="sub">Every recovery starts with the <b>smallest effective action</b>. If that's not enough, the platform reaches one level deeper, and only then one level deeper again. Cache makes each escalation cheap — replayed steps cost milliseconds, not LLM calls. <b>Three tiers, in order, then the run continues.</b></p>
+      </div>
+
+      <div class="flow-stage reveal-2">
+        <!-- SVG layer behind the cards drawing the dashed connectors + arrowheads.
+             Cards sit on top; the cursor sits on top of everything. -->
+        <div class="flow-connectors" aria-hidden="true">
+          <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+            <!-- One long dashed horizontal line at the vertical centre of the row -->
+            <line class="conn-line" x1="0" y1="5" x2="100" y2="5"/>
+          </svg>
+        </div>
+
+        <!-- STUCK endpoint -->
+        <div class="flow-end is-start">
+          <div class="end-glyph">!</div>
+          <div class="end-label">Entry</div>
+          <div class="end-title">STUCK</div>
+          <div class="end-sub">The runner is blocked.<br>Locator gone, popup in the way, screen drifted.</div>
+        </div>
+
+        <!-- TIER 1 — popup-only / minimal action -->
+        <div class="flow-tier" data-tier="1">
+          <div class="tier-tag"><span class="tier-num">1</span>Light · minimal action</div>
+          <div class="tier-title">Close the popup.<br>Try the cache.</div>
+          <div class="tier-q">▶ Is something blocking the locator?</div>
+          <div class="tier-action">Dismiss any modal / dialog, wait a beat, then <b>let the runner retry the same step from cache</b>. If it hits, done.</div>
+          <div class="tier-viz" aria-hidden="true">
+            <svg viewBox="0 0 240 50" fill="none">
+              <!-- popup with X being closed -->
+              <rect x="60" y="6" width="120" height="38" rx="4" stroke="#5b6783" stroke-width="1.5"/>
+              <line x1="60" y1="16" x2="180" y2="16" stroke="#5b6783" stroke-width="1.2"/>
+              <line x1="158" y1="9" x2="174" y2="9" stroke="#5b6783" stroke-width="1"/>
+              <line x1="166" y1="22" x2="174" y2="30" stroke="#e6435f" stroke-width="2.4" stroke-linecap="round"/>
+              <line x1="174" y1="22" x2="166" y2="30" stroke="#e6435f" stroke-width="2.4" stroke-linecap="round"/>
+              <text x="90" y="36" font-family="JetBrains Mono" font-size="9" fill="#8b97ad" letter-spacing="0.06em">DIALOG</text>
+              <!-- arrow back to flow -->
+              <path d="M 50 25 L 10 25" stroke="#1fd388" stroke-width="1.6" stroke-dasharray="3 3"/>
+              <polygon points="10,25 16,22 16,28" fill="#1fd388"/>
+              <text x="186" y="36" font-family="JetBrains Mono" font-size="9" fill="#1fd388" letter-spacing="0.08em">RETRY</text>
+            </svg>
+          </div>
+          <div class="tier-stat"><span>cost <b>~10 s</b></span><span>covers <b>blockers</b></span></div>
+        </div>
+
+        <!-- TIER 2 — partial rollback -->
+        <div class="flow-tier" data-tier="2">
+          <div class="tier-tag"><span class="tier-num">2</span>Middle · partial rollback</div>
+          <div class="tier-title">Auto-judge depth.<br>Cache replays back.</div>
+          <div class="tier-q">▶ Can a small rollback unstick it?</div>
+          <div class="tier-action">Platform <b>auto-judges the rollback depth</b> (typically 1–3 prior steps); cache replays them in seconds. Then retry the stuck step. If it hits, done.</div>
+          <div class="tier-viz" aria-hidden="true">
+            <svg viewBox="0 0 240 50" fill="none">
+              <!-- step dots with rollback arc -->
+              <circle cx="40"  cy="32" r="4" fill="#5b6783"/>
+              <circle cx="90"  cy="32" r="4" fill="#f5a623"/>
+              <circle cx="140" cy="32" r="4" fill="#f5a623"/>
+              <circle cx="190" cy="32" r="6" fill="rgba(245,166,35,0.30)" stroke="#f5a623" stroke-width="1.5"/>
+              <line x1="44"  y1="32" x2="86"  y2="32" stroke="#5b6783" stroke-width="1.2"/>
+              <line x1="94"  y1="32" x2="136" y2="32" stroke="#5b6783" stroke-width="1.2"/>
+              <line x1="144" y1="32" x2="184" y2="32" stroke="#5b6783" stroke-width="1.2"/>
+              <!-- rollback arc -->
+              <path d="M 190 26 Q 140 6 90 26" stroke="#f5a623" stroke-width="1.8" stroke-dasharray="4 3" fill="none"/>
+              <polygon points="90,26 96,22 96,30" fill="#f5a623"/>
+              <text x="118" y="14" font-family="JetBrains Mono" font-size="9" fill="#f5a623" letter-spacing="0.08em">ROLL BACK</text>
+              <text x="172" y="48" font-family="JetBrains Mono" font-size="8" fill="#8b97ad" letter-spacing="0.06em">STUCK</text>
+            </svg>
+          </div>
+          <div class="tier-stat"><span>cost <b>~15 s</b></span><span>covers <b>state drift</b></span></div>
+        </div>
+
+        <!-- TIER 3 — full reset -->
+        <div class="flow-tier" data-tier="3">
+          <div class="tier-tag"><span class="tier-num">3</span>Heavy · full reset</div>
+          <div class="tier-title">Click SAP logo.<br>Replay from step 1.</div>
+          <div class="tier-q">▶ Nothing small works. Reset to home.</div>
+          <div class="tier-action">Agent clicks the <b>SAP logo</b> to land on home, then the runner <b>replays every prior step from cache</b> and retries the stuck step.</div>
+          <div class="tier-viz" aria-hidden="true">
+            <svg viewBox="0 0 240 50" fill="none">
+              <!-- home icon -->
+              <path d="M 20 30 L 32 18 L 44 30 L 44 42 L 36 42 L 36 34 L 28 34 L 28 42 L 20 42 Z" stroke="#0070f2" stroke-width="1.6" fill="rgba(0,112,242,0.18)"/>
+              <text x="14" y="14" font-family="JetBrains Mono" font-size="8" fill="#00a8ff" letter-spacing="0.08em">HOME</text>
+              <!-- arrow from home into a chain of cache hits -->
+              <line x1="54" y1="30" x2="76" y2="30" stroke="#0070f2" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <polygon points="76,30 70,27 70,33" fill="#0070f2"/>
+              <!-- cache chain -->
+              <circle cx="90"  cy="30" r="4" fill="rgba(0,168,255,0.5)" stroke="#00a8ff" stroke-width="1.2"/>
+              <circle cx="115" cy="30" r="4" fill="rgba(0,168,255,0.5)" stroke="#00a8ff" stroke-width="1.2"/>
+              <circle cx="140" cy="30" r="4" fill="rgba(0,168,255,0.5)" stroke="#00a8ff" stroke-width="1.2"/>
+              <circle cx="165" cy="30" r="4" fill="rgba(0,168,255,0.5)" stroke="#00a8ff" stroke-width="1.2"/>
+              <line x1="94"  y1="30" x2="111" y2="30" stroke="#00a8ff" stroke-width="1.2"/>
+              <line x1="119" y1="30" x2="136" y2="30" stroke="#00a8ff" stroke-width="1.2"/>
+              <line x1="144" y1="30" x2="161" y2="30" stroke="#00a8ff" stroke-width="1.2"/>
+              <text x="100" y="44" font-family="JetBrains Mono" font-size="8" fill="#00a8ff" letter-spacing="0.08em">CACHE REPLAY</text>
+              <!-- target -->
+              <circle cx="194" cy="30" r="6" fill="rgba(31,211,136,0.30)" stroke="#1fd388" stroke-width="1.5"/>
+              <line x1="171" y1="30" x2="188" y2="30" stroke="#1fd388" stroke-width="1.4" stroke-dasharray="2 2"/>
+              <polygon points="188,30 184,28 184,32" fill="#1fd388"/>
+              <text x="180" y="14" font-family="JetBrains Mono" font-size="8" fill="#1fd388" letter-spacing="0.08em">PASS</text>
+            </svg>
+          </div>
+          <div class="tier-stat"><span>cost <b>~30 s</b></span><span>covers <b>anything</b></span></div>
+        </div>
+
+        <!-- PASSED endpoint -->
+        <div class="flow-end is-end">
+          <div class="end-glyph">✓</div>
+          <div class="end-label">Exit</div>
+          <div class="end-title">PASSED</div>
+          <div class="end-sub">The stuck step succeeds.<br>The run finishes — without you.</div>
+        </div>
+
+        <!-- Traveling cursor — auto-loops through the 5 zones -->
+        <div class="flow-cursor" aria-hidden="true"></div>
+      </div>
+
+      <div class="flow-legend reveal-3" aria-hidden="true">
+        <span><b>Try the lightest fix first</b></span>
+        <span><b>·</b> Escalate only when the previous tier didn't unstick it <b>·</b></span>
+        <span><b>The cache makes every escalation cheap</b></span>
+      </div>
+
+      <footer class="rail">
+        <span>Graceful degradation · three tiers · cache-replayed</span>
+        <span class="page">20 / 26</span>
+      </footer>
+    </section>
+
+    <!-- ============================== SLIDE 20 · AI RECOVERY · LIGHT (partial rollback) ============================== -->
+    <section class="slide s-imgfirst s-recover s-recover--light">
+      <header class="crown">
+        <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
+        <div class="meta"><span>Pitch · §20 / recovery · light</span></div>
+      </header>
+
+      <div class="head reveal-1">
+        <div class="head-text">
+          <div class="eyebrow">Live demo · mid-run interference (light)</div>
+          <h2 class="h-section">One step got erased.<br>The agent <em>put it back</em>.</h2>
+          <span class="tier-pill">Tier 2 · Partial rollback · auto-judged depth</span>
+          <p class="sub">25 秒 · 一步被撤销 · <b>AI 自动判断需要回撤 3 步</b> · 自动重做. A click got dismissed mid-flow — the platform <b>computes how many steps back to rewind</b>, cache replays them in seconds, then continues. <b>No human in the loop.</b></p>
+        </div>
+        <aside class="engineer-card" aria-hidden="true">
+          <svg class="engineer-svg" viewBox="0 0 240 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- monitor -->
+            <rect x="38" y="14" width="62" height="40" rx="3" stroke="#5b6783" stroke-width="1.6"/>
+            <rect class="desk-glow" x="42" y="18" width="54" height="32" rx="2" fill="rgba(0,168,255,0.32)"/>
+            <line x1="40" y1="50" x2="98" y2="50" stroke="#5b6783" stroke-width="1.2"/>
+            <rect x="62" y="56" width="14" height="6" rx="1" stroke="#5b6783" stroke-width="1.2"/>
+            <!-- desk surface -->
+            <line x1="10" y1="66" x2="135" y2="66" stroke="#5b6783" stroke-width="1.6"/>
+            <!-- chair (always visible) -->
+            <line x1="150" y1="46" x2="150" y2="76" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="142" y1="62" x2="166" y2="62" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="146" y1="62" x2="146" y2="76" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="162" y1="62" x2="162" y2="76" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="150" y1="46" x2="150" y2="62" stroke="#5b6783" stroke-width="1.6"/>
+            <!-- person silhouette (fades out on a loop) -->
+            <g class="person" stroke="#f3f6fb" stroke-width="1.8" fill="none">
+              <circle cx="150" cy="36" r="6"/>
+              <path d="M 144 44 Q 150 52 156 44 L 158 58 L 142 58 Z" fill="rgba(243,246,251,0.85)"/>
+              <line x1="143" y1="52" x2="135" y2="48"/>
+            </g>
+            <!-- ambient floor mark -->
+            <line x1="6" y1="76" x2="234" y2="76" stroke="#1b2230" stroke-width="1"/>
+            <!-- right-side: progress beacon stays running -->
+            <g transform="translate(196 30)">
+              <circle r="5" fill="rgba(31,211,136,0.85)"/>
+              <circle r="5" fill="none" stroke="rgba(31,211,136,0.55)" stroke-width="1.4">
+                <animate attributeName="r" values="5;14;5" dur="2.4s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0;0.9" dur="2.4s" repeatCount="indefinite"/>
+              </circle>
+            </g>
+            <text x="206" y="58" font-family="JetBrains Mono" font-size="8.5" fill="#1fd388" letter-spacing="0.12em">LIVE</text>
+          </svg>
+          <div class="engineer-caption">
+            <span><span class="dot"></span>18:42 · You're watching</span>
+            <span><span class="dot"></span>22:11 · You went home</span>
+          </div>
+        </aside>
+      </div>
+
+      <div class="shot-wrap reveal-2">
+        <div class="shot live">
+          <div class="video-speed" data-speed-group role="group" aria-label="Playback speed">
+            <span class="vs-label">Speed</span>
+            <button class="vs-btn"           data-rate="0.5"  type="button">0.5×</button>
+            <button class="vs-btn"           data-rate="0.75" type="button">0.75×</button>
+            <button class="vs-btn is-active" data-rate="1"    type="button">1×</button>
+            <button class="vs-btn"           data-rate="1.25" type="button">1.25×</button>
+            <button class="vs-btn"           data-rate="1.5"  type="button">1.5×</button>
+          </div>
+          <video src="assets/recovery-light.mp4" controls muted loop playsinline preload="metadata"
+                 controlsList="nodownload" data-autoplay-on-active
+                 data-recovery-track></video>
+          <div class="recovery-timeline" data-recovery-marks='[
+            {"at":0,    "kind":"start", "label":"Run begins"},
+            {"at":0.36, "kind":"recover", "label":"Rollback 1 step · continue"},
+            {"at":1,    "kind":"end",   "label":"Passed"}
+          ]'>
+            <div class="rt-track"><div class="rt-fill"></div></div>
+            <div class="rt-marks"></div>
+            <div class="rt-tick-row">
+              <span>00:00 · run start</span>
+              <span><b>00:25</b> · finished without you</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="rail">
+        <span>Light interference · 1-step rollback · 25 s end-to-end</span>
+        <span class="page">21 / 26</span>
+      </footer>
+    </section>
+
+    <!-- ============================== SLIDE 20 · AI RECOVERY · DEEP (full reset) ============================== -->
+    <section class="slide s-imgfirst s-recover s-recover--deep">
+      <header class="crown">
+        <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
+        <div class="meta"><span>Pitch · §21 / recovery · deep</span></div>
+      </header>
+
+      <div class="head reveal-1">
+        <div class="head-text">
+          <div class="eyebrow">Live demo · mid-run interference (deep)</div>
+          <h2 class="h-section">They navigated to the wrong screen.<br>The run walked itself <em>home</em>.</h2>
+          <span class="tier-pill">Tier 3 · Full reset → cache replay</span>
+          <p class="sub">AI 点回主页 → <b>cache 重放前序步骤</b> → 卡住的步骤继续。A bigger detour the partial rollback can't reach. The platform escalates — click SAP logo, replay the prior steps from cache, retry. <b>The run that should have failed, finishes.</b></p>
+        </div>
+        <aside class="engineer-card" aria-hidden="true">
+          <svg class="engineer-svg" viewBox="0 0 240 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- monitor -->
+            <rect x="38" y="14" width="62" height="40" rx="3" stroke="#5b6783" stroke-width="1.6"/>
+            <rect class="desk-glow" x="42" y="18" width="54" height="32" rx="2" fill="rgba(0,168,255,0.32)"/>
+            <line x1="40" y1="50" x2="98" y2="50" stroke="#5b6783" stroke-width="1.2"/>
+            <rect x="62" y="56" width="14" height="6" rx="1" stroke="#5b6783" stroke-width="1.2"/>
+            <!-- desk surface -->
+            <line x1="10" y1="66" x2="135" y2="66" stroke="#5b6783" stroke-width="1.6"/>
+            <!-- chair -->
+            <line x1="150" y1="46" x2="150" y2="76" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="142" y1="62" x2="166" y2="62" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="146" y1="62" x2="146" y2="76" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="162" y1="62" x2="162" y2="76" stroke="#5b6783" stroke-width="1.6"/>
+            <line x1="150" y1="46" x2="150" y2="62" stroke="#5b6783" stroke-width="1.6"/>
+            <!-- person silhouette -->
+            <g class="person" stroke="#f3f6fb" stroke-width="1.8" fill="none">
+              <circle cx="150" cy="36" r="6"/>
+              <path d="M 144 44 Q 150 52 156 44 L 158 58 L 142 58 Z" fill="rgba(243,246,251,0.85)"/>
+              <line x1="143" y1="52" x2="135" y2="48"/>
+            </g>
+            <line x1="6" y1="76" x2="234" y2="76" stroke="#1b2230" stroke-width="1"/>
+            <!-- live beacon -->
+            <g transform="translate(196 30)">
+              <circle r="5" fill="rgba(31,211,136,0.85)"/>
+              <circle r="5" fill="none" stroke="rgba(31,211,136,0.55)" stroke-width="1.4">
+                <animate attributeName="r" values="5;14;5" dur="2.4s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0;0.9" dur="2.4s" repeatCount="indefinite"/>
+              </circle>
+            </g>
+            <text x="206" y="58" font-family="JetBrains Mono" font-size="8.5" fill="#1fd388" letter-spacing="0.12em">LIVE</text>
+          </svg>
+          <div class="engineer-caption">
+            <span><span class="dot"></span>18:42 · You're watching</span>
+            <span><span class="dot"></span>23:47 · Run continues</span>
+          </div>
+        </aside>
+      </div>
+
+      <div class="shot-wrap reveal-2">
+        <div class="shot live">
+          <div class="video-speed" data-speed-group role="group" aria-label="Playback speed">
+            <span class="vs-label">Speed</span>
+            <button class="vs-btn"           data-rate="0.5"  type="button">0.5×</button>
+            <button class="vs-btn"           data-rate="0.75" type="button">0.75×</button>
+            <button class="vs-btn is-active" data-rate="1"    type="button">1×</button>
+            <button class="vs-btn"           data-rate="1.25" type="button">1.25×</button>
+            <button class="vs-btn"           data-rate="1.5"  type="button">1.5×</button>
+          </div>
+          <video src="assets/recovery-deep.mp4" controls muted loop playsinline preload="metadata"
+                 controlsList="nodownload" data-autoplay-on-active
+                 data-recovery-track></video>
+          <div class="recovery-timeline" data-recovery-marks='[
+            {"at":0,    "kind":"start",   "label":"Run begins"},
+            {"at":0.46, "kind":"recover", "label":"Click SAP logo · home"},
+            {"at":0.96, "kind":"recover", "label":"Stuck step retries · passes"},
+            {"at":1,    "kind":"end",     "label":"Passed"}
+          ]'>
+            <div class="rt-track"><div class="rt-fill"></div></div>
+            <div class="rt-marks"></div>
+            <div class="rt-tick-row">
+              <span>00:00 · run start</span>
+              <span><b>00:54</b> · finished without you</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="rail">
+        <span>Deep interference · home + replay from step 1 · 54 s end-to-end</span>
+        <span class="page">22 / 26</span>
+      </footer>
+    </section>
+
+    <!-- ============================== SLIDE 21 · QUANTIFIED IMPACT ============================== -->
     <section class="slide s-impact">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §16 / quantified impact</span></div>
+        <div class="meta"><span>Pitch · §22 / quantified impact</span></div>
       </header>
 
       <div class="head">
@@ -1905,15 +3151,15 @@ img, video, svg, canvas { max-width: 100%; max-height: 100%; }
 
       <footer class="rail">
         <span>The strategic upside, in numbers</span>
-        <span class="page">17 / 20</span>
+        <span class="page">23 / 26</span>
       </footer>
     </section>
 
-    <!-- ============================== SLIDE 18 · VISION ============================== -->
+    <!-- ============================== SLIDE 22 · VISION ============================== -->
     <section class="slide s-vision">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §17 / future direction</span></div>
+        <div class="meta"><span>Pitch · §23 / future direction</span></div>
       </header>
 
       <div class="body">
@@ -1961,15 +3207,15 @@ read the balance."</div>
 
       <footer class="rail">
         <span>Where the platform is going</span>
-        <span class="page">18 / 20</span>
+        <span class="page">24 / 26</span>
       </footer>
     </section>
 
-    <!-- ============================== SLIDE 19 · ROADMAP ============================== -->
+    <!-- ============================== SLIDE 23 · ROADMAP ============================== -->
     <section class="slide s-roadmap">
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §18 / roadmap</span></div>
+        <div class="meta"><span>Pitch · §24 / roadmap</span></div>
       </header>
 
       <div class="body">
@@ -2016,16 +3262,16 @@ read the balance."</div>
 
       <footer class="rail">
         <span>From product to platform to operator</span>
-        <span class="page">19 / 20</span>
+        <span class="page">25 / 26</span>
       </footer>
     </section>
 
-    <!-- ============================== SLIDE 20 · CLOSING ============================== -->
+    <!-- ============================== SLIDE 24 · CLOSING ============================== -->
     <section class="slide s-end">
       <div class="slab"></div>
       <header class="crown">
         <div class="logo"><div class="logo-mark">S</div><span>SAPTest · Console</span></div>
-        <div class="meta"><span>Pitch · §19 / next</span></div>
+        <div class="meta"><span>Pitch · §25 / next</span></div>
       </header>
 
       <div class="stage">
@@ -2046,7 +3292,7 @@ read the balance."</div>
 
       <footer class="rail">
         <span>Robert Bosch · GS / TET-APAC</span>
-        <span class="page">20 / 20</span>
+        <span class="page">26 / 26</span>
       </footer>
     </section>
 
@@ -2085,48 +3331,74 @@ read the balance."</div>
    ============================================================================ */
 /* Outline of every slide. The tooltip uses these as a reading-card
  * preview so the audience knows what's on a slide before jumping to it.
- * Keep titles short; summary HTML allows <b> for the key takeaway. */
+ * Keep titles short; summary HTML allows <b> for the key takeaway.
+ * `section` groups slides into chapters for the TOC; null = front matter
+ * (Cover, Contents). The TOC reads SECTIONS (declared below) for the
+ * chapter title shown above each group. */
 const SLIDE_META = [
-  { n: 1,  title: 'Cover',
+  { n: 1,  section: null,             title: 'Cover',
     summary: 'Opening principle <b>"Record once. Run forever."</b> with three live KPI chips: cases · pass-rate · cached cycle time.' },
-  { n: 2,  title: 'The Problem',
+  { n: 2,  section: null,             title: 'Contents',
+    summary: '<b>Interactive table of contents.</b> Every slide listed, click to jump. The deck is 26 slides — Foundations, Product, Recovery, Outcomes, Future.' },
+  { n: 3,  section: 'problem',        title: 'The Problem',
     summary: 'Three structural costs every SAP team pays today: <b>manual rituals</b> · <b>brittle scripts</b> · <b>knowledge vanishes</b> when people leave.' },
-  { n: 3,  title: 'Cost Today · Numbers',
+  { n: 4,  section: 'problem',        title: 'Cost Today · Numbers',
     summary: 'The current baseline in hours: <b>~18 min/case</b> · <b>~6 h per release</b> · <b>~3 h per UI change</b> · <b>~2 weeks</b> when a tester rolls off.' },
-  { n: 4,  title: 'Thesis',
+  { n: 5,  section: 'thesis',         title: 'Thesis',
     summary: 'The operating principle in one slide: <b>show it once · say it in your own words · run it forever — with any inputs.</b>' },
-  { n: 5,  title: 'Four Principles',
+  { n: 6,  section: 'thesis',         title: 'Four Principles',
     summary: 'Four reversals that swap a cost for a capability:<br><b>Demonstrate</b> not document · <b>Describe</b> not code · <b>Parameterise</b> not re-record · <b>Observe</b> not guess.' },
-  { n: 6,  title: 'The Workflow',
+  { n: 7,  section: 'thesis',         title: 'The Workflow',
     summary: 'Three moves to make a case permanent:<br><b>① Demonstrate</b> the flow → <b>② Narrate</b> the intent → <b>③ The case is born</b> as a parameterised asset.' },
-  { n: 7,  title: 'Live Demo · Run',
+  { n: 8,  section: 'product',        title: 'Live Demo · Run',
     summary: 'End-to-end run video — <b>Asset Balance verification</b>, 27 steps, fully unattended, from SAP login to value read-out.' },
-  { n: 8,  title: 'Live Broadcast',
+  { n: 9,  section: 'product',        title: '★ Parallel Execution',
+    summary: 'Throughput multiplier: <b>N cases · 1 operator · same wall-clock</b>. Each case in its own isolated browser; one person fires the whole batch and reads the verdict. Sequential queue → concurrent sweep.' },
+  { n: 10, section: 'product',        title: 'Command Center',
+    summary: 'The fleet on one panel — live during every run. Eleven instruments with <b>derivation notes</b> for each: pass-rate (passed/(passed+failed)) · cache hit (hits/steps) · 7-day activity · time saved (cached runs × steps × hit-rate × 4 s) · fleet health (60/25/15 composite).' },
+  { n: 11, section: 'product',        title: 'Live Broadcast',
     summary: 'Live SAP screens projected step-by-step. Subtitle bar shows <b>step · API · cache hit</b>. Scrub backwards anytime; one click back to live.' },
-  { n: 9,  title: 'Live Step Log',
+  { n: 12, section: 'product',        title: 'Live Step Log',
     summary: 'Textual heartbeat alongside the visual stream. Each step\'s <b>API call · params · cache outcome</b> streams into the workbench right rail.' },
-  { n: 10, title: 'Flow View',
+  { n: 13, section: 'product',        title: 'Flow View',
     summary: 'The case rendered as a filmstrip — <b>every step a clickable, re-watchable frame</b>. Find a failure in two clicks.' },
-  { n: 11, title: 'Cinema Replay',
+  { n: 14, section: 'product',        title: 'Cinema Replay',
     summary: 'Past runs are not log files. They are <b>watchable, scrubbable films</b> — full SAP screens, step-by-step, original subtitles intact.' },
-  { n: 12, title: 'Replay Report',
+  { n: 15, section: 'product',        title: 'Replay Report',
     summary: 'Auto-generated structured artifact after every run: <b>timeline · screenshots · captured variables · assertions</b>. Shareable, no engineer required.' },
-  { n: 13, title: 'Case Library',
+  { n: 16, section: 'product',        title: 'Case Library',
     summary: 'The fleet: <b>discoverable · owned · version-controlled · runnable by anyone</b>. Not buried in a single tester\'s mailbox.' },
-  { n: 14, title: 'Editing Model',
+  { n: 17, section: 'product',        title: 'Editing Model',
     summary: 'Two surfaces, zero code. <b>The narrative</b> (what the case does) + <b>the parameter sheet</b> (what data it uses). Anyone can read or revise.' },
-  { n: 15, title: '★ Parameter Swap',
+  { n: 18, section: 'differentiators',title: '★ Parameter Swap',
     summary: 'Signature capability: <b>one recording → every permutation</b>. Swap company code · asset · date → fresh run, zero re-recording, ~5s to fork.' },
-  { n: 16, title: 'Speed Modes',
+  { n: 19, section: 'differentiators',title: 'Speed Modes',
     summary: 'Same flow, three operating speeds:<br><b>Manual ~18 min</b> · <b>Raw ~4 min</b> · <b>Cached ~45 s</b> — up to <b>24× faster</b> than the human pass.' },
-  { n: 17, title: 'Quantified Impact',
+  { n: 20, section: 'differentiators',title: '★ Recovery Architecture',
+    summary: 'How the platform stays unattended: <b>three-tier graceful degradation</b>. Light (close popup) → Middle (rollback N) → Heavy (home + cache replay). <b>Try the smallest fix first; escalate only when needed.</b>' },
+  { n: 21, section: 'differentiators',title: '★ AI Recovery · Light',
+    summary: 'One step got erased mid-run. The agent <b>put it back</b>: notice → <b>auto-judge rollback depth</b> → cache-replay → continue — without a human in the loop. <b>25 s</b> end-to-end.' },
+  { n: 22, section: 'differentiators',title: '★ AI Recovery · Deep',
+    summary: 'Bigger detour: session walked to the wrong screen. The agent <b>clicked SAP logo to walk itself home</b>, <b>cache replayed every prior step</b>, then the stuck step passed. <b>The run that should have failed, finishes.</b>' },
+  { n: 23, section: 'outcome',        title: '★ Quantified Impact',
     summary: 'Six KPIs the platform buys back on a 20-case fleet:<br><b>24× faster</b> regression · <b>~5.5 h saved per release</b> · <b>95% maintenance cut</b> · <b>5 min</b> to author a new case.' },
-  { n: 18, title: 'Future Direction',
+  { n: 24, section: 'outcome',        title: 'Future Direction',
     summary: 'Next horizon: <b>agent-authored cases</b>. Hand the agent a screen-recording + a plain-language paragraph → the case writes itself, parameterised, ready to multiply.' },
-  { n: 19, title: 'Roadmap',
+  { n: 25, section: 'outcome',        title: 'Roadmap',
     summary: 'Three-step path:<br><b>Today</b> · Recorded / Replayed / Parameterised → <b>Q3</b> · Agent-authored cases → <b>Beyond</b> · Autonomous SAP operators.' },
-  { n: 20, title: 'Closing',
+  { n: 26, section: 'outcome',        title: 'Closing',
     summary: 'The CTA: <b>Pick a flow. Record it. Done.</b> One case is all it takes to start the compounding effect.' },
+];
+
+/* Chapter titles. Order matters — the TOC walks SECTIONS in this order
+ * and assigns each chapter to a column based on `column` (0-indexed).
+ * Sections in the same column stack vertically. */
+const SECTIONS = [
+  { key: 'problem',         title: 'The Problem',    column: 0 },
+  { key: 'thesis',          title: 'The Thesis',     column: 0 },
+  { key: 'product',         title: 'The Product',    column: 1 },
+  { key: 'differentiators', title: 'Differentiators',column: 2 },
+  { key: 'outcome',         title: 'The Outcome',    column: 2 },
 ];
 
 /* ============================================================================
@@ -2144,7 +3416,7 @@ const SLIDE_META = [
         <span class="rail-num">${String(m.n).padStart(2,'0')}</span>
       </a>
       <div class="rail-tooltip">
-        <div class="tt-label">Slide ${String(m.n).padStart(2,'0')} / 20</div>
+        <div class="tt-label">Slide ${String(m.n).padStart(2,'0')} / 26</div>
         <h4 class="tt-title">${m.title}</h4>
         <p class="tt-sum">${m.summary}</p>
       </div>`;
@@ -2172,8 +3444,16 @@ const SLIDE_META = [
       s.classList.toggle('active', on);
       const v = s.querySelector('video[data-autoplay-on-active]');
       if (v) {
-        if (on) { try { v.currentTime = 0; v.play(); } catch(e){} }
-        else    { try { v.pause(); } catch(e){} }
+        if (on) {
+          try {
+            v.currentTime = 0;
+            const def = Number(v.dataset.defaultRate || 1);
+            if (def && def !== 1) v.playbackRate = def;
+            v.play();
+          } catch(e){}
+        } else {
+          try { v.pause(); } catch(e){}
+        }
       }
     });
     // Sync rail active state
@@ -2208,6 +3488,74 @@ const SLIDE_META = [
     });
   });
 
+  // ── Back-to-Contents button — inject a small chip into every slide's
+  // top-left .logo group. Clicking it jumps to slide 2 (the TOC). The
+  // TOC slide itself skips the button (would be redundant). Cover gets
+  // a button too so the audience can leave the cover and head straight
+  // for the index.
+  document.querySelectorAll('.slide .crown .logo').forEach((logoEl) => {
+    const slide = logoEl.closest('.slide');
+    if (slide.classList.contains('s-toc')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'back-to-toc';
+    btn.title = 'Back to Contents (slide 2)';
+    btn.setAttribute('aria-label', 'Back to Contents');
+    btn.innerHTML = '<span class="glyph" aria-hidden="true">≡</span><span class="label">Contents</span>';
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      show(1);
+    });
+    logoEl.insertBefore(btn, logoEl.firstChild);
+  });
+
+  // ── Table of Contents (slide 2) — populate clickable, section-grouped
+  // rows from SLIDE_META + SECTIONS. Front-matter slides (Cover, Contents)
+  // sit at the top of column 0 with no header. Each numbered section gets
+  // a header row + its member slides, placed into the column specified by
+  // SECTIONS[].column. Click handlers route through the same show()
+  // dispatcher used by the right-rail thumbs.
+  const tocGrid = document.getElementById('toc-grid');
+  if (tocGrid) {
+    const cols = Array.from(tocGrid.querySelectorAll('.toc-col'));
+    cols.forEach((c) => { c.innerHTML = ''; });
+
+    const makeEntry = (m) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toc-item';
+      if (/^\s*★/.test(m.title)) btn.classList.add('is-starred');
+      btn.dataset.idx = String(m.n - 1);
+      if (m.n === 2) btn.classList.add('is-current');
+      btn.innerHTML = `
+        <span class="toc-num">${String(m.n).padStart(2,'0')}</span>
+        <span class="toc-title">${m.title}</span>
+        <span class="toc-chevron" aria-hidden="true">▸</span>`;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        show(Number(btn.dataset.idx));
+      });
+      return btn;
+    };
+
+    // 1) Front matter (no section) — straight into column 0, no header.
+    SLIDE_META.filter((m) => !m.section).forEach((m) => {
+      cols[0].appendChild(makeEntry(m));
+    });
+
+    // 2) For each declared section: header + member entries, into its column.
+    SECTIONS.forEach((sec, idx) => {
+      const head = document.createElement('div');
+      head.className = 'toc-section-head';
+      head.innerHTML = `<span class="toc-section-num">§${String(idx + 1).padStart(2,'0')}</span><span class="toc-section-title">${sec.title}</span>`;
+      cols[sec.column].appendChild(head);
+      SLIDE_META
+        .filter((m) => m.section === sec.key)
+        .forEach((m) => cols[sec.column].appendChild(makeEntry(m)));
+    });
+  }
+
   show(0);
 })();
 
@@ -2221,6 +3569,7 @@ const SLIDE_META = [
   document.querySelectorAll('[data-speed-group]').forEach((group) => {
     const video = group.parentElement.querySelector('video');
     if (!video) return;
+    const defaultRate = Number(group.dataset.defaultRate || 1);
     const btns = Array.from(group.querySelectorAll('.vs-btn'));
     const setRate = (rate) => {
       video.playbackRate = rate;
@@ -2229,16 +3578,71 @@ const SLIDE_META = [
     btns.forEach((b) => {
       b.addEventListener('click', () => setRate(Number(b.dataset.rate)));
     });
-    // Reset to 1× whenever this slide becomes active again.
+    // Re-apply the slide's default rate whenever it becomes active again,
+    // so a previous user-chosen speed doesn't carry over between visits.
     const slide = group.closest('.slide');
     if (slide) {
       const obs = new MutationObserver(() => {
-        if (slide.classList.contains('active') && video.playbackRate !== 1) {
-          setRate(1);
+        if (slide.classList.contains('active') && video.playbackRate !== defaultRate) {
+          setRate(defaultRate);
         }
       });
       obs.observe(slide, { attributes: true, attributeFilter: ['class'] });
     }
+  });
+})();
+
+/* ============================================================================
+ * Recovery-timeline overlay — drives the progress strip + recovery markers
+ * sitting on top of each .s-recover video. The .recovery-timeline node carries
+ * a `data-recovery-marks` JSON array; we materialise it into .rt-mark DOM nodes
+ * at authoring time, then watch the sibling <video> to keep the fill width and
+ * "is-hit" pulse in sync with playback. Resets when the video loops.
+ * ============================================================================ */
+(function(){
+  document.querySelectorAll('.recovery-timeline').forEach((tl) => {
+    const shot = tl.closest('.shot');
+    const video = shot && shot.querySelector('video[data-recovery-track]');
+    if (!video) return;
+    let marks = [];
+    try { marks = JSON.parse(tl.dataset.recoveryMarks || '[]'); }
+    catch (e) { console.warn('recovery-timeline: bad JSON', e); return; }
+    const marksHost = tl.querySelector('.rt-marks');
+    const fill = tl.querySelector('.rt-fill');
+    if (!marksHost || !fill) return;
+    // Materialise each mark as a positioned dot + optional label.
+    const markEls = marks.map((m) => {
+      const el = document.createElement('div');
+      el.className = 'rt-mark';
+      el.dataset.kind = m.kind || 'recover';
+      el.style.left = `${Math.max(0, Math.min(100, (m.at || 0) * 100))}%`;
+      el.innerHTML = `<div class="rt-dot"></div>${m.label ? `<div class="rt-label">${m.label}</div>` : ''}`;
+      marksHost.appendChild(el);
+      return { el, at: m.at, kind: m.kind, hit: false };
+    });
+    // Reset hit state when the video loops back to 0 (loop attribute).
+    const resetHits = () => {
+      markEls.forEach((m) => { m.hit = false; m.el.classList.remove('is-hit'); });
+    };
+    video.addEventListener('seeked', () => {
+      if (video.currentTime < 0.1) resetHits();
+    });
+    video.addEventListener('timeupdate', () => {
+      const dur = video.duration || 1;
+      const pct = Math.max(0, Math.min(1, video.currentTime / dur));
+      fill.style.width = `${pct * 100}%`;
+      markEls.forEach((m) => {
+        if (!m.hit && pct >= m.at && m.kind === 'recover') {
+          m.hit = true;
+          m.el.classList.add('is-hit');
+        }
+      });
+    });
+    // When the video loops via the `loop` attribute the time jumps back to 0
+    // without a `seeked` event — listen for that path too.
+    video.addEventListener('play', () => {
+      if (video.currentTime < 0.1) resetHits();
+    });
   });
 })();
 </script>

@@ -319,6 +319,117 @@ a.lang-toggle.docs-link:hover {
 }
 
 /* ───────── Inputs ───────── */
+/* Toggle switch — used in the JS run modal for "keep cache even if run
+ * fails". The native checkbox stays in the DOM (so form semantics +
+ * keyboard work) but is visually hidden; the track + thumb is rendered
+ * by the wrapping span. Click anywhere on the row toggles. */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px; height: 20px;
+  flex: 0 0 auto;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.switch > input[type="checkbox"] {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+.switch .switch-track {
+  position: absolute; inset: 0;
+  background: hsl(var(--input));
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+  transition: background .15s ease, border-color .15s ease;
+}
+.switch .switch-track::after {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: hsl(var(--foreground));
+  opacity: 0.7;
+  transition: transform .18s cubic-bezier(.4,1.2,.4,1), background .15s ease, opacity .15s ease;
+}
+.switch > input[type="checkbox"]:checked + .switch-track {
+  background: hsl(var(--info));
+  border-color: hsl(var(--info));
+}
+.switch > input[type="checkbox"]:checked + .switch-track::after {
+  transform: translateX(16px);
+  background: #fff;
+  opacity: 1;
+}
+.switch > input[type="checkbox"]:focus-visible + .switch-track {
+  box-shadow: 0 0 0 2px hsla(var(--info), 0.35);
+}
+.switch-row { cursor: pointer; user-select: none; }
+
+/* Cache pin buttons — sit inline next to the status tag in the history
+ * table. Click to nominate THIS run as the source for that cache slot.
+ * Unpinned = outline chip with ☆ glyph; pinned = filled chip with ★.
+ * Pass slot uses --info blue, fail slot uses amber. */
+.cache-pin-btn {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  height: 20px;
+  line-height: 18px;
+  font-family: 'JetBrains Mono', monospace, ui-monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.10s;
+}
+.cache-pin-btn.slot-pass {
+  border: 1px solid hsla(var(--info), 0.35);
+  color: hsl(var(--info));
+}
+.cache-pin-btn.slot-pass:hover {
+  background: hsla(var(--info), 0.10);
+  border-color: hsla(var(--info), 0.55);
+}
+.cache-pin-btn.slot-pass.is-pinned {
+  background: hsla(var(--info), 0.20);
+  border-color: hsl(var(--info));
+  color: hsl(var(--info));
+  font-weight: 800;
+  box-shadow: 0 0 0 1px hsla(var(--info), 0.30) inset;
+}
+.cache-pin-btn.slot-fail {
+  border: 1px solid rgba(245, 166, 35, 0.38);
+  color: hsl(35 85% 50%);
+}
+.cache-pin-btn.slot-fail:hover {
+  background: rgba(245, 166, 35, 0.10);
+  border-color: rgba(245, 166, 35, 0.58);
+}
+.cache-pin-btn.slot-fail.is-pinned {
+  background: rgba(245, 166, 35, 0.20);
+  border-color: hsl(35 85% 50%);
+  color: hsl(35 85% 45%);
+  font-weight: 800;
+  box-shadow: 0 0 0 1px rgba(245, 166, 35, 0.32) inset;
+}
+.cache-pin-btn:active { transform: scale(0.96); }
+
+/* Row tint when this row is the active source for a slot — gives a
+ * full-row visual anchor without being too loud. */
+tr.cache-pinned-pass td { background: hsla(var(--info), 0.05); }
+tr.cache-pinned-fail td { background: rgba(245, 166, 35, 0.05); }
+tr.cache-pinned-pass.cache-pinned-fail td {
+  background: linear-gradient(90deg, hsla(var(--info), 0.07), rgba(245, 166, 35, 0.07));
+}
+
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field > span {
   color: hsl(var(--foreground));

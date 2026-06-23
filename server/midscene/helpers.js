@@ -140,8 +140,15 @@ export const STEP_RETRY_DELAY_MS = 10000;
 export const SCROLL_DRAG_TIMEOUT_MS = 90 * 1000;
 export const SCROLL_RECOVERY_DELAY_MS = 500;
 export const RIGHT_SCROLL_RECOVERY_DELAY_MS = 5000;
-export const SCROLL_RECOVERY_MAX_MOVES = 1;
-export const SCROLL_RECOVERY_DIRECTIONS = ['right'];
+// MAX_MOVES — how many small scrolls per direction the recovery loop
+// tries before giving up. With ~40% viewport per step, 6 moves covers
+// roughly 2.5 viewport heights — enough to find anything within a
+// typical SAP table page without grinding forever.
+export const SCROLL_RECOVERY_MAX_MOVES = 6;
+// Down first (most common — long SAP report tables that need vertical
+// seek), then the "rightmost column" jump (for wide tables where the
+// target columns are clipped on the right).
+export const SCROLL_RECOVERY_DIRECTIONS = ['down', 'right'];
 
 // Inter-step delays. Defaults to STEP_DELAY_MS; if the step is an aiTap whose
 // text mentions Execute (= SAP query submission), bump to EXECUTE_DELAY for
@@ -152,9 +159,18 @@ export const EXECUTE_DELAY_MS = 7000;
 export const QUERY_PRE_DELAY_MS = 5000;
 
 // Pick the right post-step delay based on the step's intent.
+// "Execute"-class steps trigger an SAP server roundtrip + new screen
+// render — wait EXECUTE_DELAY (7 s) before the next step so it doesn't
+// race against the still-loading result page. Fires for both the
+// original aiTap("点击 Execute") form AND the newer aiKeyboardPress
+// (Enter) classification — the heuristic in llm.js routes "Execute /
+// 执行 / Continue / 继续" intents to aiKeyboardPress, but the
+// downstream wait need is the same.
 export function delayAfterStepMs(step) {
   const text = `${step?.title ?? ''} ${step?.naturalLanguageInstruction ?? ''}`.toLowerCase();
-  if (normalizeApiName(step) === 'aiTap' && /execute/.test(text)) {
+  const api = normalizeApiName(step);
+  const isExecuteText = /execute|执行|继续|continue|提交|submit|查询执行/.test(text);
+  if ((api === 'aiTap' || api === 'aiKeyboardPress') && isExecuteText) {
     return EXECUTE_DELAY_MS;
   }
   return STEP_DELAY_MS;

@@ -1,0 +1,18 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 3828
+PlayResY: 1914
+ScaledBorderAndShadow: yes
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Eyebrow,Microsoft YaHei UI,72,&H00BCE6FF,&H00FFFFFF,&H00000000,&HC0050608,1,0,0,0,100,100,8,0,4,18,0,2,140,140,540,1
+Style: Headline,Microsoft YaHei UI,140,&H00FFFFFF,&H00FFFFFF,&H00000000,&HD0050608,1,0,0,0,100,100,0,0,4,28,4,2,140,140,420,1
+Style: Sub,Microsoft YaHei UI,96,&H00F3F6FB,&H00FFFFFF,&H00000000,&HC8050608,0,0,0,0,100,100,0,0,4,24,4,2,140,140,420,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.30,0:00:05.00,Eyebrow,,0,0,0,,{\fad(280,200)}LIVE DEMO  ·  MID-RUN INTERFERENCE  (LIGHT)
+Dialogue: 0,0:00:05.20,0:00:22.20,Headline,,0,0,0,,{\fad(320,260)}One step got erased.\NThe agent {\c&H00BCE6FF&}put it back{\c}.
+Dialogue: 0,0:00:22.40,0:00:25.40,Sub,,0,0,0,,{\fad(280,160)}25 秒 · 一步被撤销 · AI 自动判断需要回撤 3 步 · 自动重做

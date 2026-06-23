@@ -1,0 +1,18 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 3828
+PlayResY: 1914
+ScaledBorderAndShadow: yes
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Eyebrow,Microsoft YaHei UI,72,&H00BCE6FF,&H00FFFFFF,&H00000000,&HC0050608,1,0,0,0,100,100,8,0,4,18,0,2,140,140,540,1
+Style: Headline,Microsoft YaHei UI,130,&H00FFFFFF,&H00FFFFFF,&H00000000,&HD0050608,1,0,0,0,100,100,0,0,4,28,4,2,140,140,420,1
+Style: Sub,Microsoft YaHei UI,88,&H00F3F6FB,&H00FFFFFF,&H00000000,&HC8050608,0,0,0,0,100,100,0,0,4,24,4,2,140,140,420,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.30,0:00:06.00,Eyebrow,,0,0,0,,{\fad(280,200)}LIVE DEMO  ·  MID-RUN INTERFERENCE  (DEEP)
+Dialogue: 0,0:00:06.20,0:00:46.00,Headline,,0,0,0,,{\fad(320,260)}They navigated to the wrong screen.\NThe run walked itself {\c&H00BCE6FF&}home{\c}.
+Dialogue: 0,0:00:46.20,0:00:54.30,Sub,,0,0,0,,{\fad(280,200)}AI 点回主页  →  cache 重放前序步骤  →  卡住的步骤继续

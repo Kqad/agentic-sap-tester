@@ -41,7 +41,7 @@
 
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { copyFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { ROOT, RUNS_DIR } from '../paths.js';
 import { detectScrollExtreme } from './helpers.js';
 
@@ -164,6 +164,89 @@ export function resolveCachePath(cacheId) {
   return path.join(ROOT, 'midscene_run', 'cache', `${cacheId}.cache.yaml`);
 }
 
+// ── Two-slot cache model ──────────────────────────────────────────────
+// Each case has TWO physical cache files keyed off the base cacheId:
+//   <base>-pass.cache.yaml  ← gold cache. Updated only by passing runs.
+//                              Read by `Run with cache`. Conservative.
+//   <base>-fail.cache.yaml  ← work-in-progress cache. Updated by raw
+//                              runs (write mode) and by passing-but-
+//                              kept-on-failure runs. Read by NO mode
+//                              today, but the debug page can promote
+//                              it to pass.
+// Midscene needs a fixed filename to read/write — we give it the slot
+// cacheId (e.g. `<base>-pass`) and let it manage that file.
+export function resolveSlotCacheId(baseCacheId, slot /* 'pass' | 'fail' */) {
+  if (slot !== 'pass' && slot !== 'fail') {
+    throw new Error(`resolveSlotCacheId: slot must be 'pass' | 'fail' (got ${slot})`);
+  }
+  return `${baseCacheId}-${slot}`;
+}
+export function resolveSlotCachePath(baseCacheId, slot) {
+  return resolveCachePath(resolveSlotCacheId(baseCacheId, slot));
+}
+
+// Per-run cache snapshots — saved at the end of EVERY run (pass, fail,
+// raw — all of them). Used by the cache-debug page to let the user
+// "rewind" a slot to any past run's cache state. Snapshot is a literal
+// byte copy of whichever slot file the run was using, captured before
+// the post-run save/restore policy fires (so the user can see the
+// "what would have been kept" state too).
+import { mkdirSync } from 'node:fs';
+export function resolveSnapshotPath(runId) {
+  const dir = path.join(ROOT, 'run-history', 'cache-snapshots');
+  return path.join(dir, `${runId}.cache.yaml`);
+}
+export function ensureSnapshotDir() {
+  mkdirSync(path.join(ROOT, 'run-history', 'cache-snapshots'), { recursive: true });
+}
+
+// Find the most recent per-run cache snapshot for `caseId` whose run
+// status matches `preferStatus` ('passed' | 'failed'). Returns the
+// absolute snapshot file path, or null if nothing matches. Used by the
+// runner as a fallback when a user-pinned source runId no longer has
+// a snapshot file (e.g. the pinned run pre-dates the snapshot system,
+// or the snapshot got deleted).
+export function findLatestSnapshotForCase(caseId, preferStatus) {
+  if (!existsSync(RUNS_DIR)) return null;
+  let entries;
+  try {
+    entries = readdirSync(RUNS_DIR).filter((n) => n.endsWith('.json'));
+  } catch {
+    return null;
+  }
+  entries.sort((a, b) => b.localeCompare(a)); // newest first
+
+  for (const name of entries) {
+    let rec;
+    try {
+      rec = JSON.parse(readFileSync(path.join(RUNS_DIR, name), 'utf8'));
+    } catch { continue; }
+    if (rec?.caseId !== caseId) continue;
+    if (preferStatus && rec?.status !== preferStatus) continue;
+    const snapPath = resolveSnapshotPath(rec.runId);
+    if (existsSync(snapPath)) return snapPath;
+  }
+  return null;
+}
+
+// One-shot migration: if a legacy `<base>.cache.yaml` exists but no
+// `<base>-pass.cache.yaml`, treat the legacy file as the case's
+// historical pass cache and copy it into the pass slot. Idempotent —
+// returns null if nothing to migrate. Logged by the caller. Doesn't
+// touch the legacy file itself so older code paths keep working.
+export function migrateLegacyCacheToPassSlot(baseCacheId) {
+  const legacy = resolveCachePath(baseCacheId);
+  const passSlot = resolveSlotCachePath(baseCacheId, 'pass');
+  if (!existsSync(legacy)) return null;
+  if (existsSync(passSlot)) return null;
+  try {
+    copyCacheFileForId(legacy, passSlot, resolveSlotCacheId(baseCacheId, 'pass'));
+    return { from: path.basename(legacy), to: path.basename(passSlot) };
+  } catch {
+    return null;
+  }
+}
+
 // Check cache existence + at least one "caches:" record. Avoid pulling in a
 // YAML parser just for this — a substring match is plenty robust for our use:
 // Midscene always writes either `caches: []` (empty) or `caches:\n  - type:`.
@@ -177,6 +260,20 @@ export function hasUsableCache(cacheId) {
   } catch {
     return false;
   }
+}
+
+export function rewriteCacheFileId(filePath, cacheId) {
+  const raw = readFileSync(filePath, 'utf8');
+  const next = /^cacheId:\s*.+$/m.test(raw)
+    ? raw.replace(/^cacheId:\s*.+$/m, `cacheId: ${cacheId}`)
+    : raw.replace(/^(midsceneVersion:\s*.+\r?\n)/m, `$1cacheId: ${cacheId}\n`);
+  return next;
+}
+
+export function copyCacheFileForId(fromPath, toPath, cacheId) {
+  mkdirSync(path.dirname(toPath), { recursive: true });
+  const rewritten = rewriteCacheFileId(fromPath, cacheId);
+  writeFileSync(toPath, rewritten, 'utf8');
 }
 
 // When the case JSON is edited (NL / apiGuide / params for tcode), the hash
@@ -231,7 +328,7 @@ export function autoMigrateCacheFromLatestPassedRun(caseId, currentCacheId, log 
     if (!existsSync(fromPath)) continue;
     const toPath = resolveCachePath(currentCacheId);
     try {
-      copyFileSync(fromPath, toPath);
+      copyCacheFileForId(fromPath, toPath, currentCacheId);
       log(`Auto-migrated cache: copied ${historicalId} → ${currentCacheId} (source: passed run at ${rec.finishedAt ?? rec.startedAt ?? 'unknown'})`);
       return { from: historicalId, to: currentCacheId, reason: 'latest-passed-run' };
     } catch (e) {
@@ -261,7 +358,7 @@ export function autoMigrateCacheFromLatestPassedRun(caseId, currentCacheId, log 
     const best = candidates[0];
     const historicalId = best.name.replace('.cache.yaml', '');
     const toPath = resolveCachePath(currentCacheId);
-    copyFileSync(best.full, toPath);
+    copyCacheFileForId(best.full, toPath, currentCacheId);
     log(`Auto-migrated cache: copied ${historicalId} → ${currentCacheId} (fallback: largest orphan ${best.size} bytes; no passed-run source available)`);
     return { from: historicalId, to: currentCacheId, reason: 'largest-orphan' };
   } catch (e) {

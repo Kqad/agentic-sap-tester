@@ -13,12 +13,17 @@
 //     correctly under the new id (Midscene checks this against runtime).
 
 import {
-  copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync,
-  statSync, writeFileSync,
+  existsSync, readdirSync, readFileSync, statSync,
 } from 'node:fs';
 import path from 'node:path';
 import { CASES_DIR } from '../paths.js';
-import { buildJavascriptCacheId, resolveCachePath } from './cache-id.js';
+import {
+  buildJavascriptCacheId,
+  copyCacheFileForId,
+  resolveCachePath,
+  resolveSlotCacheId,
+  resolveSlotCachePath,
+} from './cache-id.js';
 
 // Find the newest saptest-js-<templateId>-*.cache.yaml on disk (any hash).
 // Used as fallback when the template's CURRENT apiGuide hash doesn't have
@@ -58,10 +63,13 @@ export function ensureTemplateCacheForCase(targetCase) {
     return { copied: false, reason: `template case "${templateCaseId}" not found or has no apiGuide` };
   }
 
-  // Resolve the template's cache file. Try template's CURRENT hash first;
-  // fall back to the most recently modified cache file under that case id.
+  // Resolve the template's cache file. Prefer the current pass slot, then
+  // the legacy base file, then the most recently modified file for that case.
   const templateCacheId = buildJavascriptCacheId(template);
-  let templateCachePath = resolveCachePath(templateCacheId);
+  let templateCachePath = resolveSlotCachePath(templateCacheId, 'pass');
+  if (!existsSync(templateCachePath)) {
+    templateCachePath = resolveCachePath(templateCacheId);
+  }
   if (!existsSync(templateCachePath)) {
     templateCachePath = findLatestCacheForCase(template.id);
     if (!templateCachePath) {
@@ -69,17 +77,13 @@ export function ensureTemplateCacheForCase(targetCase) {
     }
   }
 
-  const newCacheId = buildJavascriptCacheId(targetCase);
+  const newBaseCacheId = buildJavascriptCacheId(targetCase);
+  const newCacheId = resolveSlotCacheId(newBaseCacheId, 'pass');
   const newCachePath = resolveCachePath(newCacheId);
   if (existsSync(newCachePath)) {
     return { copied: false, reason: 'target cache already exists (not overwritten)' };
   }
 
-  mkdirSync(path.dirname(newCachePath), { recursive: true });
-  // Read template YAML, rewrite the top-level `cacheId:` line so the new
-  // file's metadata matches its filename. Midscene compares them at load.
-  const yaml = readFileSync(templateCachePath, 'utf8');
-  const rewritten = yaml.replace(/^cacheId:\s*.+$/m, `cacheId: ${newCacheId}`);
-  writeFileSync(newCachePath, rewritten);
+  copyCacheFileForId(templateCachePath, newCachePath, newCacheId);
   return { copied: true, targetPath: newCachePath, sourcePath: templateCachePath };
 }

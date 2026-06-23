@@ -13,14 +13,32 @@
 import { isMissingQueryResult } from './helpers.js';
 
 // ── Variable name extraction (from aiQuery instructions). ───────────────
+// Order matters — try the strongest, most specific patterns first. The
+// killer was a regex like /(?:记录)\s*(?:为)?\s*([A-Za-z]\w*)/ where the
+// "为" was optional: "记录Display document 页面..." captured "Display"
+// instead of the A2 sitting at the end after "为A2". Now every match
+// REQUIRES an explicit connector (为/as/作为/into/…) right before the
+// name, OR anchors the match to end-of-string, so descriptions in the
+// middle of the instruction can't accidentally win.
 export function parseVariableName(instruction) {
   if (!instruction) return '';
   return (
+    // "变量 X" anywhere — strongest signal, explicit "variable" keyword.
     instruction.match(/(?:保存|记录|记|存).*?变量\s*([A-Za-z][A-Za-z0-9_]*)/i)?.[1] ||
-    instruction.match(/(?:保存|记录|记|存)\s*(?:为|作为|成|到|进)?\s*([A-Za-z][A-Za-z0-9_]*)\b/i)?.[1] ||
-    instruction.match(/\b(?:save|record|store)\s*(?:as|to|into)?\s*([A-Za-z][A-Za-z0-9_]*)\b/i)?.[1] ||
-    instruction.match(/\bas\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i)?.[1] ||
     instruction.match(/变量\s*([A-Za-z][A-Za-z0-9_]*)/i)?.[1] ||
+    // "...为A2" / "...作为 A2" / "...成 A2" at the END of the instruction
+    // (with or without space, with or without trailing punctuation).
+    // This is the dominant user pattern: long description ending in 为<name>.
+    instruction.match(/(?:为|作为|成)\s*([A-Z][A-Z0-9]{0,5})\s*[.。!！?？,，]?\s*$/)?.[1] ||
+    // English "save/record/store as NAME" or trailing "as NAME".
+    instruction.match(/\b(?:save|record|store|capture)\s+(?:as|to|into)\s+([A-Za-z][A-Za-z0-9_]*)\b/i)?.[1] ||
+    instruction.match(/\bas\s+([A-Za-z][A-Za-z0-9_]*)\s*[.!?]?\s*$/i)?.[1] ||
+    // Last-ditch: "记录" / "保存" followed IMMEDIATELY by a 1-6 char
+    // ALL-CAPS-ish name (A1, A2, X, OUT) — short names look like
+    // variables, not English description words.
+    instruction.match(/(?:保存|记录|记|存)\s+([A-Z][A-Z0-9]{0,5})\b/)?.[1] ||
+    // Unicode fallback (variables.js used to keep these for non-Latin
+    // variable names like "甲" / "乙"). Kept for back-compat.
     instruction.match(/(?:保存|记录|记|存).*?变量\s*([\p{L}\p{N}_-]+)/u)?.[1] ||
     instruction.match(/变量\s*([\p{L}\p{N}_-]+)/u)?.[1] ||
     ''

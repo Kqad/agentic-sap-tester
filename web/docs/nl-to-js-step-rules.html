@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>自然语言转 JS Step 规则说明</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --text: #172033;
+      --muted: #5d6a7e;
+      --line: #d9e0ea;
+      --soft: #f5f7fa;
+      --accent: #126b61;
+      --accent-soft: #e7f4f2;
+      --code: #253047;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 15px/1.72 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background: #fff;
+    }
+    main {
+      width: min(1040px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 42px 0 64px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 36px 0 12px;
+      padding-top: 8px;
+      font-size: 22px;
+      line-height: 1.35;
+      border-top: 1px solid var(--line);
+    }
+    h3 {
+      margin: 24px 0 8px;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+    p { margin: 8px 0 12px; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 4px 0; }
+    code {
+      color: var(--code);
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 1px 5px;
+      font-family: Consolas, "SFMono-Regular", monospace;
+      font-size: 0.92em;
+    }
+    .lead {
+      color: var(--muted);
+      max-width: 840px;
+      font-size: 16px;
+    }
+    .callout {
+      margin: 18px 0;
+      padding: 14px 16px;
+      border: 1px solid #b6d8d3;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      border-radius: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 22px;
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th { background: var(--soft); font-weight: 700; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #fff;
+    }
+    .panel h3 { margin-top: 0; }
+    @media (max-width: 760px) {
+      main { width: min(100% - 24px, 1040px); padding-top: 28px; }
+      h1 { font-size: 26px; }
+      table { table-layout: auto; display: block; overflow-x: auto; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>自然语言转 JS Step 规则说明</h1>
+    <p class="lead">说明系统如何把 SAP 测试用例的自然语言转换成 <code>apiGuide.steps</code>，以及本地规则和 LLM 规则分别怎么制定、怎么选择。</p>
+
+    <div class="callout">
+      默认使用本地规则生成 JS steps；只有在 <code>.env</code> 设置 <code>API_GUIDE_USE_LLM=1</code> 时才启用 LLM。LLM 不可用、超时或返回错误时，会自动回退到本地规则。
+      本地版和 LLM 版只负责生成方式不同，最终执行都走同一个 Midscene JS runner。
+    </div>
+
+    <h2>理解方式</h2>
+    <p>可以把系统想成一个“测试步骤翻译员”。用户写的是人话，系统要把它翻译成机器能执行的动作。</p>
+    <p>例如用户写：<code>在 company code 输入 8540，然后点击 Execute，读取 Curr.bk.val. 列保存为 A1，如果 A1 和 A2 相等则通过</code></p>
+    <ol>
+      <li>找到 company code 字段，输入 8540。</li>
+      <li>点击 Execute。</li>
+      <li>去报表表格里读 Curr.bk.val. 这一列。</li>
+      <li>把读到的值记成 A1。</li>
+      <li>比较 A1 和 A2 是否相等。</li>
+    </ol>
+
+    <table>
+      <thead><tr><th>方式</th><th>它像什么</th><th>怎么工作</th></tr></thead>
+      <tbody>
+        <tr><td>本地规则</td><td>关键词对照表</td><td>看到固定字眼，就按预先写好的规则转换</td></tr>
+        <tr><td>LLM 规则</td><td>给 AI 的操作手册</td><td>把完整需求交给模型，让模型按手册拆步骤、选动作</td></tr>
+      </tbody>
+    </table>
+    <p>当前设计默认优先本地规则，不是因为 LLM 不会做，而是因为 SAP 用例通常步骤长、上下文多。长上下文交给 LLM 时更容易出现耗时久、漏步骤、合并步骤、改写用户原意、输出格式不稳定等问题。本地规则虽然不聪明，但每次结果更一致，更适合稳定执行和缓存复用。</p>
+    <p>如果已经有 John 给的逐步操作文档，或者有录屏，其实不一定要重新手写一大段自然语言。更快的做法是先用 Claude/LLM 把文档或录屏整理成“每行一个动作”的步骤清单，再交给本地规则或系统生成 apiGuide。这样通常比从零写自然语言更快、更准确。</p>
+
+    <h2>本地规则看到哪些字眼会触发什么动作</h2>
+    <table>
+      <thead><tr><th>用户自然语言里出现的字眼</th><th>系统理解成</th><th>转成的动作</th></tr></thead>
+      <tbody>
+        <tr><td><code>点击</code>、<code>选择</code>、<code>打开</code>、<code>进入</code>、<code>返回</code>、<code>展开</code>、<code>保存</code></td><td>要点页面上的东西</td><td><code>aiTap</code> 点击</td></tr>
+        <tr><td><code>勾选</code>、<code>启用</code>、<code>开启</code></td><td>要打开某个选项或复选框</td><td><code>aiTap</code> 点击/勾选</td></tr>
+        <tr><td><code>输入</code>、<code>填写</code>、<code>填入</code></td><td>要往输入框里写值</td><td><code>aiInput</code> 输入</td></tr>
+        <tr><td><code>搜索</code>、<code>查询</code>、<code>查</code>，并且后面跟着值</td><td>多数情况下是往搜索框或字段里输入</td><td><code>aiInput</code> 输入</td></tr>
+        <tr><td><code>回车</code>、<code>Enter</code>、<code>提交</code>、<code>确认</code>、<code>Continue</code>、<code>Execute</code>、<code>执行</code></td><td>要按键继续或执行</td><td><code>aiKeyboardPress("Enter")</code>，必要时回退为点击</td></tr>
+        <tr><td><code>读取</code>、<code>提取</code>、<code>获取</code>、<code>查找...值</code>、<code>记录为变量</code></td><td>要从页面或表格拿数据</td><td><code>aiQuery</code> 读取</td></tr>
+        <tr><td><code>断言</code>、<code>验证</code>、<code>比较</code>、<code>相等</code>、<code>等于</code>、<code>case通过</code></td><td>要判断结果对不对</td><td><code>aiAssert</code> 校验</td></tr>
+        <tr><td><code>滚动</code>、<code>滑动</code>、<code>拖动</code>、<code>向下</code>、<code>向上</code>、<code>向左</code>、<code>向右</code></td><td>要移动页面或表格</td><td><code>aiScroll</code> 或 <code>aiAct</code></td></tr>
+        <tr><td><code>等 4s</code>、<code>等待 3 秒</code>、<code>wait 5s</code></td><td>要暂停等待</td><td><code>sleep(ms)</code></td></tr>
+        <tr><td><code>xpath=...</code></td><td>用户已经给了精确位置</td><td>直接用 xpath 定位</td></tr>
+      </tbody>
+    </table>
+
+    <h3>SAP 相关触发词</h3>
+    <table>
+      <thead><tr><th>SAP 写法</th><th>系统会怎么理解</th></tr></thead>
+      <tbody>
+        <tr><td><code>TC框</code>、<code>T-code框</code>、<code>事务码框</code>、<code>OK Code</code>、<code>左上角矩形输入框</code></td><td>SAP 左上角输入事务码的位置</td></tr>
+        <tr><td><code>company code</code>、<code>公司代码</code></td><td>公司代码字段</td></tr>
+        <tr><td><code>Asset number</code>、<code>资产编号</code></td><td>资产编号字段</td></tr>
+        <tr><td><code>Report date</code>、<code>报告日期</code></td><td>报表日期字段</td></tr>
+        <tr><td><code>List assets</code></td><td>List assets 复选框</td></tr>
+        <tr><td><code>Execute</code>、<code>执行</code></td><td>执行查询，通常对应 Execute 按钮、Enter 或 F8</td></tr>
+        <tr><td><code>Favorites</code></td><td>SAP 首页收藏夹区域</td></tr>
+        <tr><td><code>Menu</code>、<code>Settings</code>、<code>Visualization</code></td><td>SAP 菜单设置路径</td></tr>
+        <tr><td><code>列</code>、<code>表格</code>、<code>记录为变量 A1</code></td><td>从 SAP 报表结果表格里取值</td></tr>
+      </tbody>
+    </table>
+
+    <h2>LLM 的操作手册里怎么定义</h2>
+    <p>LLM 版不是简单地问一句“帮我生成代码”。系统会给模型一份明确操作手册，让它按规则输出。</p>
+    <ol>
+      <li>你是 SAP WebGUI 自动化测试的步骤规划员。</li>
+      <li>用户会给你一段自然语言需求。</li>
+      <li>你只能输出 JSON，不能输出解释、Markdown 或多余文字。</li>
+      <li>你要把用户的话拆成一步一步的页面操作。</li>
+      <li>每一步必须说明：第几步、标题、用哪个动作、原始指令、为什么这么选、示例代码。</li>
+      <li>一步只能做一个动作，不能把多个动作塞进同一步。</li>
+      <li>一次点击、一次输入、一次勾选、一次执行、一次读取、一次比较，都要分开。</li>
+      <li>如果一句话里有多个字段输入，例如 company code、Asset number、Report date，要拆成多个输入步骤。</li>
+      <li>SAP 场景要写清楚目标位置，例如 TC/OK Code 框、company code 字段、Execute 按钮、报表列。</li>
+      <li>点击按钮优先用点击动作，输入字段优先用输入动作。</li>
+      <li>提取表格值必须用读取动作，比较 A1、A2 这类变量必须用断言动作。</li>
+      <li>不要使用太宽泛的动作，例如“让 AI 自己随便操作整个页面”。</li>
+      <li>如果缺少账号、密码、目标页面等必要信息，要写到 warnings 里。</li>
+    </ol>
+
+    <h3>LLM 拿到的 Midscene 函数调用参考</h3>
+    <p>LLM 的操作手册里会告诉它：生成步骤时只能从下面这些常用 Midscene/执行器动作里选，不要自己发明函数。</p>
+    <table>
+      <thead><tr><th>函数/动作</th><th>什么时候用</th><th>示例</th></tr></thead>
+      <tbody>
+        <tr><td><code>agent.aiTap("目标")</code></td><td>点击按钮、菜单、链接、复选框、图标</td><td><code>await agent.aiTap("点击 Execute 按钮");</code></td></tr>
+        <tr><td><code>agent.aiInput("字段", { value: "值" })</code></td><td>给输入框、SAP 字段、搜索框填值</td><td><code>await agent.aiInput("company code", { value: "8540" });</code></td></tr>
+        <tr><td><code>agent.aiKeyboardPress("Enter")</code></td><td>按 Enter、Tab、Esc、F8 等键</td><td><code>await agent.aiKeyboardPress("Enter");</code></td></tr>
+        <tr><td><code>agent.aiQuery("string, 要读取的内容")</code></td><td>从页面或 SAP 表格里提取值</td><td><code>const result = await agent.aiQuery("string, 读取 Curr.bk.val. 列");</code></td></tr>
+        <tr><td><code>agent.aiAssert("校验条件")</code></td><td>判断页面状态或变量比较是否成立</td><td><code>await agent.aiAssert("如果 A1 和 A2 相等则通过");</code></td></tr>
+        <tr><td><code>agent.aiScroll("滚动说明")</code></td><td>普通滚动页面或表格</td><td><code>await agent.aiScroll("向下滚动一小段");</code></td></tr>
+        <tr><td><code>agent.aiAct("拖动说明")</code></td><td>SAP 滚动条拖到最右/最底这类复杂动作</td><td><code>await agent.aiAct("拖动底部横向滚动条到最右端");</code></td></tr>
+        <tr><td><code>sleep(ms)</code></td><td>等待页面加载或报表刷新</td><td><code>await sleep(4000);</code></td></tr>
+        <tr><td><code>agent.aiTap("目标", { xpath: "..." })</code></td><td>用户已经提供精确 xpath</td><td><code>await agent.aiTap("点击图标", { xpath: "//*[@id='...']" });</code></td></tr>
+      </tbody>
+    </table>
+    <p>这份参考的作用是限制 LLM 的输出范围：它不能随便写不存在的函数，也不能把所有事情都写成一句“让 AI 操作页面”。它必须把每个动作归类到点击、输入、按键、读取、断言、滚动、等待这些明确类型里。</p>
+
+    <table>
+      <thead><tr><th>LLM 每一步要输出的字段</th><th>给非技术读者的解释</th></tr></thead>
+      <tbody>
+        <tr><td><code>order</code></td><td>第几步</td></tr>
+        <tr><td><code>title</code></td><td>这一步的短标题</td></tr>
+        <tr><td><code>midsceneApi</code></td><td>这一步属于点击、输入、读取、断言还是滚动</td></tr>
+        <tr><td><code>naturalLanguageInstruction</code></td><td>真正交给执行器看的那句人话</td></tr>
+        <tr><td><code>reason</code></td><td>为什么这一步要用这个动作</td></tr>
+        <tr><td><code>exampleCode</code></td><td>系统最终能执行的示例代码</td></tr>
+      </tbody>
+    </table>
+
+    <h2>为什么当前优先本地规则</h2>
+    <p>对 SAP WebGUI 测试来说，很多用例不是三五步，而是几十步，里面还会包含字段、表格列、变量、滚动条、设置弹窗、等待时间和 xpath。把整段长上下文直接丢给 LLM，会带来几个问题：</p>
+    <table>
+      <thead><tr><th>问题</th><th>具体表现</th></tr></thead>
+      <tbody>
+        <tr><td>上下文过长</td><td>模型可能漏掉中间步骤，或者把多个动作合并成一步</td></tr>
+        <tr><td>输出不稳定</td><td>同一段需求多跑几次，拆分结果可能不同</td></tr>
+        <tr><td>耗时更久</td><td>LLM 需要完整阅读、规划、输出 JSON，比本地关键词规则慢</td></tr>
+        <tr><td>更难复用 cache</td><td>如果模型改写 locator 文案，已有缓存命中率会下降</td></tr>
+        <tr><td>容易过度理解</td><td>用户只是想点击某按钮，模型可能自动补充不存在的前提或步骤</td></tr>
+      </tbody>
+    </table>
+    <p>因此推荐：标准 SAP 操作优先本地；本地拆错时再启用 LLM；如果有 John 的步骤文档或录屏，优先把它整理成逐步清单，而不是从零写自然语言。</p>
+    <p>最理想的输入是“每行一个动作”的清单，例如：</p>
+    <ol>
+      <li>进入 Menu</li>
+      <li>点击 Settings</li>
+      <li>打开 Visualization</li>
+      <li>勾选 Show OK Code Field</li>
+      <li>点击 Save</li>
+      <li>在左上角 OK Code 输入 FAGLL03H</li>
+      <li>按 Enter</li>
+      <li>在 company code 输入 8540</li>
+      <li>点击 Execute</li>
+      <li>读取 Curr.bk.val. 列，保存为 A1</li>
+      <li>读取 Book val. 列，保存为 A2</li>
+      <li>如果 A1 和 A2 相等，则 case 通过</li>
+    </ol>
+
+    <h2>两套规则是怎么制定的</h2>
+    <div class="grid">
+      <section class="panel">
+        <h3>本地规则</h3>
+        <p>本地规则来自已有 SAP WebGUI 测试用例和稳定的 Midscene API 能力，把高频写法沉淀成确定性转换规则。</p>
+        <ul>
+          <li>先拆分步骤：编号、逗号、分号、然后、并且。</li>
+          <li>再标准化 SAP 术语：OK Code、company code、Asset number、Report date。</li>
+          <li>再选择 API：输入用 <code>aiInput</code>，点击用 <code>aiTap</code>，取值用 <code>aiQuery</code>，断言用 <code>aiAssert</code>。</li>
+          <li>最后加执行增强：xpath 直连、变量本地比较、滚动恢复、cache bypass。</li>
+        </ul>
+        <p>目标是可预测、稳定、便于缓存复用。</p>
+      </section>
+      <section class="panel">
+        <h3>LLM 规则</h3>
+        <p>LLM 版通过 prompt 把模型限制成 Midscene.js API 步骤规划器，不允许自由输出代码。</p>
+        <ul>
+          <li>输出必须是固定 JSON。</li>
+          <li>每个 step 必须包含 API、自然语言指令、原因和示例代码。</li>
+          <li>每一步只能使用一个明确 API。</li>
+          <li>禁止用泛化的 <code>agent.ai()</code> 代替具体动作。</li>
+          <li>返回后还会校验、归一化和重新编号；失败则回退本地规则。</li>
+        </ul>
+        <p>目标是理解更强，适合口语化或复杂描述。</p>
+      </section>
+    </div>
+
+    <h2>两套生成规则怎么选</h2>
+    <table>
+      <thead><tr><th>场景</th><th>推荐选择</th><th>原因</th></tr></thead>
+      <tbody>
+        <tr><td>SAP 用例步骤标准，包含点击、输入、执行、提取、断言</td><td>本地规则</td><td>稳定、快、可预测，不容易合并或漏掉步骤</td></tr>
+        <tr><td>用例很长，但编号和格式清楚</td><td>本地规则</td><td>会按编号和连接词拆成细步骤</td></tr>
+        <tr><td>描述比较口语化，需要理解上下文</td><td>LLM</td><td>更擅长理解复杂语义和不规则描述</td></tr>
+        <tr><td>需要严格复现每一步</td><td>本地规则</td><td>规则驱动，输出更可控</td></tr>
+        <tr><td>本地规则分类明显不对</td><td>LLM 或手动编辑</td><td>LLM 可重新规划，也可以直接改 <code>apiGuide</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>JS Step 操作选择逻辑</h2>
+    <table>
+      <thead><tr><th>自然语言意图</th><th>生成的 JS 操作</th><th>例子</th><th>优势</th></tr></thead>
+      <tbody>
+        <tr><td>点击按钮、菜单、链接、复选框</td><td><code>agent.aiTap()</code></td><td>点击 Execute 按钮</td><td>适合界面点击</td></tr>
+        <tr><td>往字段里输入值</td><td><code>agent.aiInput()</code></td><td>在 company code 字段输入 8540</td><td>locator 和 value 分离，便于改参数和复用 cache</td></tr>
+        <tr><td>Enter、Tab、Esc、F8 等按键</td><td><code>agent.aiKeyboardPress()</code></td><td>按回车进入事务码</td><td>更贴近 SAP 快捷键习惯</td></tr>
+        <tr><td>提取页面或表格中的值</td><td><code>agent.aiQuery()</code></td><td>读取 Curr.bk.val. 列，保存为 A1</td><td>可保存变量供后续断言</td></tr>
+        <tr><td>校验页面状态或变量比较</td><td><code>agent.aiAssert()</code></td><td>如果 A1 和 A2 相等则通过</td><td>变量比较可走本地逻辑，减少模型判断</td></tr>
+        <tr><td>滚动、拖动页面或表格</td><td><code>agent.aiScroll()</code> / <code>agent.aiAct()</code></td><td>页面拖到最右边</td><td>适配 SAP 横向表格和滚动条</td></tr>
+        <tr><td>等待页面加载</td><td><code>sleep(ms)</code></td><td>等 4s</td><td>不走模型，简单稳定</td></tr>
+        <tr><td>明确给出 xpath</td><td><code>agent.aiTap(..., { xpath })</code></td><td>点击图标 xpath=...</td><td>直接 DOM 定位，减少视觉误判</td></tr>
+      </tbody>
+    </table>
+
+    <h2>SAP 系统专项规则</h2>
+    <h3>事务码和 OK Code</h3>
+    <table>
+      <thead><tr><th>用户写法</th><th>转换结果</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><code>TC框搜索 S_ALR_87011990</code></td><td><code>aiInput("左上角 TC 框", { value: "S_ALR_87011990" })</code> + 回车</td><td>事务码是输入动作，不是点击动作</td></tr>
+        <tr><td><code>左上角矩形输入框输入 FAGLL03H</code></td><td><code>aiInput("左上角矩形", { value: "FAGLL03H" })</code></td><td>兼容 OK Code 输入框没有明确 label 的情况</td></tr>
+        <tr><td><code>点击 Execute</code></td><td>点击或 Enter 类动作</td><td>Execute 在 SAP 中常等价于 F8/Enter，runner 会做回退处理</td></tr>
+      </tbody>
+    </table>
+
+    <h3>常见字段输入</h3>
+    <table>
+      <thead><tr><th>用户写法</th><th>标准化后</th></tr></thead>
+      <tbody>
+        <tr><td><code>company code输入8540</code></td><td><code>在 company code 字段 输入 8540</code></td></tr>
+        <tr><td><code>Asset number输入1010001732</code></td><td><code>在 Asset number 字段 输入 1010001732</code></td></tr>
+        <tr><td><code>Report date输入30.04.2026</code></td><td><code>在 Report date 字段 输入 30.04.2026</code></td></tr>
+        <tr><td><code>search term输入operational division</code></td><td><code>aiInput("search term", { value: "operational division" })</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>菜单、Favorites、表格、滚动和 xpath</h3>
+    <ul>
+      <li><code>在 Menu / Settings / Visualization 界面启用 Show OK Code Field 并保存</code> 会拆成 Menu、Settings、Visualization、勾选、Save 多步。</li>
+      <li><code>返回 SAP 主页，选择 Favorites 下面的 Asset Balances</code> 会拆成返回主页和展开 Favorites 两步。</li>
+      <li><code>查找 Curr.bk.val. 列的值，记录为变量 A1</code> 会转成 <code>aiQuery</code> 并保存变量。</li>
+      <li><code>A1 和 A2 相等则 case 通过</code> 会转成 <code>aiAssert</code>，运行时优先本地变量比较。</li>
+      <li><code>页面拖动到最右边</code> 会生成针对底部横向滚动条的拖动动作；cached 模式下建议 bypass 这类步骤。</li>
+      <li><code>点击图标 xpath=//*[@id="C185_toolbar_btn10"]</code> 会把 xpath 拆出来，直接用 DOM 定位。</li>
+      <li>显式日期原样输入；动态日期如“上个月最后一个自然日”会在运行时尝试解析成 SAP 日期格式。</li>
+    </ul>
+
+    <h2>运行操作怎么选</h2>
+    <table>
+      <thead><tr><th>操作</th><th>什么时候用</th><th>优势</th></tr></thead>
+      <tbody>
+        <tr><td><code>Run raw</code> / <code>Run JS</code></td><td>第一次运行、新改 T Code、新改步骤、页面结构可能变了</td><td>重新规划 locator，写入新 cache</td></tr>
+        <tr><td><code>Run cached</code> / <code>Run JS w/ Cache</code></td><td>用例已经成功跑过，想快速稳定复跑</td><td>复用上次成功运行的定位结果</td></tr>
+        <tr><td><code>bypass cache</code> 某一步</td><td>cached 模式下某一步 locator 可能过期</td><td>只让这一小步重新问模型</td></tr>
+        <tr><td><code>keep cache even if run fails</code></td><td>raw 调试阶段，希望保留失败前已写入的定位结果</td><td>下一次可复用已有进展</td></tr>
+      </tbody>
+    </table>
+
+    <h2>建议流程</h2>
+    <ol>
+      <li>先写自然语言。</li>
+      <li>点 <code>Gen API</code> 生成 steps。</li>
+      <li>人工快速检查 <code>aiInput</code>、<code>aiQuery</code>、<code>aiAssert</code> 是否合理。</li>
+      <li>第一次用 <code>Run raw</code>。</li>
+      <li>成功后再用 <code>Run cached</code> 做稳定复跑。</li>
+      <li>如果 cached 某一步失败，只勾选那一步的 <code>bypass cache</code> 后再跑。</li>
+    </ol>
+  </main>
+</body>
+</html>

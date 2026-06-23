@@ -89,6 +89,76 @@ export function stripScrollCacheEntries(cacheFilePath) {
 }
 
 /**
+ * Dedupe scroll-class cache entries to one-per-prompt, keeping the FIRST
+ * occurrence and dropping later duplicates. Use after a successful scroll
+ * step so prior runs' stale leftovers don't survive.
+ *
+ * Why keep-first (not keep-last): Midscene 1.8.1's locate cache rewrites
+ * the first matched slot in-place on cache-miss. So after this run's
+ * successful aiLocate, the FIRST file entry for that prompt holds the
+ * fresh xpath; same-prompt entries further down are from older runs that
+ * never got rematched (e.g. junk "/html/body/div[1]" fallbacks). Keeping
+ * only the first means next run's first cache lookup hits the good entry
+ * and the stale ones can't pollute multi-call scenarios.
+ *
+ * Non-scroll entries pass through untouched.
+ *
+ * @param {string} cacheFilePath
+ * @returns {{ kept: number, removed: number, dedupedPrompts: string[] } | null}
+ */
+export function dedupeScrollCacheKeepFirst(cacheFilePath) {
+  if (!existsSync(cacheFilePath)) return null;
+  const text = readFileSync(cacheFilePath, 'utf8');
+  const headerMatch = text.match(/^([\s\S]*?\bcaches:\s*\n)/);
+  if (!headerMatch) return { kept: 0, removed: 0, dedupedPrompts: [] };
+  const header = headerMatch[1];
+  const tail = text.slice(header.length);
+
+  const re = /^\s{0,4}-\s+type:/gm;
+  const positions = [];
+  let m;
+  while ((m = re.exec(tail)) !== null) positions.push(m.index);
+  if (positions.length === 0) return { kept: 0, removed: 0, dedupedPrompts: [] };
+
+  const blocks = [];
+  for (let i = 0; i < positions.length; i += 1) {
+    const start = positions[i];
+    const end = i + 1 < positions.length ? positions[i + 1] : tail.length;
+    blocks.push(tail.slice(start, end));
+  }
+  const preamble = tail.slice(0, positions[0]);
+
+  const seenPrompts = new Set();
+  const kept = [];
+  let removed = 0;
+  const dedupedPrompts = new Set();
+  for (const block of blocks) {
+    if (!isScrollEntry(block)) {
+      kept.push(block);
+      continue;
+    }
+    const inline = block.match(/^\s*prompt:\s*(.+?)\s*$/m);
+    const prompt = inline?.[1]?.replace(/^['"]|['"]$/g, '') ?? null;
+    if (!prompt) {
+      // Couldn't extract a key (block-scalar prompt etc.) — keep to be safe.
+      kept.push(block);
+      continue;
+    }
+    if (seenPrompts.has(prompt)) {
+      removed += 1;
+      dedupedPrompts.add(prompt);
+    } else {
+      seenPrompts.add(prompt);
+      kept.push(block);
+    }
+  }
+
+  const next = header + preamble + kept.join('');
+  if (removed > 0) writeFileSync(cacheFilePath, next, 'utf8');
+  return { kept: kept.length, removed, dedupedPrompts: [...dedupedPrompts] };
+}
+
+/**
  * Strip cache entries whose `prompt:` field is in `promptsToRemove`.
  * Used for per-step "bypass cache" — the runner deletes targeted entries
  * before the run so Midscene cache-misses on those locators and re-LLMs.

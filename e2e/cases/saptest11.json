@@ -1,0 +1,282 @@
+{
+  "$schema": "SAP TEST 11 — composed from sap_testcase/03_Sales Order Creation - Standard.docx",
+  "title": "SAP TEST 11",
+  "description": "BP_IT_B2P_GUI_Sales Order Creation - Standard.\nCreate a standard Sales Order in VA01: order type YCC1, sales org IDP1, channel 2B, division 01, sold-to / ship-to 88100322, material 2.608.621.840 with qty 1, customer reference \"Test 2.0\", PO type TELE, route 41DB1. Save and confirm a new Sales Order number is generated.",
+  "sapUrl": "https://q4t.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "VA01",
+  "naturalLanguage": "\n2.在 左上角矩形输入框 输入 VA01，按 Enter 回车键。\n3.在 Order type 输入YCC2 输入 YCC1，按 Tab 键。\n4.在 Sales Organization 输入框 输入 IDP1，按 Tab 键。\n5.在 Distribution Channel 输入框 输入 2B，按 Tab 键。\n6.在 Division 输入框 输入 01，点击continue,等5s。\n7.在 Sold-to Party 输入框 输入 88100322，按 Tab 键。\n8. 在ship-to-party输入 88100322。\n9.在 Material 列底下的第一个输入框 输入 2.608.621.840，按 Tab 键，按tab。\n10.输入 1，按 Tab 键，输入pc。\n11.点击 Display Header Details 按钮xpath=//*[@id=\"M0:46:1::3:78\"]。\n12.切换到 Order Data 选项卡。\n13.在 Customer reference 输入框 输入 Test 2.0。\n14.在 Purchase Order type 输入 TELE。\n17.点击 Save 按钮，等5s,点击新跳出来的save。\n18.等3s,如果屏幕左下角出现对勾和类似order saved即为案例通过",
+  "apiGuide": {
+    "summary": "SAP TEST 11",
+    "assumptions": [
+      "从 https://q4t.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "在 左上角矩形输入框 输入 VA01",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 VA01",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"VA01\" });"
+      },
+      {
+        "order": 2,
+        "title": "按 Enter 回车键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 3,
+        "title": "在 Order type 输入框 输入 YCC1",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Order type 输入框 输入 YCC1",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Order type\", { value: \"YCC1\" });"
+      },
+      {
+        "order": 4,
+        "title": "按 Tab 键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Tab 键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Tab\");"
+      },
+      {
+        "order": 5,
+        "title": "在 Sales Organization 输入框 输入 ...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Sales Organization 输入框 输入 IDP1",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Sales Organization\", { value: \"IDP1\" });"
+      },
+      {
+        "order": 6,
+        "title": "按 Tab 键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Tab 键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Tab\");"
+      },
+      {
+        "order": 7,
+        "title": "在 Distribution Channel 输入框 输...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Distribution Channel 输入框 输入 2B",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Distribution Channel\", { value: \"2B\" });"
+      },
+      {
+        "order": 8,
+        "title": "按 Tab 键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Tab 键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Tab\");"
+      },
+      {
+        "order": 9,
+        "title": "在 Division 输入框 输入 01",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Division 输入框 输入 01",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Division\", { value: \"01\" });"
+      },
+      {
+        "order": 10,
+        "title": "点击continue",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "点击continue",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 11,
+        "title": "等5s",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "等5s",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await sleep(5000);"
+      },
+      {
+        "order": 12,
+        "title": "在 Sold-to Party 输入框 输入 88100...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Sold-to Party 输入框 输入 88100322",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Sold-to Party\", { value: \"88100322\" });"
+      },
+      {
+        "order": 13,
+        "title": "按 Tab 键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Tab 键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Tab\");"
+      },
+      {
+        "order": 14,
+        "title": "在ship-to-party输入 88100322",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在ship-to-party输入 88100322",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"ship-to-party\", { value: \"88100322\" });"
+      },
+      {
+        "order": 15,
+        "title": "在 Material 列底下的第一个输入框 输入 2.6...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Material 列底下的第一个输入框 输入 2.608.621.840",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Material 列底下的第一个\", { value: \"2.608.621.840\" });"
+      },
+      {
+        "order": 16,
+        "title": "按 Tab 键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Tab 键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Tab\");"
+      },
+      {
+        "order": 17,
+        "title": "按tab",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按tab",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Tab\");"
+      },
+      {
+        "order": 18,
+        "title": "输入 1",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "输入 1",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"输入框\", { value: \"1\" });"
+      },
+      {
+        "order": 19,
+        "title": "按 Tab 键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Tab 键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Tab\");"
+      },
+      {
+        "order": 20,
+        "title": "输入pc",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "输入pc",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"输入框\", { value: \"pc\" });"
+      },
+      {
+        "order": 21,
+        "title": "点击 Display Header Details 按钮",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Display Header Details 按钮",
+        "xpath": "//*[@id=\"M0:46:1::3:78\"]",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Display Header Details 按钮\", { xpath: \"//*[@id=\\\"M0:46:1::3:78\\\"]\" });"
+      },
+      {
+        "order": 22,
+        "title": "切换到 Order Data 选项卡",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Order Data 选项卡",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"切换到 Order Data 选项卡\");"
+      },
+      {
+        "order": 23,
+        "title": "在 Customer reference 输入框 输入 ...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Customer reference 输入框 输入 Test 2.0",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Customer reference\", { value: \"Test 2.0\" });"
+      },
+      {
+        "order": 24,
+        "title": "在 Purchase Order type 输入 TEL...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Purchase Order type 输入 TELE",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Purchase Order type\", { value: \"TELE\" });"
+      },
+      {
+        "order": 25,
+        "title": "点击 Save 按钮",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Save 按钮",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Save 按钮\");"
+      },
+      {
+        "order": 26,
+        "title": "等5s",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "等5s",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await sleep(5000);"
+      },
+      {
+        "order": 27,
+        "title": "点击新跳出来的save",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击新跳出来的save",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击新跳出来的save\");"
+      },
+      {
+        "order": 28,
+        "title": "等3s",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "等3s",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await sleep(3000);"
+      },
+      {
+        "order": 29,
+        "title": "如果屏幕左下角出现对勾和类似order saved即为案...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "如果屏幕左下角出现对勾和类似order saved即为案例通过",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"如果屏幕左下角出现对勾和类似order saved即为案例通过\");"
+      }
+    ],
+    "recommendedYamlSnippet": "",
+    "docReferences": [],
+    "warnings": [
+      "已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。",
+      "本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+    ],
+    "markdown": "## SAP TEST 11\n\n### 前提假设\n- 从 https://q4t.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。\n\n### API 步骤\n1. 在 左上角矩形输入框 输入 VA01\n   - API: `agent.aiInput()`\n   - 指令: 在 左上角矩形输入框 输入 VA01\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"左上角矩形\", { value: \"VA01\" });`\n2. 按 Enter 回车键\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按 Enter 回车键\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Enter\");`\n3. 在 Order type 输入框 输入 YCC1\n   - API: `agent.aiInput()`\n   - 指令: 在 Order type 输入框 输入 YCC1\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Order type\", { value: \"YCC1\" });`\n4. 按 Tab 键\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按 Tab 键\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Tab\");`\n5. 在 Sales Organization 输入框 输入 ...\n   - API: `agent.aiInput()`\n   - 指令: 在 Sales Organization 输入框 输入 IDP1\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Sales Organization\", { value: \"IDP1\" });`\n6. 按 Tab 键\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按 Tab 键\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Tab\");`\n7. 在 Distribution Channel 输入框 输...\n   - API: `agent.aiInput()`\n   - 指令: 在 Distribution Channel 输入框 输入 2B\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Distribution Channel\", { value: \"2B\" });`\n8. 按 Tab 键\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按 Tab 键\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Tab\");`\n9. 在 Division 输入框 输入 01\n   - API: `agent.aiInput()`\n   - 指令: 在 Division 输入框 输入 01\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Division\", { value: \"01\" });`\n10. 点击continue\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 点击continue\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Enter\");`\n11. 等5s\n   - API: `agent.aiTap()`\n   - 指令: 等5s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(5000);`\n12. 在 Sold-to Party 输入框 输入 88100...\n   - API: `agent.aiInput()`\n   - 指令: 在 Sold-to Party 输入框 输入 88100322\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Sold-to Party\", { value: \"88100322\" });`\n13. 按 Tab 键\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按 Tab 键\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Tab\");`\n14. 在ship-to-party输入 88100322\n   - API: `agent.aiInput()`\n   - 指令: 在ship-to-party输入 88100322\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"ship-to-party\", { value: \"88100322\" });`\n15. 在 Material 列底下的第一个输入框 输入 2.6...\n   - API: `agent.aiInput()`\n   - 指令: 在 Material 列底下的第一个输入框 输入 2.608.621.840\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Material 列底下的第一个\", { value: \"2.608.621.840\" });`\n16. 按 Tab 键\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按 Tab 键\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Tab\");`\n17. 按tab\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按tab\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Tab\");`\n18. 输入 1\n   - API: `agent.aiInput()`\n   - 指令: 输入 1\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"输入框\", { value: \"1\" });`\n19. 按 Tab 键\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 按 Tab 键\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Tab\");`\n20. 输入pc\n   - API: `agent.aiInput()`\n   - 指令: 输入pc\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"输入框\", { value: \"pc\" });`\n21. 点击 Display Header Details 按钮\n   - API: `agent.aiTap()`\n   - 指令: 点击 Display Header Details 按钮\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击 Display Header Details 按钮\", { xpath: \"//*[@id=\\\"M0:46:1::3:78\\\"]\" });`\n22. 切换到 Order Data 选项卡\n   - API: `agent.aiTap()`\n   - 指令: 切换到 Order Data 选项卡\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"切换到 Order Data 选项卡\");`\n23. 在 Customer reference 输入框 输入 ...\n   - API: `agent.aiInput()`\n   - 指令: 在 Customer reference 输入框 输入 Test 2.0\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Customer reference\", { value: \"Test 2.0\" });`\n24. 在 Purchase Order type 输入 TEL...\n   - API: `agent.aiInput()`\n   - 指令: 在 Purchase Order type 输入 TELE\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Purchase Order type\", { value: \"TELE\" });`\n25. 点击 Save 按钮\n   - API: `agent.aiTap()`\n   - 指令: 点击 Save 按钮\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击 Save 按钮\");`\n26. 等5s\n   - API: `agent.aiTap()`\n   - 指令: 等5s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(5000);`\n27. 点击新跳出来的save\n   - API: `agent.aiTap()`\n   - 指令: 点击新跳出来的save\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击新跳出来的save\");`\n28. 等3s\n   - API: `agent.aiTap()`\n   - 指令: 等3s\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await sleep(3000);`\n29. 如果屏幕左下角出现对勾和类似order saved即为案...\n   - API: `agent.aiAssert()`\n   - 指令: 如果屏幕左下角出现对勾和类似order saved即为案例通过\n   - 原因: 结果校验或变量比较,适合断言 API。\n   - 示例: `await agent.aiAssert(\"如果屏幕左下角出现对勾和类似order saved即为案例通过\");`\n\n### 注意事项\n- 已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。\n- 本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+  },
+  "apiGuideNaturalLanguage": "\n2.在 左上角矩形输入框 输入 VA01，按 Enter 回车键。\n3.在 Order type 输入框 输入 YCC1，按 Tab 键。\n4.在 Sales Organization 输入框 输入 IDP1，按 Tab 键。\n5.在 Distribution Channel 输入框 输入 2B，按 Tab 键。\n6.在 Division 输入框 输入 01，点击continue,等5s。\n7.在 Sold-to Party 输入框 输入 88100322，按 Tab 键。\n8. 在ship-to-party输入 88100322。\n9.在 Material 列底下的第一个输入框 输入 2.608.621.840，按 Tab 键，按tab。\n10.输入 1，按 Tab 键，输入pc。\n11.点击 Display Header Details 按钮xpath=//*[@id=\"M0:46:1::3:78\"]。\n12.切换到 Order Data 选项卡。\n13.在 Customer reference 输入框 输入 Test 2.0。\n14.在 Purchase Order type 输入 TELE。\n17.点击 Save 按钮，等5s,点击新跳出来的save。\n18.等3s,如果屏幕左下角出现对勾和类似order saved即为案例通过",
+  "tags": [
+    "SAP",
+    "SD",
+    "VA01",
+    "Sales Order Creation"
+  ],
+  "source": {
+    "desktop": false,
+    "docxSource": "sap_testcase/03_Sales Order Creation - Standard.docx",
+    "composedAt": "2026-06-15T05:44:30.038Z"
+  },
+  "cacheSlotConfig": {
+    "pass": {
+      "source": "auto",
+      "excludeSteps": []
+    },
+    "fail": {
+      "source": "2026-06-22T09-21-52-361-jsrun-saptest1-ca6a",
+      "excludeSteps": [],
+      "dropTailCount": 3
+    }
+  },
+  "params": {
+    "3": "YCC2"
+  }
+}

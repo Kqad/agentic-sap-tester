@@ -33,6 +33,11 @@ import {
 // trail by several seconds after an action returns).
 const POST_RECOVERY_SETTLE_MS = 10_000;
 
+// Before invoking the expensive/noisy aiAct recovery cascade, give SAP one
+// short settle window and retry the original step. Many WebGUI transitions
+// finish a few seconds after the previous action returns.
+const PRE_REPLAN_RETRY_DELAY_MS = 5_000;
+
 
 // Layer 2 pre-flight (cached xpath ↔ live DOM) polling window. SAP
 // popups / modals can take 1-2 s to render after a preceding step's
@@ -84,7 +89,12 @@ export async function tryScrollRecovery(agent, step, ctx, executeOne) {
   for (const direction of SCROLL_RECOVERY_DIRECTIONS) {
     const recoveryInstruction = direction === 'right'
       ? '结果表格左上角的工具栏里有一组横向导航按钮（类似 |< < > >| 的箭头图标，紧挨在 Menu 输入框右边），其中最右边那个指向竖线的「>|」按钮表示跳到最后一组列。请只点击一次这个「>|」按钮，让原本在右侧被裁掉的列显示出来。不要点击其它按钮，不要点击表格行，不要切换页面，不要拖动滚动条。'
-      : '在当前结果表格区域使用鼠标滚轮向下快速滚动一次，让更多数据行显示出来。不要点击表格内的按钮或行，不要拖动滚动条，不要切换页面。';
+      // Down: small step — roughly 40% of the current viewport. Keeps
+      // ~10% overlap between consecutive frames so context isn't lost,
+      // and the loop can step up to SCROLL_RECOVERY_MAX_MOVES times
+      // (~2.5 viewport heights total) before giving up. Each step is
+      // small enough that we don't blast past the target row.
+      : '在当前结果表格/页面区域使用鼠标滚轮向下滚动大约屏幕高度的 40%(保留上下文重叠,不要一次滚太多),让原本在下方被裁掉的数据行显示出来。不要点击表格内的按钮或行,不要拖动滚动条,不要切换页面。';
     for (let move = 1; move <= SCROLL_RECOVERY_MAX_MOVES; move += 1) {
       try {
         ctx.log(`Step ${step.order} scroll recovery aiAct ${direction} ${move}`);
@@ -140,10 +150,24 @@ function extractStepLocatorPrompts(step) {
   const code = step?.exampleCode || '';
   if (!code) return [];
   const out = [];
-  // aiTap / aiInput / aiHover / aiKeyboardPress: locator is the FIRST string arg.
-  const re1 = /agent\.ai(?:Tap|Input|Hover|KeyboardPress)\s*\(\s*(['"`])([\s\S]*?)\1/g;
+  // aiTap / aiInput / aiHover: locator is the FIRST string arg. Their
+  // locate result is what gets cached, so these prompts ARE the cache keys.
+  const re1 = /agent\.ai(?:Tap|Input|Hover)\s*\(\s*(['"`])([\s\S]*?)\1/g;
   let m;
   while ((m = re1.exec(code)) !== null) out.push(m[2]);
+  // aiKeyboardPress — two signatures, only ONE of them uses a locator:
+  //   · 1-arg form `aiKeyboardPress("Enter")` — first arg is the KEY NAME,
+  //     not a locator. Midscene dispatches the key to the currently-focused
+  //     element with NO locate step → nothing to cache, nothing to
+  //     pre-flight. Including it here was wrong: we'd look for "Enter" /
+  //     "Tab" in the cache, miss (because they're never there), and abort
+  //     the whole run via the "MISS → replan failed" branch.
+  //   · 2-arg form `aiKeyboardPress("locator", { keyName: "Enter" })` —
+  //     first arg IS a locator (focus this element first, then press key).
+  //     That one DOES cache; check it only when we see the `, { keyName:`
+  //     companion.
+  const kbpRe = /agent\.aiKeyboardPress\s*\(\s*(['"`])([\s\S]*?)\1\s*,\s*\{\s*keyName\s*:/g;
+  while ((m = kbpRe.exec(code)) !== null) out.push(m[2]);
   // aiScroll: locator is the SECOND arg (after the scroll-opts object), e.g.
   //   agent.aiScroll({ scrollType: 'untilBottom' }, "查询结果表格")
   const re2 = /agent\.aiScroll\s*\(\s*(?:\{[\s\S]*?\}|(['"`])[\s\S]*?\1)\s*,\s*(['"`])([\s\S]*?)\2/g;
@@ -576,6 +600,23 @@ async function tryReplanWithCaseContext(agent, step, ctx, executeOne) {
   return { recovered: false, error: s2.error || s1.error };
 }
 
+async function retryOriginalStepBeforeReplan(agent, step, ctx, executeOne, stepTimeoutMs, reason) {
+  ctx.log(`Step ${step.order} ${reason} — waiting ${PRE_REPLAN_RETRY_DELAY_MS}ms, then retrying original step before aiAct recovery`);
+  await sleep(PRE_REPLAN_RETRY_DELAY_MS);
+  try {
+    const result = await withTimeout(executeOne(agent, step, ctx), stepTimeoutMs, `Step ${step.order} pre-replan retry`);
+    if (normalizeApiName(step) === 'aiQuery' && isMissingQueryResult(result, step?.naturalLanguageInstruction)) {
+      ctx.log(`Step ${step.order} pre-replan retry: aiQuery still missing: ${JSON.stringify(result)}`);
+      return { recovered: false, error: new Error(`查询目标未找到：${JSON.stringify(result)}`), queryMissing: result };
+    }
+    ctx.log(`Step ${step.order} pre-replan retry succeeded; skipping aiAct recovery`);
+    return { recovered: true, result };
+  } catch (err) {
+    ctx.log(`Step ${step.order} pre-replan retry failed: ${normalizeError(err)}`);
+    return { recovered: false, error: err };
+  }
+}
+
 // Orchestrator. Calls executeOne(agent, step, ctx). New cascade order:
 //   1. one attempt at the recorded step
 //   2. aiAct replan with full case context (was last; promoted because it
@@ -611,6 +652,10 @@ export async function executeStepWithRecovery(agent, step, ctx, executeOne) {
   }
   if (miss.miss) {
     ctx.log(`Step ${step.order} cache pre-flight MISS (${miss.reason}) — skipping cache attempt, going straight to replan`);
+    const retry = await retryOriginalStepBeforeReplan(agent, step, ctx, executeOne, stepTimeoutMs, 'cache pre-flight miss');
+    if (retry.recovered) return retry.result;
+    if (retry.error) lastError = retry.error;
+    if (typeof retry.queryMissing !== 'undefined') lastQueryMissing = retry.queryMissing;
     const r = await tryReplanWithCaseContext(agent, step, ctx, executeOne);
     if (r.recovered) return r.result;
     // Replan also failed — fall through to scroll recoveries so an
@@ -667,6 +712,11 @@ export async function executeStepWithRecovery(agent, step, ctx, executeOne) {
   // here would just re-ask the model with more context that, for Execute
   // buttons, tends to confuse rather than help. Fall straight to scroll.
   if (!isExec) {
+    const retry = await retryOriginalStepBeforeReplan(agent, step, ctx, executeOne, stepTimeoutMs, 'failed initial attempt');
+    if (retry.recovered) return retry.result;
+    if (retry.error) lastError = retry.error;
+    if (typeof retry.queryMissing !== 'undefined') lastQueryMissing = retry.queryMissing;
+
     const r = await tryReplanWithCaseContext(agent, step, ctx, executeOne);
     if (r.recovered) return r.result;
     if (r.error) lastError = r.error;

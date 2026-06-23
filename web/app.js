@@ -1542,15 +1542,18 @@ VIEWS.dashboard = async () => {
   // Fetch the data the workbench depends on. All endpoints are pre-existing —
   // no schema changes. Failures fall back to empty arrays so partial perms
   // (e.g. cases:read but not results:read) still render usefully.
-  const [casesRes, recentRes] = await Promise.all([
+  const [casesRes, recentRes, activeRes] = await Promise.all([
     canReadCases   ? api.get('/api/cases').catch(() => ({ cases: [] }))                            : Promise.resolve({ cases: [] }),
     canReadResults ? api.get('/api/results/recent?limit=200').catch(() => ({ runs: [] }))           : Promise.resolve({ runs: [] }),
+    canRun         ? api.get('/api/midscene-js/runs/active').catch(() => ({ active: [] }))          : Promise.resolve({ active: [] }),
   ]);
 
-  // Sort cases: saptest1-8 first (project convention), then alpha. Same logic
-  // as VIEWS.cases — kept inline to avoid coupling.
+  // Sort cases: all saptestN in numeric order first (so saptest9 → saptest10
+  // → saptest11 read naturally instead of lex-sorted as 10,11,…,2,…),
+  // everything else falls back to alpha. Same logic as VIEWS.cases — kept
+  // inline to avoid coupling.
   const saptestRank = (id) => {
-    const m = /^saptest([1-8])$/.exec(id);
+    const m = /^saptest(\d+)$/.exec(id);
     return m ? Number(m[1]) : Infinity;
   };
   const cases = (casesRes.cases || []).slice().sort((a, b) => {
@@ -3393,8 +3396,23 @@ VIEWS.dashboard = async () => {
   renderCasesList();
   renderResults();
 
-  // Auto-select the first case so the center column isn't empty on load.
-  if (cases.length > 0) selectCase(cases[0].id);
+  // Auto-select on workbench entry. Priority:
+  //   1. The case of a currently-running run (so coming back from elsewhere
+  //      lands you on what you were watching).
+  //   2. The case of the most recent run from /api/results/recent
+  //      (lets you pick up where you left off without scrolling).
+  //   3. The first case in the sorted list (original fallback).
+  // Each candidate must still exist in `cases` (id might have been
+  // renamed / deleted since the run record was written).
+  const caseIdsAvailable = new Set(cases.map((c) => c.id));
+  const activeCaseId = (activeRes.active || [])
+    .map((a) => a.caseId)
+    .find((id) => caseIdsAvailable.has(id));
+  const latestRunCaseId = (recentRes.runs || [])
+    .map((r) => r.caseId)
+    .find((id) => caseIdsAvailable.has(id));
+  const initialPickId = activeCaseId || latestRunCaseId || (cases[0] && cases[0].id);
+  if (initialPickId) selectCase(initialPickId);
 
   // ── WebSocket + active-run poller (reuse existing endpoints) ──
   try { runWs?.close(); } catch {}
@@ -4510,9 +4528,10 @@ VIEWS.cases = async () => {
     if (r.caseId && !lastRunByCase.has(r.caseId)) lastRunByCase.set(r.caseId, r);
   }
 
-  // Sort: saptest1-8 first (in numeric order), then everything else by id.
+  // Sort: all saptestN in numeric order (saptest1, saptest2, …, saptest9,
+  // saptest10, saptest11, …), everything else by id alpha after.
   const saptestRank = (id) => {
-    const m = /^saptest([1-8])$/.exec(id);
+    const m = /^saptest(\d+)$/.exec(id);
     return m ? Number(m[1]) : Infinity;
   };
   casesRes.cases.sort((a, b) => {
@@ -5445,7 +5464,7 @@ VIEWS.caseDetail = async (route) => {
       }
     }
   } else if (activeTab === 'history') {
-    body.appendChild(renderHistoryTab(caseId, runsList.runs || []));
+    body.appendChild(renderHistoryTab(caseId, runsList.runs || [], caseData?.parsed?.cacheSlotConfig));
   }
 
   return h('div', { class: 'case-detail' }, header, tabBar, body);
@@ -5710,10 +5729,20 @@ function renderParamsTab(caseData, stepsTree) {
       disabled: !hasPerm('cases:delete'),
       onClick: () => deleteCase(caseData.id),
     }, t('cases.delete'));
+    // Cache Debug — opens the per-case slot-config modal (source pin +
+    // per-step bypass + fail-slot tail-drop). Sits on the right side
+    // just left of Save — it's a save-adjacent affordance (modifies
+    // persisted per-case config, same as the Save button does).
+    const topCacheDebugBtn = h('button', {
+      class: 'btn primary',
+      disabled: !canWrite || !stepCount,
+      title: stepCount ? 'Configure pass / fail cache slots — source pin, per-step exclude, fail-slot tail-drop' : 'apiGuide is empty — generate it first',
+      onClick: () => openCacheDebugModal(caseData.id),
+    }, 'Cache Debug');
     wrap.appendChild(h('div', {
       class: 'row',
       style: { gap: '8px', marginBottom: '12px', flexWrap: 'wrap' },
-    }, topRunJsBtn, topRunJsCacheBtn, topGenApiBtn, h('span', { class: 'spacer' }), topSaveBtn, topDeleteBtn));
+    }, topRunJsBtn, topRunJsCacheBtn, topGenApiBtn, h('span', { class: 'spacer' }), topCacheDebugBtn, topSaveBtn, topDeleteBtn));
 
     const titleInp = h('input', { value: parsed.title ?? '', disabled: !canWrite });
     const urlInp   = h('input', { value: parsed.sapUrl ?? '', disabled: !canWrite });
@@ -6343,6 +6372,10 @@ async function loadCachePanel(caseId, mountEl) {
             class: 'tag info',
             style: { marginLeft: '6px', fontSize: '10px' },
           }, 'CURRENT'),
+          f.slot && h('span', {
+            class: 'tag',
+            style: { marginLeft: '6px', fontSize: '10px' },
+          }, String(f.slot).toUpperCase()),
         ),
         h('td', { class: 'mono', style: { fontSize: '12px' } }, hashTail),
         h('td', { class: 'mono' }, fmtBytes(f.bytes)),
@@ -6371,8 +6404,14 @@ async function loadCachePanel(caseId, mountEl) {
 // Each row pairs with a hidden expansion row underneath that lazily embeds
 // the Midscene report in an iframe. The report is themed to match SAPTest
 // via the `?theme=…` param (see reportPreviewUrl + strip-branding.js).
-function renderHistoryTab(caseId, runs) {
+function renderHistoryTab(caseId, runs, cacheSlotConfig) {
   const wrap = h('div', { class: 'card' });
+  // Track which run is currently pinned as each slot's source. 'auto'
+  // (or unset) means no pin — the runner picks the latest matching
+  // snapshot at run-start time. Used to highlight the pinned row and
+  // toggle the pin button labels.
+  const passSource = cacheSlotConfig?.pass?.source ?? 'auto';
+  const failSource = cacheSlotConfig?.fail?.source ?? 'auto';
   const headChildren = [
     h('h2', {}, t('history.title')),
     h('span', { class: 'muted small' }, t('detail.runs.count', { n: runs.length })),
@@ -6438,11 +6477,74 @@ function renderHistoryTab(caseId, runs) {
       previewBtn.setAttribute('data-preview-btn', '1');
     }
 
-    const row = h('tr', {},
+    // Which cache slot this run used (used by the pin buttons + for
+    // legacy back-compat). Legacy runs derive slot from useCache.
+    const slot = r.cacheSlot ?? (r.useCache === true ? 'pass' : r.useCache === false ? 'fail' : null);
+
+    // Pin buttons — let the user nominate THIS run as the source for
+    // either cache slot. When pinned, the runner reads from this run's
+    // snapshot (run-history/cache-snapshots/<runId>.cache.yaml) for
+    // subsequent cached / raw runs. Click again to unpin (revert to
+    // auto = latest matching).
+    const isPinnedPass = passSource === r.runId;
+    const isPinnedFail = failSource === r.runId;
+    const pinPassBtn = h('button', {
+      class: 'cache-pin-btn slot-pass' + (isPinnedPass ? ' is-pinned' : ''),
+      title: isPinnedPass
+        ? 'Currently pinned as PASS cache source — click to revert to auto'
+        : 'Pin this run as the PASS cache source (used by Run-with-cache)',
+      type: 'button',
+      onClick: async () => {
+        try {
+          await api.put('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/cache-debug', {
+            pass: {
+              source: isPinnedPass ? 'auto' : r.runId,
+              excludeSteps: cacheSlotConfig?.pass?.excludeSteps || [],
+            },
+            fail: cacheSlotConfig?.fail || {},
+          });
+          toast(isPinnedPass ? 'Pass slot reset to auto' : 'Pinned as PASS cache source', 'ok');
+          render();
+        } catch (e) { toast(e.message, 'err'); }
+      },
+    }, isPinnedPass ? '★ pass' : '☆ pass');
+    const pinFailBtn = h('button', {
+      class: 'cache-pin-btn slot-fail' + (isPinnedFail ? ' is-pinned' : ''),
+      title: isPinnedFail
+        ? 'Currently pinned as FAIL cache source — click to revert to auto'
+        : 'Pin this run as the FAIL cache source (used by Run raw)',
+      type: 'button',
+      onClick: async () => {
+        try {
+          await api.put('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/cache-debug', {
+            pass: cacheSlotConfig?.pass || {},
+            fail: {
+              source: isPinnedFail ? 'auto' : r.runId,
+              excludeSteps: cacheSlotConfig?.fail?.excludeSteps || [],
+              dropTailCount: cacheSlotConfig?.fail?.dropTailCount ?? 2,
+            },
+          });
+          toast(isPinnedFail ? 'Fail slot reset to auto' : 'Pinned as FAIL cache source', 'ok');
+          render();
+        } catch (e) { toast(e.message, 'err'); }
+      },
+    }, isPinnedFail ? '★ fail' : '☆ fail');
+
+    const row = h('tr', {
+      // Subtle row-level tint when this run is the active source for a slot.
+      class: (isPinnedPass ? 'cache-pinned-pass ' : '') + (isPinnedFail ? 'cache-pinned-fail' : ''),
+    },
       h('td', {}, fmtDate(r.startedAt)),
       h('td', {},
         h('span', { class: 'tag ' + (ok ? 'ok' : 'err') },
           ok ? t('history.status.passed') : t('history.status.failed')),
+        // Only show the pin button that matches this row's outcome —
+        // passed runs can be pinned as the PASS cache source, failed
+        // runs as the FAIL cache source. Pinning a failed run as the
+        // pass source (or vice-versa) is almost always a mistake, so
+        // we hide that option entirely.
+        ' ',
+        ok ? pinPassBtn : pinFailBtn,
       ),
       h('td', {}, r.startedBy ? '@' + r.startedBy : '—'),
       h('td', { class: 'mono' }, fmtMs(r.durationMs)),
@@ -6833,6 +6935,222 @@ function stripBase(e) {
 // runs badge). Talks to /api/midscene-js/* — see server/api/midscene-js.js.
 // ──────────────────────────────────────────────────────────────────────────
 
+// ──────────────────────────────────────────────────────────────────────────
+// Cache Debug modal — per-case configuration of the two cache slots
+// (pass + fail). Lets the user:
+//   · Source each slot from "auto" (latest snapshot of the matching kind)
+//     or from a specific past run's snapshot.
+//   · Exclude individual steps from cache (per-step "force re-plan" that
+//     persists across runs, unlike the per-run bypass toggles in the
+//     Run modal).
+//   · For the fail slot: override the default "drop last N steps" count.
+// Talks to GET/PUT /api/midscene-js/cases/:id/cache-debug.
+// ──────────────────────────────────────────────────────────────────────────
+async function openCacheDebugModal(caseId) {
+  let data;
+  try {
+    data = await api.get('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/cache-debug');
+  } catch (e) {
+    return toast(e.message, 'err');
+  }
+
+  // Mutable working copies of the two slot configs (server-side normalized).
+  const draft = {
+    pass: { source: data.pass.source, excludeSteps: new Set(data.pass.excludeSteps || []) },
+    fail: {
+      source: data.fail.source,
+      excludeSteps: new Set(data.fail.excludeSteps || []),
+      dropTailCount: Number(data.fail.dropTailCount ?? 2),
+    },
+  };
+
+  // ── Helper: snapshot picker dropdown for a slot ──────────────────
+  // Filters the global snapshots list by status preference (passes for
+  // pass slot, failures for fail slot) but always shows all snapshots
+  // available — the preferred ones float to the top.
+  const buildSnapshotOptions = (slot) => {
+    const preferStatus = slot === 'pass' ? 'passed' : 'failed';
+    const opts = [];
+    opts.push(h('option', { value: 'auto' }, slot === 'pass'
+      ? 'Auto (latest passed snapshot)'
+      : 'Auto (latest failed snapshot)'));
+    const preferred = data.snapshots.filter((s) => s.status === preferStatus && s.hasFile);
+    const others   = data.snapshots.filter((s) => s.status !== preferStatus && s.hasFile);
+    const fmtSnap = (s) => {
+      const date = s.finishedAt ? new Date(s.finishedAt).toISOString().replace('T', ' ').slice(5, 16) : '?';
+      const sz = s.sizeBytes != null ? `${Math.round(s.sizeBytes / 1024)}kB` : '?';
+      return `${s.runId.slice(-12)} · ${date} · ${s.status} · ${sz}`;
+    };
+    if (preferred.length) {
+      const og = h('optgroup', { label: `── ${preferStatus} runs ──` });
+      preferred.forEach((s) => og.appendChild(h('option', { value: s.runId }, fmtSnap(s))));
+      opts.push(og);
+    }
+    if (others.length) {
+      const og = h('optgroup', { label: '── other runs ──' });
+      others.forEach((s) => og.appendChild(h('option', { value: s.runId }, fmtSnap(s))));
+      opts.push(og);
+    }
+    return opts;
+  };
+
+  // ── Per-slot column UI ─────────────────────────────────────────────
+  const buildColumn = (slot) => {
+    const cfg = draft[slot];
+    const isPass = slot === 'pass';
+    const currentFile = isPass ? data.currentPassFile : data.currentFailFile;
+    const sourceSel = h('select', {
+      style: { width: '100%' },
+      onChange: (e) => { cfg.source = e.target.value; },
+    }, ...buildSnapshotOptions(slot));
+    sourceSel.value = cfg.source;
+
+    let dropTailInp = null;
+    if (!isPass) {
+      dropTailInp = h('input', {
+        type: 'number', min: '0', max: '20', step: '1',
+        value: String(cfg.dropTailCount),
+        style: { width: '64px' },
+        onChange: (e) => {
+          const n = Number(e.target.value);
+          if (Number.isFinite(n) && n >= 0) cfg.dropTailCount = n;
+        },
+      });
+    }
+
+    const stepChecks = data.apiGuideSteps.map((s) => {
+      const isExcluded = cfg.excludeSteps.has(s.order);
+      const chk = h('input', {
+        type: 'checkbox',
+        checked: isExcluded,
+        onChange: (e) => {
+          if (e.target.checked) cfg.excludeSteps.add(s.order);
+          else cfg.excludeSteps.delete(s.order);
+          countLabel.textContent = `${cfg.excludeSteps.size} of ${data.apiGuideSteps.length} excluded`;
+        },
+      });
+      return h('label', {
+        class: 'row',
+        style: { gap: '8px', alignItems: 'center', padding: '3px 6px', borderRadius: '4px' },
+        title: s.midsceneApi,
+      },
+        chk,
+        h('span', { class: 'mono small', style: { width: '28px', color: 'var(--muted)' } }, String(s.order).padStart(2, '0')),
+        h('span', { style: { flex: '1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, s.title || s.midsceneApi),
+      );
+    });
+
+    const stepList = h('div', {
+      style: { maxHeight: '320px', overflowY: 'auto', border: '1px solid var(--input)', borderRadius: '6px', padding: '4px' },
+    }, ...stepChecks);
+
+    const selectAllBtn = h('button', {
+      class: 'btn sm ghost', type: 'button',
+      onClick: () => {
+        data.apiGuideSteps.forEach((s) => cfg.excludeSteps.add(s.order));
+        stepChecks.forEach((label) => { label.querySelector('input').checked = true; });
+        countLabel.textContent = `${cfg.excludeSteps.size} of ${data.apiGuideSteps.length} excluded`;
+      },
+    }, 'Exclude all');
+    const selectNoneBtn = h('button', {
+      class: 'btn sm ghost', type: 'button',
+      onClick: () => {
+        cfg.excludeSteps.clear();
+        stepChecks.forEach((label) => { label.querySelector('input').checked = false; });
+        countLabel.textContent = `${cfg.excludeSteps.size} of ${data.apiGuideSteps.length} excluded`;
+      },
+    }, 'Include all');
+
+    const countLabel = h('span', { class: 'muted small' },
+      `${cfg.excludeSteps.size} of ${data.apiGuideSteps.length} excluded`);
+
+    const headerColor = isPass ? 'hsl(var(--info))' : 'hsl(35 85% 50%)';
+    const slotFileNote = currentFile.exists
+      ? `${Math.round(currentFile.sizeBytes / 1024)} kB · updated ${currentFile.mtime ? new Date(currentFile.mtime).toISOString().slice(0, 16).replace('T', ' ') : '?'}`
+      : '(not yet created — runs in this slot will start from empty)';
+
+    return h('div', {
+      style: {
+        flex: '1', minWidth: '0',
+        border: '1px solid var(--input)', borderRadius: '8px',
+        padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px',
+      },
+    },
+      h('div', { style: { borderLeft: `3px solid ${headerColor}`, paddingLeft: '10px' } },
+        h('div', { class: 'mono', style: { fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: headerColor, fontWeight: 700 } },
+          isPass ? 'PASS CACHE  ·  gold' : 'FAIL CACHE  ·  scratchpad'),
+        h('div', { class: 'muted small', style: { marginTop: '3px' } },
+          isPass
+            ? '"Run with cache" reads this. Conservative — only updated by passing runs.'
+            : '"Run raw" writes here when keepCacheOnFailure=on. Work-in-progress.'),
+        h('div', { class: 'muted small mono', style: { marginTop: '3px' } }, slotFileNote),
+      ),
+      h('div', { class: 'field' },
+        h('span', {}, 'Source snapshot'),
+        sourceSel,
+      ),
+      !isPass && h('div', { class: 'field' },
+        h('span', {}, 'Drop last N steps from snapshot'),
+        h('div', { class: 'row', style: { gap: '8px', alignItems: 'center' } },
+          dropTailInp,
+          h('span', { class: 'muted small' }, '(default 2 · scrubs bad xpaths from steps adjacent to the failure point)'),
+        ),
+      ),
+      h('div', { class: 'field' },
+        h('div', { class: 'row', style: { gap: '8px', alignItems: 'center' } },
+          h('span', {}, 'Exclude these steps from cache (force re-plan)'),
+          h('span', { class: 'spacer' }),
+          countLabel,
+          selectAllBtn,
+          selectNoneBtn,
+        ),
+        stepList,
+      ),
+    );
+  };
+
+  const passCol = buildColumn('pass');
+  const failCol = buildColumn('fail');
+
+  const saveBtn = h('button', { class: 'btn primary' }, 'Save');
+  const resetBtn = h('button', { class: 'btn ghost' }, 'Reset to defaults');
+  const m = modal({
+    title: 'Cache Debug · ' + (data.caseId || caseId),
+    wide: true,
+    body: h('div', {
+      style: { display: 'flex', gap: '14px', alignItems: 'stretch' },
+    }, passCol, failCol),
+    footer: h('div', { class: 'row', style: { marginLeft: 'auto', gap: '8px' } }, resetBtn, saveBtn),
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (!confirm('Reset both slots to defaults (Auto source · no excludes · fail dropTail=2)?')) return;
+    draft.pass = { source: 'auto', excludeSteps: new Set() };
+    draft.fail = { source: 'auto', excludeSteps: new Set(), dropTailCount: 2 };
+    m.close();
+    openCacheDebugModal(caseId); // re-render by re-opening; cheap
+  });
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    try {
+      await api.put('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/cache-debug', {
+        pass: { source: draft.pass.source, excludeSteps: [...draft.pass.excludeSteps] },
+        fail: {
+          source: draft.fail.source,
+          excludeSteps: [...draft.fail.excludeSteps],
+          dropTailCount: draft.fail.dropTailCount,
+        },
+      });
+      toast('Cache slot config saved', 'ok');
+      m.close();
+    } catch (e) {
+      toast(e.message, 'err');
+      saveBtn.disabled = false; saveBtn.textContent = 'Save';
+    }
+  });
+}
+
 async function generateApiGuide(caseId) {
   toast('Generating API guide (本地规则拆分)…', 'info', 4000);
   try {
@@ -6867,6 +7185,17 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
   }
 
   const headedChk = h('input', { type: 'checkbox', checked: true });
+  // "Keep cache even if the run fails" toggle.
+  //   Run raw (write mode):  default ON  — raw runs are exploratory; you
+  //     usually want each LLM-relocate attempt to accumulate into the fail
+  //     cache slot so the NEXT raw run can replay them. The runner also
+  //     auto-strips the failing tail (default last 2 steps) before the
+  //     keep so bad xpaths from the dying step don't pollute the slot.
+  //   Run with cache (read mode):  default OFF  — you're already replaying
+  //     a validated pass cache; if it fails, the safe move is to roll back
+  //     so the next run still has the gold copy. Flip ON only when you
+  //     want to preserve mid-run LLM patches.
+  const keepCacheChk = h('input', { type: 'checkbox', checked: cacheMode === 'write' });
   // Capped-height + internal scroll log viewer. Auto-scrolls to bottom on
   // every textContent update unless the user has scrolled up manually
   // (we detect "near bottom" before the write; if the user was looking at
@@ -6988,6 +7317,14 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
       h('div', { class: 'field' },
         h('span', {}, 'Run options'),
         h('label', { class: 'row', style: { gap: '6px' } }, headedChk, h('span', {}, 'headed (show browser window)')),
+        h('label', {
+          class: 'row switch-row',
+          style: { gap: '10px', alignItems: 'center' },
+          title: 'When ON, partial cache writes from a failed run are kept (next cached run will reuse them). When OFF, failed runs roll back to the pre-run cache snapshot (pass-only-keep policy, default).',
+        },
+          h('span', { class: 'switch' }, keepCacheChk, h('span', { class: 'switch-track' })),
+          h('span', {}, 'keep cache even if run fails'),
+        ),
       ),
       h('div', { class: 'field' }, h('span', {}, 'API guide steps (' + apiGuide.steps.length + ')'), stepsList),
       h('div', { class: 'field' }, h('span', {}, 'Status'), statusEl),
@@ -7086,7 +7423,7 @@ async function openJsRunModal(caseId, cacheMode, opts = {}) {
     // modal for the full run duration.
     const runPromise = api.post(
       '/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/run?cache=' + encodeURIComponent(cacheMode),
-      { headed: headedChk.checked, noCacheSteps },
+      { headed: headedChk.checked, noCacheSteps, keepCacheOnFailure: keepCacheChk.checked },
     );
 
     // Tear down the modal and open cinema in a NAMED tab. If a cinema tab

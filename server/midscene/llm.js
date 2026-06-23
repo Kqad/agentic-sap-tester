@@ -201,16 +201,17 @@ function validateApiGuide(rawContent, input) {
 
   const steps = rawSteps.map((item, index) => {
     const rec = item && typeof item === 'object' ? item : {};
-    const instruction = typeof rec.naturalLanguageInstruction === 'string'
+    const rawInstruction = typeof rec.naturalLanguageInstruction === 'string'
       ? rec.naturalLanguageInstruction.trim()
       : '';
+    const { instruction, xpath: inlineXpath } = extractXpathFromInstruction(rawInstruction);
     const rawApi = typeof rec.midsceneApi === 'string' ? rec.midsceneApi : 'agent.aiTap()';
     const inferredApi = inferMidsceneApi(instruction);
     const midsceneApi =
       rawApi.toLowerCase().includes('aiact') || rawApi.toLowerCase() === 'agent.ai()'
         ? inferredApi
         : rawApi;
-    const xpath = typeof rec.xpath === 'string' && rec.xpath.trim() ? rec.xpath.trim() : undefined;
+    const xpath = typeof rec.xpath === 'string' && rec.xpath.trim() ? rec.xpath.trim() : inlineXpath;
     return {
       order: typeof rec.order === 'number' ? rec.order : index + 1,
       title:
@@ -245,14 +246,65 @@ function validateApiGuide(rawContent, input) {
 }
 
 // ── Heuristics: inferMidsceneApi / exampleCodeForApi / reasonForApi ───
+// Keyword → SAP key mapping. SAP WebGUI uses Enter for both Execute (F8
+// in classic GUI) and Continue, so all four of {Enter, 回车, Execute,
+// Continue, 提交, 确认} resolve to the same physical Enter key. The
+// runner adds a runtime aiTap-fallback if the screen doesn't change
+// after the key press, so the original NL ("点击右下角 execute") still
+// gets a chance to work as a button tap. Order matters — more specific
+// patterns first so "Tab" doesn't accidentally swallow "Tab key X". */
+const KEYPRESS_PATTERNS = [
+  { re: /\b(?:F[1-9]|F1[0-2])\b/i,                            key: null }, // captured below
+  { re: /(?:回车|enter\s*键|按\s*enter|hit\s*enter|press\s*enter|提交|确认|continue|继续|execute|执行)/i, key: 'Enter' },
+  { re: /(?:按\s*tab|hit\s*tab|press\s*tab|tab\s*键)/i,       key: 'Tab' },
+  { re: /(?:escape|esc\s*键|按\s*esc|取消)/i,                  key: 'Escape' },
+  { re: /(?:pagedown|page\s*down|向下翻页)/i,                  key: 'PageDown' },
+  { re: /(?:pageup|page\s*up|向上翻页)/i,                      key: 'PageUp' },
+];
+
+// Returns the SAP key name to press for an NL instruction, or null if
+// the instruction isn't a key press. Detect FN keys explicitly so an
+// instruction like "按 F8" resolves to keyName 'F8'.
+export function detectKeyName(instruction) {
+  if (!instruction) return null;
+  const fn = instruction.match(/\b(F[1-9]|F1[0-2])\b/i);
+  if (fn) return fn[1].toUpperCase();
+  for (const { re, key } of KEYPRESS_PATTERNS) {
+    if (key && re.test(instruction)) return key;
+  }
+  return null;
+}
+
 export function inferMidsceneApi(instruction) {
   if (!instruction) return 'agent.aiTap()';
-  if (/断言|验证|确认|比较|是否|相等|成功|失败/.test(instruction)) return 'agent.aiAssert()';
+  // aiAssert pattern set — covers the common ways users write assertions
+  // in Chinese AND English. The original short list (断言/验证/确认/…)
+  // missed colloquial forms like "如果A1=A2则case通过" and "X 等于 Y",
+  // which dropped to aiTap and produced broken cases. Now matched:
+  //   · 断言/验证/确认/比较/对比/校验/检查/是否
+  //   · 相等/等于/不等/不相等
+  //   · 通过/不通过/成功/失败  (when used as a test outcome verb)
+  //   · 如果...则... / 如果...即为...
+  //   · case/案例/用例/测试 通过 (signature phrase in our SAP cases)
+  //   · English: assert/expect/verify/should/equals/matches
+  if (/断言|验证|确认|比较|对比|校验|检查|是否|相等|不相等|等于|不等|成功|失败|不通过|如果.+(?:则|即为|即表示|就).*(?:通过|成功|失败)|(?:case|案例|用例|测试用例|测试)\s*通过|\b(?:assert|expect|verify|should|equals?|matches)\b/i.test(instruction)) return 'agent.aiAssert()';
   if (/记录|提取|获取|读取|查找.*值|表格.*行|变量/.test(instruction)) return 'agent.aiQuery()';
   if (isTapLikeInstruction(instruction)) return 'agent.aiTap()';
   if (/输入|填写|填入/.test(instruction) || isInputLikeInstruction(instruction)) return 'agent.aiInput()';
-  if (/按回车|进入|点击|选择|勾选|启用|开启|执行|打开|返回|展开|保存/.test(instruction)) return 'agent.aiTap()';
-  if (/滚动|滑动|拖动|左侧|右侧|横向/.test(instruction)) return 'agent.aiScroll()';
+  // Keypress detection BEFORE the generic tap fallback. SAP-friendly:
+  // "Enter / Tab / Execute / Continue / Escape" become aiKeyboardPress
+  // with the right key. Runner adds aiTap-fallback if screen doesn't
+  // change, so the legacy "点击 Execute 按钮" semantics still work as
+  // a click when the keypress route fails.
+  if (detectKeyName(instruction) !== null) return 'agent.aiKeyboardPress()';
+  if (/点击|选择|勾选|启用|开启|打开|返回|展开|保存|进入/.test(instruction)) return 'agent.aiTap()';
+  if (/滚动|滑动|拖动|左侧|右侧|横向|向下|向上|向左|向右/.test(instruction)) {
+    // Non-extreme scroll → aiAct with small distance. The actual
+    // extreme path (滑到最底/最右 etc.) is detected separately in
+    // exampleCodeForApi via isScrollExtremeInstruction; that branch
+    // still emits the formatAiScrollExampleCode aiAct drag.
+    return isScrollExtremeInstruction(instruction) ? 'agent.aiScroll()' : 'agent.aiAct()';
+  }
   return 'agent.aiTap()';
 }
 
@@ -280,6 +332,16 @@ export function exampleCodeForApi(midsceneApi, instruction, xpath) {
   // Wait directive (no LLM call needed).
   const waitMs = parseWaitMs(instruction);
   if (waitMs !== null) return `await sleep(${waitMs});`;
+  // Keypress takes priority — explicit Enter/Tab/Execute/Continue/Esc.
+  // Uses the (deprecated but still supported) keyName-first signature
+  // because the NL usually doesn't carry a locator for keypresses; the
+  // runner adds an aiTap-fallback (original NL) if the screen doesn't
+  // change after the press, so "点击 Execute 按钮" still resolves as a
+  // click when the Enter route doesn't trigger anything.
+  if (midsceneApi.includes('aiKeyboardPress')) {
+    const key = detectKeyName(instruction) || 'Enter';
+    return `await agent.aiKeyboardPress(${JSON.stringify(key)});`;
+  }
   // Scroll-extreme is best done with an explicit drag instruction.
   if (isScrollExtremeInstruction(instruction)) return formatAiScrollExampleCode(instruction);
   if (midsceneApi.includes('aiAssert')) return `await agent.aiAssert(${q});`;
@@ -287,10 +349,21 @@ export function exampleCodeForApi(midsceneApi, instruction, xpath) {
     return `const result = await agent.aiQuery(${JSON.stringify(`string, ${instruction}`)});`;
   }
   if (midsceneApi.includes('aiScroll')) return formatAiScrollExampleCode(instruction);
+  if (midsceneApi.includes('aiAct')) {
+    // Non-extreme scroll → small downward aiAct. The runner's scroll
+    // recovery will keep stepping if the next step's locate misses,
+    // so a single small scroll here is enough as a starting point.
+    return `await agent.aiAct(${JSON.stringify(
+      '把当前页面/表格向下滚动一小段(约屏幕高度的 40%),不要点击任何按钮,不要切换页面,不要拖动其它滚动条。'
+    )});`;
+  }
   if (midsceneApi.includes('aiInput')) {
     const parsed = parseGuideInputInstruction(instruction);
     if (parsed) {
-      return `await agent.aiInput(${JSON.stringify(parsed.locate)}, { value: ${JSON.stringify(parsed.value)} });`;
+      const opts = xpath
+        ? `{ value: ${JSON.stringify(parsed.value)}, xpath: ${JSON.stringify(xpath)} }`
+        : `{ value: ${JSON.stringify(parsed.value)} }`;
+      return `await agent.aiInput(${JSON.stringify(parsed.locate)}, ${opts});`;
     }
     return `await agent.aiInput(${q});`;
   }
@@ -305,7 +378,9 @@ export function reasonForApi(midsceneApi, _instruction) {
   if (midsceneApi.includes('aiAssert')) return '结果校验或变量比较,适合断言 API。';
   if (midsceneApi.includes('aiQuery')) return '从 SAP 查询结果/表格列提取值,适合数据提取 API。';
   if (midsceneApi.includes('aiInput')) return '向明确字段输入值,拆成独立输入步骤以提升稳定性。';
+  if (midsceneApi.includes('aiKeyboardPress')) return 'SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。';
   if (midsceneApi.includes('aiTap')) return '点击菜单/按钮/复选框的界面动作,适合点击 API。';
+  if (midsceneApi.includes('aiAct')) return '非极端滚动 — 小幅 aiAct 滑动一段,runner 在下一步定位失败时会继续小步推进。';
   if (midsceneApi.includes('aiScroll')) return '滚动或横向移动界面,适合滚动 API。';
   return '界面交互步骤,优先用可控的点击 API。';
 }
@@ -406,6 +481,38 @@ function splitNaturalLanguageSteps(naturalLanguage) {
     .filter(Boolean);
 }
 
+// Like `text.split(/(?:[,;]+|然后|并且|并)/g)` but only splits at delimiters
+// that sit at `[]` bracket depth 0. Xpath predicates routinely contain
+// commas inside `[...]` (e.g. `[@id="M1:46:1[1,0]"]`) — a depth-blind split
+// would chop them mid-xpath, leaving each half mis-quoted.
+function splitOutsideBrackets(text) {
+  const segments = [];
+  let buf = '';
+  let depth = 0;
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === '[') { depth += 1; buf += ch; i += 1; continue; }
+    if (ch === ']') { depth = Math.max(0, depth - 1); buf += ch; i += 1; continue; }
+    if (depth === 0) {
+      const rest = text.slice(i);
+      const sep = rest.match(/^(?:[,;]+|然后|并且|并)/);
+      if (sep) {
+        const trimmed = buf.trim();
+        if (trimmed) segments.push(trimmed);
+        buf = '';
+        i += sep[0].length;
+        continue;
+      }
+    }
+    buf += ch;
+    i += 1;
+  }
+  const tail = buf.trim();
+  if (tail) segments.push(tail);
+  return segments;
+}
+
 function expandNaturalLanguageSection(section) {
   const normalized = section
     .replace(/\r/g, '')
@@ -455,10 +562,10 @@ function expandNaturalLanguageSection(section) {
   }
 
   // Generic split by , ; 然后 并且 并 (after normalization above).
-  const baseSegments = normalized
-    .split(/(?:[,;]+|然后|并且|并)/g)
-    .map((item) => item.trim())
-    .filter(Boolean);
+  // Bracket-depth aware: commas inside `[...]` (e.g. xpath predicates like
+  // `//*[@id="M1:46:1[1,0]"]/div`) must NOT split — otherwise a single
+  // `点击图标 xpath=...[1,0]...` step gets shredded into two broken aiTaps.
+  const baseSegments = splitOutsideBrackets(normalized);
 
   // Merge "查找X" with following "记录为Y" so they become one aiQuery step.
   const merged = [];

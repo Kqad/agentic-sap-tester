@@ -1,0 +1,88 @@
+midsceneVersion: 1.8.1
+cacheId: saptest-js-saptest11-6fafccb870c3-fail
+caches:
+  - type: locate
+    prompt: 左上角矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 左上角矩形 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: Order type 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: Sales Organization 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[3]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: Distribution Channel 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[3]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: Division 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[3]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[6]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: Sold-to Party 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[6]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: ship-to-party 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[6]/div[1]/div[5]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: Order Quantity 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[2]/span[1]
+  - type: locate
+    prompt: 点击 Display Header Details 按钮
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[11]/div[1]
+  - type: locate
+    prompt: 切换到 Order Data 选项卡
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[11]/div[1]/span[normalize-space()="Order Data"]
+  - type: locate
+    prompt: Customer reference 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[1]/div[11]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: Purchase Order type 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[1]/div[11]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[8]/table[1]/tbody[1]/tr[1]/td[1]/input[1]
+  - type: locate
+    prompt: Material 列底下的第一个 右侧输入框本身，不要定位左侧标签文字
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/table[1]/tbody[2]/tr[2]/td[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/span[1]/span[1]
+  - type: locate
+    prompt: 切换到 Order Data 选项卡
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[11]/div[1]/span[normalize-space()="Order Data"]
+  - type: locate
+    prompt: 点击 Save 按钮保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 点击新跳出来的save
+    cache:
+      xpaths:
+        - /html/body/div[1]

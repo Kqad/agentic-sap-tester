@@ -29,7 +29,12 @@ import {
   abortActiveRun,
   getActiveRun,
 } from '../midscene/active-runs.js';
-import { buildJavascriptCacheId } from '../midscene/cache-id.js';
+import {
+  buildJavascriptCacheId,
+  resolveSlotCacheId,
+  resolveSlotCachePath,
+  resolveSnapshotPath,
+} from '../midscene/cache-id.js';
 import { generateMidsceneApiGuide } from '../midscene/llm.js';
 
 const CACHE_DIR = path.join(ROOT, 'midscene_run', 'cache');
@@ -137,6 +142,11 @@ router.post(
     const noCacheSteps = Array.isArray(req.body?.noCacheSteps)
       ? req.body.noCacheSteps.filter((n) => Number.isFinite(Number(n))).map(Number)
       : [];
+    // keepCacheOnFailure: when true, the runner skips the failure-path
+    // cache snapshot restore — partial / mid-flight cache writes survive
+    // even when the run dies before reaching the end. Default false
+    // (= existing pass-only-keep policy).
+    const keepCacheOnFailure = req.body?.keepCacheOnFailure === true;
 
     await audit(req, 'midscene-js.run.started', {
       caseId: c.id,
@@ -144,10 +154,11 @@ router.post(
       cacheMode,
       headed,
       noCacheSteps,
+      keepCacheOnFailure,
     });
 
     try {
-      const record = await runJavascript(c, { cacheMode, headed, startedByUsername, noCacheSteps });
+      const record = await runJavascript(c, { cacheMode, headed, startedByUsername, noCacheSteps, keepCacheOnFailure });
       await audit(req, 'midscene-js.run.finished', {
         runId: record.runId,
         caseId: c.id,
@@ -324,7 +335,13 @@ router.get(
     const c = await loadCase(req.params.id);
     if (!c) return res.status(404).json({ error: 'case not found' });
     let currentCacheId = null;
+    let currentPassCacheId = null;
+    let currentFailCacheId = null;
     try { currentCacheId = buildJavascriptCacheId(c); } catch { /* missing apiGuide is fine */ }
+    if (currentCacheId) {
+      currentPassCacheId = resolveSlotCacheId(currentCacheId, 'pass');
+      currentFailCacheId = resolveSlotCacheId(currentCacheId, 'fail');
+    }
 
     let names = [];
     try { names = await fs.readdir(CACHE_DIR); } catch { /* dir may not exist yet */ }
@@ -341,7 +358,15 @@ router.get(
         bytes: st.size,
         modifiedAt: st.mtime.toISOString(),
         cacheId: name.replace(/\.cache\.yaml$/, ''),
-        isCurrent: currentCacheId ? name === `${currentCacheId}.cache.yaml` : false,
+        isCurrent: currentCacheId ? (
+          name === `${currentCacheId}.cache.yaml`
+          || name === `${currentPassCacheId}.cache.yaml`
+          || name === `${currentFailCacheId}.cache.yaml`
+        ) : false,
+        slot: name === `${currentPassCacheId}.cache.yaml` ? 'pass'
+          : name === `${currentFailCacheId}.cache.yaml` ? 'fail'
+          : name === `${currentCacheId}.cache.yaml` ? 'legacy'
+          : null,
       });
     }
     out.sort((a, b) => (a.isCurrent === b.isCurrent ? b.modifiedAt.localeCompare(a.modifiedAt) : (a.isCurrent ? -1 : 1)));
@@ -369,6 +394,168 @@ router.delete(
     } catch (e) {
       if (e.code === 'ENOENT') return res.status(404).json({ error: 'cache file not found' });
       res.status(500).json({ error: e.message });
+    }
+  },
+);
+
+// -------------------------------------------------------------------- API
+// Cache-debug endpoints. Power the Cache Debug modal in the workbench —
+// per-case config for the two cache slots (pass + fail) plus a listing
+// of past-run snapshots the user can pick as a source.
+//
+//   GET  /api/midscene-js/cases/:id/cache-debug
+//        → { pass: { source, excludeSteps }, fail: { source, excludeSteps,
+//                                                    dropTailCount },
+//            snapshots: [{ runId, status, finishedAt, cacheSlot, hasFile,
+//                          sizeBytes }],
+//            currentPassFile: { exists, sizeBytes, mtime },
+//            currentFailFile: { exists, sizeBytes, mtime },
+//            apiGuideSteps: [{ order, title, midsceneApi }] }
+//
+//   PUT  /api/midscene-js/cases/:id/cache-debug
+//        body: { pass: { source, excludeSteps },
+//                fail: { source, excludeSteps, dropTailCount } }
+//        Persists into case JSON's cacheSlotConfig. Next run picks it up.
+// -------------------------------------------------------------------------
+
+function normalizeSlotConfig(input, isFailSlot = false) {
+  const out = {
+    source: 'auto',
+    excludeSteps: [],
+  };
+  if (input && typeof input === 'object') {
+    if (typeof input.source === 'string' && input.source.trim()) {
+      out.source = input.source.trim();
+    }
+    if (Array.isArray(input.excludeSteps)) {
+      out.excludeSteps = input.excludeSteps
+        .map(Number)
+        .filter((n) => Number.isFinite(n) && n > 0);
+    }
+    if (isFailSlot) {
+      const d = Number(input.dropTailCount);
+      out.dropTailCount = Number.isFinite(d) && d >= 0 ? d : 2;
+    }
+  } else if (isFailSlot) {
+    out.dropTailCount = 2;
+  }
+  return out;
+}
+
+router.get(
+  '/cases/:id/cache-debug',
+  requirePermission('cases:read'),
+  async (req, res) => {
+    const c = await loadCase(req.params.id);
+    if (!c) return res.status(404).json({ error: 'case not found' });
+
+    const cfg = c.cacheSlotConfig ?? {};
+    const passCfg = normalizeSlotConfig(cfg.pass ?? null, false);
+    const failCfg = normalizeSlotConfig(cfg.fail ?? null, true);
+
+    // List per-run snapshots from run-history for this caseId. Newest first.
+    const snapshots = [];
+    try {
+      const entries = await fs.readdir(RUNS_DIR);
+      const ordered = entries.filter((n) => n.endsWith('.json')).sort((a, b) => b.localeCompare(a));
+      for (const name of ordered) {
+        let rec;
+        try {
+          rec = JSON.parse(await fs.readFile(path.join(RUNS_DIR, name), 'utf8'));
+        } catch { continue; }
+        if (rec?.caseId !== c.id) continue;
+        const snapPath = resolveSnapshotPath(rec.runId);
+        let hasFile = false, sizeBytes = null;
+        try {
+          const st = await fs.stat(snapPath);
+          hasFile = true; sizeBytes = st.size;
+        } catch { /* no snapshot for this run */ }
+        snapshots.push({
+          runId: rec.runId,
+          status: rec.status,
+          cacheSlot: rec.cacheSlot ?? null,
+          finishedAt: rec.finishedAt,
+          durationMs: rec.durationMs,
+          stepCount: rec.runSummary?.assertions?.length != null ? undefined : undefined,
+          hasFile,
+          sizeBytes,
+        });
+        if (snapshots.length >= 80) break; // cap so UI list stays usable
+      }
+    } catch { /* run-history missing → empty list */ }
+
+    // Current slot file states (used by the modal's "currently active" header).
+    const baseCacheId = buildJavascriptCacheId(c);
+    const slotInfo = async (slot) => {
+      const p = resolveSlotCachePath(baseCacheId, slot);
+      try {
+        const st = await fs.stat(p);
+        return { exists: true, sizeBytes: st.size, mtime: st.mtime.toISOString() };
+      } catch {
+        return { exists: false, sizeBytes: null, mtime: null };
+      }
+    };
+
+    return res.json({
+      caseId: c.id,
+      pass: passCfg,
+      fail: failCfg,
+      snapshots,
+      currentPassFile: await slotInfo('pass'),
+      currentFailFile: await slotInfo('fail'),
+      apiGuideSteps: (c.apiGuide?.steps ?? []).map((s) => ({
+        order: s.order,
+        title: s.title,
+        midsceneApi: s.midsceneApi,
+      })),
+    });
+  },
+);
+
+router.put(
+  '/cases/:id/cache-debug',
+  requirePermission('cases:write'),
+  async (req, res) => {
+    if (!isSafeId(req.params.id)) return res.status(400).json({ error: 'bad id' });
+    const file = path.join(CASES_DIR, `${req.params.id}.json`);
+    if (!existsSync(file)) return res.status(404).json({ error: 'case not found' });
+
+    const body = req.body ?? {};
+    const passCfg = normalizeSlotConfig(body.pass, false);
+    const failCfg = normalizeSlotConfig(body.fail, true);
+
+    // Validate: any non-auto source must point to a runId whose
+    // snapshot file actually exists. Otherwise the pin is silently
+    // useless (the runner would fall back to auto) — better to refuse
+    // it up front so the user knows.
+    for (const [label, cfg] of [['pass', passCfg], ['fail', failCfg]]) {
+      if (cfg.source && cfg.source !== 'auto') {
+        const snapPath = resolveSnapshotPath(cfg.source);
+        if (!existsSync(snapPath)) {
+          return res.status(400).json({
+            error: `${label} slot source "${cfg.source}" has no cache snapshot. ` +
+                   `Only runs that completed AFTER the per-run snapshot system was deployed can be pinned. ` +
+                   `Pick a more recent run or leave the source on "auto".`,
+          });
+        }
+      }
+    }
+
+    try {
+      const obj = JSON.parse(await fs.readFile(file, 'utf8'));
+      obj.cacheSlotConfig = { pass: passCfg, fail: failCfg };
+      await fs.writeFile(file, JSON.stringify(obj, null, 2) + '\n', 'utf8');
+      await audit(req, 'midscene-js.cache-debug.updated', {
+        caseId: req.params.id,
+        passSource: passCfg.source,
+        passExcludes: passCfg.excludeSteps.length,
+        failSource: failCfg.source,
+        failExcludes: failCfg.excludeSteps.length,
+        failDropTail: failCfg.dropTailCount,
+      });
+      return res.json({ ok: true, cacheSlotConfig: { pass: passCfg, fail: failCfg } });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
     }
   },
 );
