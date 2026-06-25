@@ -1725,7 +1725,12 @@ VIEWS.dashboard = async () => {
   function getBypass(caseId, step) {
     const k = bypassKey(caseId, step.order);
     if (wbState.stepBypass.has(k)) return wbState.stepBypass.get(k);
-    return wbIsDragLikeStep(step); // drag-like defaults to ON
+    // Every step defaults to USE cache (not bypass) — earlier we auto-set
+    // drag/scroll steps to ON because their cache was fragile, but newer
+    // scroll-extreme logic in runner.js handles the failure path (snapshot
+    // rollback + LLM re-plan on the next attempt). User can still flip
+    // per-step manually for known-bad steps.
+    return false;
   }
   function setBypass(caseId, order, on) {
     wbState.stepBypass.set(bypassKey(caseId, order), !!on);
@@ -2666,8 +2671,8 @@ VIEWS.dashboard = async () => {
           + (dragDefault ? ' is-drag-default' : ''),
         title: dragDefault
           ? (LANG === 'zh'
-              ? '拖动/滚动步骤默认绕过缓存（cache 在这里很脆，prompt 必须精确匹配才命中）。取消勾选可强制用 cache。'
-              : 'Drag/scroll step — defaults to bypass (cache is fragile here; exact-prompt match required to hit). Uncheck to use cache anyway.')
+              ? '拖动/滚动步骤 — 默认用 cache（如果 cache 不准导致失败，可手动勾上强制重新走模型）。'
+              : 'Drag/scroll step — defaults to use cache (manually check if the cached path is wrong and you want to force re-plan).')
           : (LANG === 'zh'
               ? '勾选 = 这一步即使开了 cache 也强制重新走模型；其它步骤仍命中 cache。'
               : 'Checked = strip this step\'s cache entry before run, so it re-LLMs even though cache is enabled.'),

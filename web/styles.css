@@ -317,6 +317,20 @@ a.lang-toggle.docs-link:hover {
   border-color: hsl(var(--primary) / 0.4);
   background: hsl(var(--info-muted));
 }
+/* Run Center entry — sibling of .docs-link but tinted so users actually
+ * spot it as the "switch to user-facing run center" affordance. */
+a.lang-toggle.run-center-link {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+  font-weight: 700;
+}
+a.lang-toggle.run-center-link:hover {
+  filter: brightness(1.08);
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
 
 /* ───────── Inputs ───────── */
 /* Toggle switch — used in the JS run modal for "keep cache even if run

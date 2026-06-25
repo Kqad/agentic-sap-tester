@@ -1,5 +1,5 @@
 midsceneVersion: 1.8.1
-cacheId: saptest-js-saptest10-34f20d603aa8-fail
+cacheId: saptest-js-saptest10-34f20d603aa8-pass
 caches:
   - type: locate
     prompt: 左上角矩形

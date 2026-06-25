@@ -108,10 +108,12 @@ function extractAiInputArgs(code) {
 }
 
 function inputLocatorForPrompt(locator) {
-  const text = String(locator ?? '').trim();
-  if (!text) return text;
-  if (/xpath\s*=|输入框本身|右侧输入框|editable field|input field/i.test(text)) return text;
-  return `${text} 右侧输入框本身，不要定位左侧标签文字`;
+  // Suffix experiment ("…右侧输入框本身，不要定位左侧标签文字") removed:
+  // it made the LLM return coordinates without a clean xpath, so locate
+  // calls cost ~30s AND wrote `xpaths: []` cache entries that never hit.
+  // Pass the locator through unchanged; cases that mislabel-vs-input must
+  // disambiguate via the case JSON locator string (e.g. "company code 输入框").
+  return String(locator ?? '').trim();
 }
 
 function isImplicitFocusedInputLocator(locator) {

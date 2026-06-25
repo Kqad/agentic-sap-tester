@@ -59,8 +59,14 @@ function summarize(p) {
   const guide = p.apiGuide;
   const apiStepCount =
     guide && Array.isArray(guide.steps) ? guide.steps.length : 0;
+  // Truncate long descriptions so list endpoint stays lean.
+  // 320 chars is enough for the run-center categorizer to pick up keywords
+  // (e.g. "Asset HistorySheet", "Manage Accounts Payable", "CIT") without
+  // shipping the full multi-paragraph description.
+  const desc = typeof p.description === 'string' ? p.description.slice(0, 320) : null;
   return {
     title: p.title || p.$schema || null,
+    description: desc,
     transactionCode: p.transactionCode || null,
     favoritesEntry: p.favoritesEntry || null,
     sapUrl: p.sapUrl || null,

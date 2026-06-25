@@ -1,0 +1,3050 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Run Center · 产品方案 v2</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #101828;
+      --muted: #667085;
+      --line: #d8dee8;
+      --soft: #eef3f8;
+      --paper: #f4f7fb;
+      --navy: #15304f;
+      --teal: #08786f;
+      --blue: #0b6bdc;
+      --green: #137a4a;
+      --amber: #a15c00;
+      --red: #b4232f;
+      --violet: #6f4ed4;
+      --shadow: 0 18px 48px rgba(21, 48, 79, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #eaf1f9 0, var(--paper) 300px, #fff 700px);
+    }
+    button, input { font: inherit; }
+    a { color: inherit; }
+
+    .shell {
+      width: min(1240px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 28px 0 80px;
+    }
+
+    /* ── version banner ── */
+    .version-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #fff;
+      border: 1px solid #c5d2e6;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--navy);
+      box-shadow: 0 2px 4px rgba(21,48,79,0.04);
+    }
+    .version-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+    .v1-link {
+      margin-left: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: none;
+      border-bottom: 1px dashed var(--muted);
+    }
+    .v1-link:hover { color: var(--navy); border-color: var(--navy); }
+
+    /* ── hero ── */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(380px, 0.9fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 18px 0 12px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--teal);
+      font-weight: 800;
+      margin-bottom: 14px;
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 0 0 rgba(180,35,47,0.55);
+      animation: pulse-ring 1.4s infinite cubic-bezier(0.66,0,0,1);
+      flex: 0 0 auto;
+    }
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0   rgba(180,35,47,0.55); transform: scale(1); }
+      70%  { box-shadow: 0 0 0 10px rgba(180,35,47,0); transform: scale(1.08); }
+      100% { box-shadow: 0 0 0 0   rgba(180,35,47,0); transform: scale(1); }
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 4.5vw, 52px);
+      line-height: 1.06;
+      color: var(--navy);
+      letter-spacing: -0.3px;
+    }
+    .lead { margin: 16px 0 0; color: #475467; font-size: 17px; max-width: 580px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 700;
+      min-height: 42px;
+      transition: 0.16s ease;
+      box-shadow: 0 1px 0 rgba(21,48,79,0.05);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { border-color: #aeb8c7; transform: translateY(-1px); }
+    .btn.primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+    .btn.primary:hover { background: #0e2540; }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 26px;
+    }
+    .hero-metric {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 4px 10px rgba(21,48,79,0.04);
+    }
+    .hero-metric b { display: block; font-size: 22px; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .hero-metric span { color: var(--muted); font-size: 12px; }
+
+    /* ── hero broadcast card ── */
+    .broadcast-card {
+      background: #0e1f35;
+      color: #eaf2ff;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .broadcast-card .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      letter-spacing: 0.4px;
+    }
+    .broadcast-card .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(180,35,47,0.18);
+      color: #ffb4b8;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+    .broadcast-screen {
+      background: linear-gradient(180deg, #1e3a5f 0%, #0e1f35 100%);
+      border-radius: 10px;
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .broadcast-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 4px);
+    }
+    .broadcast-overlay {
+      position: absolute;
+      bottom: 12px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.95);
+      color: var(--navy);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      text-align: center;
+      max-width: 80%;
+    }
+    .broadcast-overlay b { display: block; font-size: 13px; }
+    .broadcast-channels {
+      display: flex; gap: 7px; flex-wrap: wrap;
+    }
+    .broadcast-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+    .broadcast-chip.active {
+      background: #fff;
+      color: var(--navy);
+    }
+
+    /* ── sections ── */
+    .section { margin-top: 80px; }
+    .section-head { margin-bottom: 22px; }
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 32px);
+      color: var(--navy);
+      letter-spacing: -0.2px;
+    }
+    .section-head .note { color: var(--muted); margin-top: 8px; max-width: 780px; font-size: 15px; }
+
+    /* ── priority status table ── */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .status-col {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(21,48,79,0.06);
+    }
+    .status-col.done    { border-top: 4px solid var(--green); }
+    .status-col.in-flight { border-top: 4px solid var(--amber); }
+    .status-col.pending { border-top: 4px solid var(--muted); }
+    .status-col h3 {
+      margin: 0;
+      padding: 18px 18px 6px;
+      font-size: 16px;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-col h3 .count {
+      margin-left: auto;
+      font-size: 12px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--navy);
+    }
+    .status-col .col-sub { padding: 0 18px 12px; color: var(--muted); font-size: 12.5px; }
+    .status-col ul {
+      list-style: none;
+      margin: 0; padding: 0;
+      border-top: 1px dashed var(--line);
+    }
+    .status-col li {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 8px;
+      padding: 11px 16px;
+      border-bottom: 1px dashed #e5ebf2;
+      align-items: flex-start;
+      font-size: 13.5px;
+    }
+    .status-col li:last-child { border-bottom: none; }
+    .status-col li .label-text { color: var(--ink); line-height: 1.4; }
+    .status-col li .label-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .pri {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 7px;
+      border-radius: 5px;
+      letter-spacing: 0.4px;
+    }
+    .pri.p0 { background: #fff1f2; color: var(--red); border: 1px solid #fecdd3; }
+    .pri.p1 { background: #fff5d9; color: var(--amber); border: 1px solid #fce7a8; }
+    .pri.p2 { background: #eef5fc; color: var(--blue); border: 1px solid #cfe1f6; }
+    .check {
+      width: 18px; height: 18px; border-radius: 50%;
+      display: inline-block;
+      flex: 0 0 auto;
+      margin-top: 2px;
+      position: relative;     /* keep ::after pseudo-elements anchored here, not on <body> */
+      overflow: hidden;       /* belt-and-suspenders: clip any rogue ::after */
+    }
+    .check.done { background: var(--green); }
+    .check.done::after {
+      content: "";
+      position: absolute;
+      left: 4px; top: 7px;
+      width: 10px; height: 5px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg);
+    }
+    .check.partial {
+      background: conic-gradient(var(--amber) 0 60%, #f4f7fb 60% 100%);
+    }
+    .check.pending { background: var(--paper); border: 1.5px solid var(--line); }
+
+    /* ── feature mock grid ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 26px;
+    }
+    .feature-block {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 22px rgba(21,48,79,0.06);
+      overflow: hidden;
+    }
+    .feature-head {
+      padding: 18px 22px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .feature-num {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: var(--navy);
+      color: #fff;
+      display: grid; place-items: center;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+    .feature-head h3 { margin: 0; font-size: 18px; color: var(--navy); }
+    .feature-head .sub { color: var(--muted); margin-top: 4px; font-size: 13px; }
+    .feature-status {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.4px;
+    }
+    .feature-status.done    { background: #e5f6ed; color: #0b6a43; border: 1px solid #bfe8d2; }
+    .feature-status.partial { background: #fff5d9; color: var(--amber); border: 1px solid #fce7a8; }
+    .feature-status.pending { background: var(--paper); color: var(--muted); border: 1px solid var(--line); }
+
+    .feature-body { padding: 18px 22px 22px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 22px; }
+    @media (max-width: 880px) { .feature-body { grid-template-columns: 1fr; } }
+    .feature-body .copy h4 {
+      margin: 0 0 6px;
+      color: var(--navy);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .feature-body .copy p { margin: 0 0 14px; color: #344054; font-size: 14px; }
+    .feature-body .copy ul { margin: 0 0 14px 18px; padding: 0; color: #344054; font-size: 13.5px; }
+    .feature-body .copy li { margin-bottom: 5px; }
+    .kbd-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: ui-monospace, "SF Mono", Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .kbd {
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    /* ── mockups (ASCII-style schematic blocks) ── */
+    .mock {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(21,48,79,0.07);
+    }
+    .mock-bar {
+      background: #f8fafc;
+      padding: 7px 10px;
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+    }
+    .mock-bar .traffic {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #d8dee8;
+    }
+    .mock-bar .traffic:nth-child(1) { background: #ff6b6b; }
+    .mock-bar .traffic:nth-child(2) { background: #ffd166; }
+    .mock-bar .traffic:nth-child(3) { background: #06d6a0; }
+    .mock-bar .url {
+      font-family: ui-monospace, Monaco, Consolas, monospace;
+      font-size: 11px;
+      color: var(--muted);
+      background: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      flex: 1;
+      max-width: 380px;
+    }
+    .mock-body { padding: 16px; background: linear-gradient(180deg, #eaf1f9 0, #f4f7fb 100%); }
+
+    /* tabs in mock */
+    .mock-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .mock-tab {
+      padding: 12px 22px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #344054;
+      cursor: default;
+    }
+    .mock-tab.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(8,120,111,0.22);
+    }
+
+    /* mock layout: sidebar + main */
+    .mock-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .mock-sidebar {
+      background: #122946;
+      color: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 380px;
+    }
+    .mock-sidebar-title { font-size: 14px; font-weight: 900; margin-bottom: 14px; padding: 4px; }
+    .mock-sidebar a {
+      display: block;
+      padding: 9px 11px;
+      border-radius: 7px;
+      color: #cbd7e8;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 5px;
+      text-decoration: none;
+    }
+    .mock-sidebar a.active { background: rgba(255,255,255,0.14); color: #fff; }
+    .mock-panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 380px;
+    }
+    .mock-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+    .mock-panel-title { font-weight: 900; color: var(--navy); font-size: 16px; }
+    .mock-panel-sub { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+    .mock-cta {
+      background: linear-gradient(180deg, #0e62cc 0%, #0b6bdc 100%);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 12px 20px;
+      font-weight: 900;
+      font-size: 14px;
+      box-shadow: 0 10px 20px rgba(11,107,220,0.30);
+      cursor: default;
+    }
+    .mock-cta.disabled { background: #d9e2ee; color: #98a2b3; box-shadow: none; }
+    .mock-cta.danger {
+      background: linear-gradient(180deg, #fff5f5 0%, #ffe4e6 100%);
+      color: #9f1d2a;
+      border: 2px solid #f87171;
+      box-shadow: 0 6px 14px rgba(239,68,68,0.18);
+    }
+
+    /* bulk bar */
+    .bulk-bar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 9px 11px;
+      margin-bottom: 12px;
+      background: var(--paper);
+      border: 1px dashed #c5d2e6;
+      border-radius: 8px;
+    }
+    .mini-btn {
+      padding: 5px 9px;
+      font-size: 11.5px;
+      font-weight: 800;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #344054;
+    }
+    .mini-btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .bulk-count { margin-left: auto; font-weight: 900; color: var(--navy); font-size: 12px; padding-left: 10px; border-left: 1px solid var(--line); }
+
+    /* case cards inside mock */
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .case-card {
+      display: grid;
+      grid-template-columns: 20px 1fr auto 26px;
+      gap: 9px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 11px;
+      background: #fff;
+      font-size: 12.5px;
+    }
+    .case-card.checked { background: #eef6ff; border-color: var(--blue); }
+    .case-card .title { font-weight: 800; color: var(--ink); }
+    .case-card .meta { color: var(--muted); font-size: 11px; margin-top: 1px; }
+    .checkbox {
+      width: 16px; height: 16px;
+      border: 1.5px solid #98a2b3;
+      border-radius: 3px;
+      flex: 0 0 auto;
+    }
+    .checkbox.checked {
+      background: var(--blue);
+      border-color: var(--blue);
+      position: relative;
+    }
+    .checkbox.checked::after {
+      content: "";
+      position: absolute;
+      left: 3px; top: 5px;
+      width: 8px; height: 4px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg);
+    }
+    .cat-tag {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .cat-ap      { background: #0e7a64; }
+    .cat-fin     { background: #0b6bdc; }
+    .cat-create  { background: #7a3fbd; }
+    .cat-verify  { background: #c2410c; }
+    .expand-mock {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      color: #475467;
+      font-weight: 900;
+    }
+    .expand-mock.expanded { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    /* filter chips */
+    .chips-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .chip {
+      padding: 5px 11px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #344054;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+    .chip.active { background: #eaf3ff; border-color: #93c0f5; color: var(--blue); }
+
+    /* takeover broadcast big screen */
+    .takeover-mock {
+      background: #fff;
+      border: 1px solid #93c0f5;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 14px 30px rgba(11,107,220,0.14);
+    }
+    .takeover-mock-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .takeover-mock-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--navy);
+    }
+    .takeover-mock-screen {
+      background: linear-gradient(180deg, #1e3a5f 0%, #0e1f35 100%);
+      border-radius: 9px;
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 10px;
+      border: 1px solid #1c3a5c;
+    }
+    .takeover-mock-log {
+      background: #0f1c2e;
+      color: #cbd5e1;
+      font-family: ui-monospace, Monaco, Consolas, monospace;
+      font-size: 11px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      max-height: 130px;
+      overflow: hidden;
+      line-height: 1.5;
+      border: 1px solid #1c3a5c;
+    }
+    .takeover-mock-log .ts { color: #64748b; margin-right: 8px; }
+    .flip-chip-mock {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #344054;
+    }
+    .flip-chip-mock.active { background: #15304f; color: #fff; border-color: #15304f; }
+    .flip-chip-mock .step { opacity: 0.7; font-weight: 700; font-size: 11px; }
+
+    /* modal mock */
+    .modal-mock {
+      background: #fff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 460px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+    }
+    .modal-mock-head { padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--paper); }
+    .modal-mock-head b { font-size: 15px; color: var(--navy); display: block; }
+    .modal-mock-head .sub { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+    .modal-mock-body { padding: 14px 16px; }
+    .modal-mock-body label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #475467;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .modal-mock-body input,
+    .modal-mock-body .pseudo-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      background: #fff;
+      font-size: 13px;
+    }
+    .run-count-row { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; margin-bottom: 12px; }
+    .run-count-row .x {
+      padding: 8px 14px;
+      font-weight: 900;
+      color: #344054;
+      border-right: 1px solid var(--line);
+      background: #fff;
+      font-size: 12px;
+    }
+    .run-count-row .x:last-child { border-right: none; }
+    .run-count-row .x.active { background: var(--navy); color: #fff; }
+    .modal-mock-foot { padding: 12px 16px; border-top: 1px solid var(--line); background: var(--paper); display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* roadmap */
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .phase {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+    }
+    .phase .stage {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      color: var(--teal);
+      text-transform: uppercase;
+    }
+    .phase h4 { margin: 6px 0 4px; color: var(--navy); font-size: 16px; }
+    .phase .timeline { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+    .phase ul { padding-left: 18px; margin: 0; font-size: 13px; color: #344054; }
+    .phase ul li { margin-bottom: 4px; }
+    .phase.shipped { border-top: 4px solid var(--green); }
+    .phase.in-flight { border-top: 4px solid var(--amber); }
+    .phase.next { border-top: 4px solid var(--blue); }
+    .phase.later { border-top: 4px solid var(--muted); }
+
+    /* ── Mini "Run Center frame" — sidebar + main, shown in each demo mockup
+     *    so the user sees where in the actual UI this view lives. ── */
+    .ui-frame {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 6px;
+      background: #f4f7fb;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px;
+      min-height: 240px;
+    }
+    .ui-sidebar {
+      background: #122946;
+      border-radius: 6px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .ui-sidebar .ui-side-title {
+      color: #fff;
+      font-weight: 900;
+      font-size: 10px;
+      letter-spacing: 0.3px;
+      padding: 3px 7px 8px;
+      border-bottom: 1px dashed rgba(255,255,255,0.15);
+      margin-bottom: 4px;
+    }
+    .ui-sidebar a {
+      display: block;
+      padding: 6px 8px;
+      color: #cbd7e8;
+      font-weight: 800;
+      font-size: 10.5px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .ui-sidebar a.active {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      border-left: 2px solid var(--teal);
+      padding-left: 6px;
+    }
+    .ui-main {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      overflow: hidden;
+    }
+    .ui-main-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    .ui-main-title {
+      font-weight: 900;
+      color: var(--navy);
+      font-size: 12.5px;
+    }
+    .ui-main-sub {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 1px;
+    }
+
+    /* ── Interactive demo (2-level tabs) ── */
+    .demo-section {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(21,48,79,0.08);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      margin-top: 48px;
+    }
+    .demo-head {
+      padding: 20px 22px 6px;
+      background: linear-gradient(180deg, #f4f7fb 0, #fff 100%);
+      border-bottom: 1px solid var(--line);
+    }
+    .demo-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .demo-title h2 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--navy);
+    }
+    .demo-title .badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 5px;
+      background: var(--paper);
+      color: var(--teal);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .demo-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    .demo-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .demo-tab {
+      padding: 13px 22px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 15px;
+      color: #344054;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .demo-tab:hover { border-color: #aeb8c7; transform: translateY(-1px); }
+    .demo-tab.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(8,120,111,0.26);
+    }
+    .demo-tab .tab-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+    }
+    .demo-tab:not(.active) .tab-num {
+      background: var(--paper);
+      color: var(--navy);
+    }
+    .demo-subtabs {
+      display: flex;
+      gap: 6px;
+      padding: 14px 22px 0;
+      flex-wrap: wrap;
+      border-bottom: 1px dashed var(--line);
+    }
+    .demo-subtab {
+      padding: 9px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease;
+      margin-bottom: -1px;
+    }
+    .demo-subtab:hover { color: var(--navy); }
+    .demo-subtab.active {
+      color: var(--navy);
+      border-bottom-color: var(--blue);
+    }
+    .demo-panel { display: none; padding: 22px; }
+    .demo-panel.active { display: block; animation: demo-fade 0.22s ease-out; }
+    @keyframes demo-fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .demo-panel-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.6fr);
+      gap: 22px;
+      align-items: start;
+    }
+    .demo-panel-grid .copy h4 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .demo-panel-grid .copy p {
+      margin: 0 0 10px;
+      color: #344054;
+      font-size: 13.5px;
+    }
+    .demo-panel-grid .copy ul {
+      margin: 0 0 12px 18px;
+      padding: 0;
+      color: #344054;
+      font-size: 13px;
+    }
+    .demo-panel-grid .copy li { margin-bottom: 4px; }
+    .demo-mock {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(21,48,79,0.06);
+    }
+    .demo-mock-bar {
+      background: var(--paper);
+      padding: 8px 12px;
+      font-size: 11px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      font-family: ui-monospace, Monaco, Consolas, monospace;
+    }
+    .demo-mock-body {
+      padding: 14px;
+      background: linear-gradient(180deg, #eaf1f9 0, #f4f7fb 100%);
+      min-height: 320px;
+    }
+    @media (max-width: 880px) {
+      .demo-panel-grid { grid-template-columns: 1fr; }
+      .demo-tab { font-size: 13px; padding: 11px 16px; }
+    }
+
+    /* ── macOS Dock-style side nav (icon + label) ──────────────────── */
+    .dock-nav {
+      position: fixed;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      padding: 12px 10px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.70);
+      border-radius: 18px;
+      box-shadow:
+        0 22px 50px rgba(21, 48, 79, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: calc(100vh - 28px);
+      overflow-y: auto;
+    }
+    .dock-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 14px;
+      min-height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #f6f9fd 0%, #e7eef7 100%);
+      border: 1px solid rgba(21, 48, 79, 0.08);
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--navy);
+      transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        color 0.18s ease;
+      min-width: 196px;
+      will-change: background, border-color;
+    }
+    .dock-item:hover {
+      background: linear-gradient(180deg, #fff 0%, #eaf3ff 100%);
+      border-color: var(--blue);
+      box-shadow:
+        0 8px 18px rgba(11, 107, 220, 0.16),
+        0 0 0 2px rgba(11, 107, 220, 0.10);
+      z-index: 2;
+    }
+    .dock-item.active {
+      background: linear-gradient(180deg, #0b6bdc 0%, #08549f 100%);
+      border-color: #08549f;
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(11, 107, 220, 0.36);
+    }
+    .dock-item.active .dock-icon,
+    .dock-item.active .dock-label { color: #fff; }
+    .dock-item.active::after {
+      content: "";
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--navy);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.6);
+    }
+    .dock-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(21, 48, 79, 0.08);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      color: var(--navy);
+      font-weight: 900;
+      line-height: 1;
+      flex: 0 0 auto;
+      transition: background 0.18s ease;
+    }
+    .dock-item:hover .dock-icon { background: rgba(11, 107, 220, 0.14); }
+    .dock-item.active .dock-icon { background: rgba(255, 255, 255, 0.18); }
+    .dock-label {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0;
+    }
+    .dock-divider {
+      height: 1px;
+      background: rgba(21, 48, 79, 0.12);
+      margin: 6px 8px;
+    }
+    /* Special CTA item at the bottom — primary blue */
+    .dock-item.cta {
+      background: linear-gradient(180deg, #0e62cc 0%, #0b6bdc 100%);
+      border-color: #08549f;
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(11, 107, 220, 0.28);
+    }
+    .dock-item.cta .dock-icon { background: rgba(255,255,255,0.22); color: #fff; }
+    .dock-item.cta:hover {
+      background: linear-gradient(180deg, #0d59b3 0%, #0a62ca 100%);
+      border-color: #08549f;
+      box-shadow: 0 12px 22px rgba(11, 107, 220, 0.34);
+    }
+    @media (max-width: 1200px) {
+      .dock-nav { padding: 10px 8px; }
+      .dock-item { min-width: 176px; padding: 10px 12px; min-height: 42px; }
+      .dock-label { font-size: 14px; }
+      .dock-icon { width: 28px; height: 28px; font-size: 15px; }
+    }
+    @media (max-width: 960px) {
+      .dock-nav { left: 10px; }
+      .dock-item { min-width: 160px; }
+    }
+    @media (max-width: 760px) {
+      .dock-nav { display: none; } /* fall back to in-page anchors on phones */
+    }
+
+    /* ── User Journey (5-step flow) ── */
+    .journey {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      position: relative;
+    }
+    .journey-step {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px 16px;
+      box-shadow: 0 4px 14px rgba(21,48,79,0.05);
+    }
+    .journey-step::after {
+      content: "→";
+      position: absolute;
+      right: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--muted);
+      z-index: 2;
+    }
+    .journey-step:last-child::after { display: none; }
+    .journey-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .journey-step h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: var(--navy);
+    }
+    .journey-step .step-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .journey-step code {
+      display: inline-block;
+      background: var(--paper);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--navy);
+      font-family: ui-monospace, Monaco, Consolas, monospace;
+    }
+
+    /* ── API surface ── */
+    .api-table {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(21,48,79,0.05);
+    }
+    .api-row {
+      display: grid;
+      grid-template-columns: 70px 1fr 1.5fr 90px;
+      gap: 14px;
+      padding: 12px 18px;
+      align-items: center;
+      border-bottom: 1px dashed var(--line);
+      font-size: 13px;
+    }
+    .api-row:last-child { border-bottom: none; }
+    .api-row.header {
+      background: var(--paper);
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.4px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .api-method {
+      font-family: ui-monospace, Monaco, Consolas, monospace;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+    .api-method.get  { background: #e7f1fb; color: var(--blue); border: 1px solid #c1ddf6; }
+    .api-method.post { background: #e5f6ed; color: #0b6a43; border: 1px solid #bfe8d2; }
+    .api-method.put  { background: #fff5d9; color: var(--amber); border: 1px solid #fce7a8; }
+    .api-method.del  { background: #ffe4e8; color: var(--red); border: 1px solid #fecdd3; }
+    .api-path {
+      font-family: ui-monospace, Monaco, Consolas, monospace;
+      font-size: 12px;
+      color: var(--navy);
+      word-break: break-all;
+    }
+    .api-row .desc { color: #344054; font-size: 12.5px; }
+    .api-row .who {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 7px;
+      border-radius: 5px;
+      background: var(--paper);
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.4px;
+    }
+
+    /* ── Design Decisions ── */
+    .decisions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .decision {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(21,48,79,0.05);
+    }
+    .decision .why {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+    .decision h4 { margin: 0 0 8px; color: var(--navy); font-size: 16px; }
+    .decision .versus {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+      font-size: 12.5px;
+    }
+    .decision .choice {
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+    .decision .choice.win {
+      background: #e5f6ed;
+      border: 1.5px solid #bfe8d2;
+    }
+    .decision .choice.win::before { content: "✓ "; color: var(--green); font-weight: 900; }
+    .decision .choice.lose {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-color: rgba(0,0,0,0.2);
+    }
+    .decision p { margin: 6px 0 0; color: #344054; font-size: 13px; }
+
+    @media (max-width: 1000px) { .journey { grid-template-columns: repeat(3, 1fr); } .journey-step:nth-child(3n)::after { display: none; } }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-metrics { grid-template-columns: repeat(2, 1fr); }
+      .status-grid { grid-template-columns: 1fr; }
+      .roadmap { grid-template-columns: repeat(2, 1fr); }
+      .journey { grid-template-columns: repeat(2, 1fr); }
+      .journey-step::after { display: none; }
+      .decisions { grid-template-columns: 1fr; }
+      .api-row { grid-template-columns: 1fr; gap: 4px; padding: 14px 18px; }
+      .api-row.header { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" id="top">
+
+    <!-- ───────── Version banner ───────── -->
+    <span class="version-pill">
+      <span class="dot"></span>v2 · 2026-06-24 · 基于已上线的 Run Center 重新整理
+    </span>
+    <a class="v1-link" href="/docs/enterprise-run-center-requirements.v1-backup.html">查看 v1（初版需求拆解）</a>
+
+    <!-- ───────── Hero ───────── -->
+    <section class="hero" style="margin-top: 18px;">
+      <div>
+        <div class="eyebrow"><span class="pulse-dot"></span>Test Run Center · 已上线</div>
+        <h1>SAP 自动化运行中心 · 选 case、命名、跑、看、复盘 一个页面搞定</h1>
+        <p class="lead">
+          从原来"开发者调试页" 解耦出来的用户向运行中心。业务用户、测试负责人、自动化执行人员都用这同一个页面：
+          按项目批量、按勾选批量、单 case 都能起跑；跑起来后实时大屏转播；跑完了 case 结果、报告、日志一站式追踪。
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="/run-center.html">▶ 打开 Run Center</a>
+          <a class="btn" href="#now-vs-next">已完成 / 待完成</a>
+          <a class="btn" href="#features">功能交互</a>
+          <a class="btn" href="#journey">用户路径</a>
+          <a class="btn" href="#api">API 速查</a>
+          <a class="btn" href="#decisions">设计取舍</a>
+          <a class="btn" href="#roadmap">落地路线</a>
+        </div>
+        <div class="hero-metrics">
+          <div class="hero-metric"><b>11</b><span>validated SAP cases</span></div>
+          <div class="hero-metric"><b>4</b><span>case category buckets</span></div>
+          <div class="hero-metric"><b>3</b><span>核心 tabs</span></div>
+          <div class="hero-metric"><b>v2</b><span>当前文档版本</span></div>
+        </div>
+      </div>
+
+      <aside class="broadcast-card">
+        <div class="top">
+          <span class="live-badge"><span class="pulse-dot"></span>LIVE EXECUTION</span>
+          <span>SAP Automation · 3 cases</span>
+        </div>
+        <div class="broadcast-screen">
+          <div class="broadcast-overlay">
+            <b>saptest4 · Supplier Balances</b>
+            <span>Step 8 / 15 · 在 Company Code 输入 8540</span>
+          </div>
+        </div>
+        <div class="broadcast-channels">
+          <span class="broadcast-chip active"><span class="pulse-dot"></span>saptest4 · step 8/15</span>
+          <span class="broadcast-chip"><span class="pulse-dot"></span>saptest9 · step 4/12</span>
+          <span class="broadcast-chip"><span class="pulse-dot"></span>saptest11 · step 11/18</span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ───────── Interactive demo (top-level tabs) ───────── -->
+    <section class="demo-section" id="demo">
+      <div class="demo-head">
+        <div class="demo-title">
+          <h2>界面交互演示</h2>
+          <span class="badge">点击切换 · 反映实际 UI</span>
+        </div>
+        <div class="demo-sub">3 个顶部 Tab × 每个 4 个子区（对应实际侧栏 4 个入口）。每个子区是一张带侧栏的迷你界面，反映 UI 实际结构。</div>
+        <div class="demo-tabs" role="tablist">
+          <button class="demo-tab active" data-mod="run" role="tab" aria-selected="true">
+            <span class="tab-num">1</span>Run Center
+          </button>
+          <button class="demo-tab" data-mod="editor" role="tab" aria-selected="false">
+            <span class="tab-num">2</span>Case Editor
+          </button>
+          <button class="demo-tab" data-mod="live" role="tab" aria-selected="false">
+            <span class="tab-num">3</span>Live Channels
+          </button>
+        </div>
+      </div>
+
+      <!-- ═════════ Module 1: Run Center ═════════ -->
+      <!-- Sub-tabs map 1:1 to the actual TestOps Command Center sidebar entries. -->
+      <div class="demo-module" data-mod="run">
+        <div class="demo-subtabs">
+          <button class="demo-subtab active" data-sub="console">Run Center</button>
+          <button class="demo-subtab" data-sub="myprojects">Projects</button>
+          <button class="demo-subtab" data-sub="takeover">Reports</button>
+          <button class="demo-subtab" data-sub="failures">Failure Analytics</button>
+        </div>
+
+        <!-- Run Center (sidebar > Run Center entry) -->
+        <div class="demo-panel active" data-sub="console">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Sidebar &gt; Run Center · 主入口</h4>
+              <p>点开页面默认就在这里。Hero <strong>Run Console</strong> + 下面 <strong>My Projects</strong>。所有 case 摆成网格，按 4 个 category 着色，配 bulk-bar 和 chip 筛选。</p>
+              <ul>
+                <li><strong>bulk-bar</strong>：Select all / Select visible / Deselect / Clear / Invert</li>
+                <li><strong>chip 筛选</strong>：All / AP Report / Finance Report / Posting Verify / Create / Passed / Failed</li>
+                <li><strong>每个 case 行</strong>：勾 checkbox 选择，点 ▸ 展开看 Description + 改参数 + 折叠 NL</li>
+                <li><strong>底部</strong>：BATCH NAME + RUN × 1/2/3/5 + Save as batch</li>
+                <li><strong>跑起来</strong>：自动切到 <strong>Live Takeover</strong> 状态，broadcast 占满主区</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">127.0.0.1:5174/run-center.html · Sidebar &gt; Run Center</div>
+              <div class="demo-mock-body" style="padding:8px;">
+              <div class="ui-frame">
+                <div class="ui-sidebar">
+                  <div class="ui-side-title">TestOps</div>
+                  <a class="active">Run Center</a>
+                  <a>Projects</a>
+                  <a>Reports</a>
+                  <a>Failure Analytics</a>
+                </div>
+                <div class="ui-main">
+                  <div class="ui-main-head">
+                    <div>
+                      <div class="ui-main-title">Run Console</div>
+                      <div class="ui-main-sub">选 case · 命名 · 跑</div>
+                    </div>
+                    <button class="mock-cta" style="padding:6px 11px; font-size:11px;">▶ Run · 3</button>
+                  </div>
+                <div class="bulk-bar" style="margin-bottom:10px;">
+                  <button class="mini-btn primary">Select all (11)</button>
+                  <button class="mini-btn">Clear all</button>
+                  <button class="mini-btn">Invert</button>
+                  <span class="bulk-count">3 selected</span>
+                </div>
+                <div class="chips-row">
+                  <span class="chip">All · 11</span>
+                  <span class="chip active">AP Report · 3</span>
+                  <span class="chip">Finance · 4</span>
+                  <span class="chip">Create · 2</span>
+                </div>
+                <div class="case-grid" style="grid-template-columns: 1fr;">
+                  <div class="case-card checked">
+                    <span class="checkbox checked"></span>
+                    <div><div class="title">saptest2 · SAP TEST 2</div><div class="meta">AP Report</div></div>
+                    <span class="cat-tag cat-ap">AP REPORT</span>
+                    <span class="expand-mock">▸</span>
+                  </div>
+                  <div class="case-card checked">
+                    <span class="checkbox checked"></span>
+                    <div><div class="title">saptest4 · SAP TEST 4</div><div class="meta">AP Report</div></div>
+                    <span class="cat-tag cat-ap">AP REPORT</span>
+                    <span class="expand-mock expanded">▾</span>
+                  </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px dashed var(--line); padding-top:10px;">
+                  <div style="font-size:11px;"><strong style="color:var(--navy);">3 × ×1 = 3 executions</strong></div>
+                  <button class="mock-cta" style="padding:10px 14px; font-size:13px;">▶ Run · 3 cases</button>
+                </div>
+                </div><!-- /.ui-main -->
+              </div><!-- /.ui-frame -->
+              </div><!-- /.demo-mock-body -->
+            </div><!-- /.demo-mock -->
+          </div>
+        </div>
+
+        <!-- Projects (sidebar > Projects entry) -->
+        <div class="demo-panel" data-sub="myprojects">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>My Projects — 把选择沉淀成可复用资产</h4>
+              <p>分两类：<strong>SAP Automation Project</strong>（内置 11 case，永远在）+ <strong>My Projects</strong>（用户自建 batch）。每张卡可展开看 case 列表。</p>
+              <ul>
+                <li><strong>新建</strong>：勾几个 case → 点 + New project from selection → 命名 → 保存</li>
+                <li><strong>展开</strong>：▸ 看 case，每行带分类 tag + 状态徽章 + Report / Log / Live 智能按钮</li>
+                <li><strong>Run</strong>：弹 Confirm Modal 可改名/×N 再启动</li>
+                <li><strong>Edit</strong>：整个 batch 倒回 Run Console，改完 Save changes 或重跑</li>
+                <li><strong>Rename / Delete</strong>：直接管理资产</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">My Projects · 自建 batches</div>
+              <div class="demo-mock-body" style="padding:12px;">
+                <div style="background:#fff; border:1px solid #93c0f5; border-radius:10px; padding:10px; box-shadow:0 6px 16px rgba(11,107,220,0.10);">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:36px; height:36px; border-radius:8px; background:var(--blue); color:#fff; display:grid; place-items:center; font-weight:900;">F</div>
+                    <div style="flex:1;">
+                      <div style="font-weight:900; color:var(--navy); font-size:14px;">FI Posting Daily Smoke</div>
+                      <div style="font-size:11px; color:var(--muted);">2 cases · ×2/case · 06/22 created</div>
+                    </div>
+                    <span class="cat-tag" style="background: #e5f6ed; color: #0b6a43; border:1px solid #bfe8d2;">PASSED</span>
+                    <span class="expand-mock expanded">▾</span>
+                  </div>
+                  <div style="border-top:1px dashed var(--line); margin-top:10px; padding-top:10px; display:grid; gap:4px;">
+                    <div style="display:flex; gap:6px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; font-size:11px; align-items:center;">
+                      <span class="cat-tag cat-verify">Posting Verify</span>
+                      <span style="flex:1;">saptest9 · SAP TEST 9</span>
+                      <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                      <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Report</button>
+                      <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Log</button>
+                    </div>
+                    <div style="display:flex; gap:6px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; font-size:11px; align-items:center;">
+                      <span class="cat-tag cat-verify">Posting Verify</span>
+                      <span style="flex:1;">saptest10 · SAP TEST 10</span>
+                      <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                      <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Report</button>
+                      <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Log</button>
+                    </div>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button class="mini-btn primary">▶ Run</button>
+                      <button class="mini-btn">Edit</button>
+                      <button class="mini-btn">Rename</button>
+                      <button class="mini-btn" style="background:#fff1f2; color:var(--red); border-color:#fecdd3;">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Takeover -->
+        <div class="demo-panel" data-sub="takeover">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Sidebar &gt; Reports — 跑完去哪儿看</h4>
+              <p>顶部 4 个 metric overview + 下面最近 30 条 run 列表。每条点 Report / View log 直达详情。</p>
+              <ul>
+                <li><strong>Overview</strong>：total runs / passed / failed / with HTML report</li>
+                <li><strong>每行</strong>：caseId + 分类色 + 时间戳 + 耗时（s 或 m s）+ 截断错误</li>
+                <li><strong>Report</strong>：开新窗口看完整 Midscene HTML report</li>
+                <li><strong>View log</strong>：跳 Live Channels → Run History 自动展开 logTail</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Sidebar &gt; Reports</div>
+              <div class="demo-mock-body" style="padding:8px;">
+              <div class="ui-frame">
+                <div class="ui-sidebar">
+                  <div class="ui-side-title">TestOps</div>
+                  <a>Run Center</a>
+                  <a>Projects</a>
+                  <a class="active">Reports</a>
+                  <a>Failure Analytics</a>
+                </div>
+                <div class="ui-main">
+                  <div class="ui-main-head">
+                    <div><div class="ui-main-title">Reports · Overview</div><div class="ui-main-sub">所有 run 历史 + HTML 报告入口</div></div>
+                  </div>
+                  <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:5px; margin-bottom:8px;">
+                    <div style="border:1px solid var(--line); border-radius:5px; padding:6px;"><b style="display:block; color:var(--navy); font-size:16px;">42</b><span style="font-size:9px; color:var(--muted);">total</span></div>
+                    <div style="border:1px solid var(--line); border-radius:5px; padding:6px;"><b style="display:block; color:var(--green); font-size:16px;">35</b><span style="font-size:9px; color:var(--muted);">passed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:5px; padding:6px;"><b style="display:block; color:var(--red); font-size:16px;">7</b><span style="font-size:9px; color:var(--muted);">failed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:5px; padding:6px;"><b style="display:block; color:var(--navy); font-size:16px;">28</b><span style="font-size:9px; color:var(--muted);">w/ report</span></div>
+                  </div>
+                  <div style="font-size:10.5px; font-weight:900; color:var(--navy); margin-bottom:5px;">Recent runs · last 30</div>
+                  <div style="display:flex; gap:5px; padding:5px 7px; border:1px solid var(--line); border-radius:5px; font-size:10.5px; align-items:center; margin-bottom:3px;">
+                    <span class="cat-tag cat-ap">AP Report</span>
+                    <div style="flex:1;"><strong>saptest4</strong> · 06/24 18:42 · 7m 14s</div>
+                    <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Report</button>
+                  </div>
+                  <div style="display:flex; gap:5px; padding:5px 7px; border:1px solid var(--line); border-radius:5px; font-size:10.5px; align-items:center;">
+                    <span class="cat-tag cat-verify">Posting Verify</span>
+                    <div style="flex:1;"><strong>saptest9</strong> · 06/24 18:35 · 4m 51s</div>
+                    <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">Failed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Log</button>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Failure Analytics (sidebar entry inside Run Center tab) -->
+        <div class="demo-panel" data-sub="failures">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Sidebar &gt; Failure Analytics — 看哪个 case 最爱挂</h4>
+              <p>从左侧 Sidebar 进 Failure Analytics。三张卡片：Overview / Top failing / Recent failures。</p>
+              <ul>
+                <li><strong>Overview</strong>：total failures / failure rate% / cases ever failed / last failure date</li>
+                <li><strong>Top failing cases</strong>：按失败次数排序，列前 5，一键 <code>↺ Rerun all</code></li>
+                <li><strong>Recent failures</strong>：时间线最近 15 条，每行 Report + Log 双按钮</li>
+                <li><strong>↺ Rerun</strong>：单 case 单独再跑，弹 Confirm Modal 走标准流程</li>
+                <li>分类色 + 时间 + 截断错误信息一目了然</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Failure Analytics</div>
+              <div class="demo-mock-body" style="padding:10px;">
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:8px;">
+                  <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:18px;">7</b><span style="font-size:10px; color:var(--muted);">failures</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:18px;">18%</b><span style="font-size:10px; color:var(--muted);">fail rate</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:18px;">3</b><span style="font-size:10px; color:var(--muted);">ever failed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:13px;">06/24</b><span style="font-size:10px; color:var(--muted);">last</span></div>
+                  </div>
+                </div>
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-weight:900; color:var(--navy); font-size:12px;">Top failing · 3</span>
+                    <button class="mock-cta danger" style="font-size:10px; padding:5px 10px;">↺ Rerun all</button>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font-size:11px; align-items:center; margin-bottom:4px;">
+                    <div style="flex:1;"><strong>saptest4</strong><div style="font-size:10px; color:var(--muted);">3 failures · last 06/24 · MISS at step 28</div></div>
+                    <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">×3</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:10px;">↺ Rerun</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═════════ Module 2: Case Editor ═════════ -->
+      <!-- Sub-tabs map 1:1 to the Case Editor sidebar entries. -->
+      <div class="demo-module" data-mod="editor" style="display:none;">
+        <div class="demo-subtabs">
+          <button class="demo-subtab active" data-sub="cases">Cases</button>
+          <button class="demo-subtab" data-sub="params">Overview</button>
+          <button class="demo-subtab" data-sub="nl">Runs</button>
+          <button class="demo-subtab" data-sub="steps">Reports</button>
+        </div>
+
+        <!-- Cases list -->
+        <div class="demo-panel active" data-sub="cases">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Case Editor — 单 case 深度编辑</h4>
+              <p>顶部 Tab 第 2 个，给开发者 / 高级用户用。日常运行去 Run Center，这里改具体 case 的步骤、参数、JS 源码。</p>
+              <ul>
+                <li><strong>左侧 case 列表</strong>：search + filter + multi-select</li>
+                <li><strong>右侧详情</strong>：基础信息 + 自然语言 + 参数 + Step 列表</li>
+                <li><strong>每个 step</strong>：可看 prompt / xpath / locator，可单独勾"绕过缓存"</li>
+                <li><strong>底部</strong>：Run · Cached · Stop · Save 等操作</li>
+              </ul>
+              <p style="color:var(--muted); font-size:12px;">这块基本继承自原开发者控制台，保留了所有调试能力。</p>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">127.0.0.1:5174 · Case Editor</div>
+              <div class="demo-mock-body" style="padding:10px; display:grid; grid-template-columns: 130px 1fr; gap:8px;">
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px; font-size:11px;">
+                  <div style="font-weight:900; color:var(--navy); margin-bottom:6px;">Cases</div>
+                  <div style="padding:5px 7px; background:var(--paper); border-radius:5px; margin-bottom:3px;">saptest1</div>
+                  <div style="padding:5px 7px; background:#eaf3ff; border-radius:5px; border-left:3px solid var(--blue); margin-bottom:3px;">saptest4</div>
+                  <div style="padding:5px 7px; border-radius:5px; margin-bottom:3px;">saptest9</div>
+                  <div style="padding:5px 7px; border-radius:5px;">saptest11</div>
+                </div>
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px;">
+                  <div style="font-weight:900; color:var(--navy); font-size:13px;">saptest4 · SAP TEST 4</div>
+                  <div style="font-size:10.5px; color:var(--muted); margin-bottom:8px;">Supplier Balances and Line Items</div>
+                  <div style="font-size:10.5px; color:var(--navy); font-weight:800; margin-bottom:4px;">STEPS · 32</div>
+                  <div style="font-size:10.5px; padding:4px 6px; background:var(--paper); border-radius:4px; margin-bottom:2px;">#1 aiTap · 进入 Menu</div>
+                  <div style="font-size:10.5px; padding:4px 6px; background:var(--paper); border-radius:4px; margin-bottom:2px;">#6 aiInput · 左上角矩形</div>
+                  <div style="font-size:10.5px; padding:4px 6px; background:#eaf3ff; border-radius:4px; margin-bottom:2px; border-left:2px solid var(--blue);">#8 aiInput · company code</div>
+                  <div style="display:flex; gap:5px; margin-top:8px;">
+                    <button class="mock-cta" style="padding:6px 10px; font-size:11px;">▶ Run</button>
+                    <button class="mini-btn">Cached</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar > Overview -->
+        <div class="demo-panel" data-sub="params">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Sidebar &gt; Overview — 项目健康度</h4>
+              <p>Case Editor 进入后默认所在的视图。一眼看到当前 SAP 自动化项目整体状态。</p>
+              <ul>
+                <li><strong>4 个 metric 卡</strong>：total cases / latest passed / latest failed / live channels</li>
+                <li>实时计算自 <code>state.cases</code> + <code>state.active</code> + 最近 run records</li>
+                <li>下面可以接 trend chart、KPI history 等扩展（v3）</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Sidebar &gt; Overview</div>
+              <div class="demo-mock-body" style="padding:8px;">
+              <div class="ui-frame">
+                <div class="ui-sidebar">
+                  <div class="ui-side-title">Project Console</div>
+                  <a class="active">Overview</a>
+                  <a>Cases</a>
+                  <a>Runs</a>
+                  <a>Reports</a>
+                </div>
+                <div class="ui-main">
+                  <div class="ui-main-head">
+                    <div><div class="ui-main-title">SAP Validated Regression Project</div><div class="ui-main-sub">项目健康度概览</div></div>
+                  </div>
+                  <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:6px;">
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--navy); font-size:22px;">11</b><span style="font-size:10px; color:var(--muted);">total cases</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--green); font-size:22px;">9</b><span style="font-size:10px; color:var(--muted);">latest passed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--red); font-size:22px;">2</b><span style="font-size:10px; color:var(--muted);">latest failed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--amber); font-size:22px;">0</b><span style="font-size:10px; color:var(--muted);">live channels</span></div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar > Runs -->
+        <div class="demo-panel" data-sub="nl">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Sidebar &gt; Runs — 项目运行历史</h4>
+              <p>看这个项目历来跑过多少 batch，每条 batch 的状态、case 数、结果。</p>
+              <ul>
+                <li>每行：batch 名 + 创建时间 + cases 数 + 状态徽章 + Open 按钮</li>
+                <li>过滤：成功 / 失败 / 进行中</li>
+                <li>点 Open 跳到 Live Channels 的 Run History 看完整日志</li>
+                <li>顶部可以再发起一次 <strong>Run Project</strong>（全选 11 个）</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Sidebar &gt; Runs</div>
+              <div class="demo-mock-body" style="padding:8px;">
+              <div class="ui-frame">
+                <div class="ui-sidebar">
+                  <div class="ui-side-title">Project Console</div>
+                  <a>Overview</a>
+                  <a>Cases</a>
+                  <a class="active">Runs</a>
+                  <a>Reports</a>
+                </div>
+                <div class="ui-main">
+                  <div class="ui-main-head">
+                    <div><div class="ui-main-title">Project Run History</div><div class="ui-main-sub">所有 batch · 按时间倒序</div></div>
+                    <button class="mock-cta" style="padding:6px 11px; font-size:11px;">▶ Run Project</button>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:5px; align-items:center; font-size:10.5px; margin-bottom:4px;">
+                    <div style="flex:1;"><strong>Full Regression · 11 cases</strong><div style="font-size:9.5px; color:var(--muted);">06/24 18:32 · 11 cases · ×1/case</div></div>
+                    <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Open</button>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:5px; align-items:center; font-size:10.5px; margin-bottom:4px;">
+                    <div style="flex:1;"><strong>AP Report Suite · 3 cases</strong><div style="font-size:9.5px; color:var(--muted);">06/24 17:18 · 3 cases · ×2/case</div></div>
+                    <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">Failed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Open</button>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:5px; align-items:center; font-size:10.5px;">
+                    <div style="flex:1;"><strong>Posting Verify · 2 cases</strong><div style="font-size:9.5px; color:var(--muted);">06/23 14:05 · 2 cases · ×1/case</div></div>
+                    <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Open</button>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar > Reports (Case Editor 视角) -->
+        <div class="demo-panel" data-sub="steps">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Sidebar &gt; Reports — 项目级报告</h4>
+              <p>这个项目所有跑过的 case 的 HTML 报告入口。比 Run Center 的 Reports 更聚焦——只显示这个项目相关的。</p>
+              <ul>
+                <li>按 case 分组显示最近报告</li>
+                <li>每条报告：caseId · status · 时间 · Open / Replay 按钮</li>
+                <li>无 report 的回退到 step screenshots 回放</li>
+                <li>支持下载为 PDF / 打包 zip（v3）</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Sidebar &gt; Reports</div>
+              <div class="demo-mock-body" style="padding:8px;">
+              <div class="ui-frame">
+                <div class="ui-sidebar">
+                  <div class="ui-side-title">Project Console</div>
+                  <a>Overview</a>
+                  <a>Cases</a>
+                  <a>Runs</a>
+                  <a class="active">Reports</a>
+                </div>
+                <div class="ui-main">
+                  <div class="ui-main-head">
+                    <div><div class="ui-main-title">Project Reports</div><div class="ui-main-sub">HTML 报告 + 回放</div></div>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:5px; align-items:center; font-size:10.5px; margin-bottom:4px;">
+                    <div style="flex:1;"><strong>saptest4</strong> · Supplier Balances<div style="font-size:9.5px; color:var(--muted);">06/24 18:42 · passed</div></div>
+                    <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Open</button>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:5px; align-items:center; font-size:10.5px; margin-bottom:4px;">
+                    <div style="flex:1;"><strong>saptest9</strong> · Check Invoice FI<div style="font-size:9.5px; color:var(--muted);">06/24 18:35 · failed · Document flow stale</div></div>
+                    <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">Failed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Replay</button>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:5px; align-items:center; font-size:10.5px;">
+                    <div style="flex:1;"><strong>saptest11</strong> · Sales Order<div style="font-size:9.5px; color:var(--muted);">06/23 14:08 · passed</div></div>
+                    <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:9.5px;">Open</button>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═════════ Module 3: Live Channels ═════════ -->
+      <!-- Sub-tabs map 1:1 to the Batch Live Monitor sidebar entries. -->
+      <div class="demo-module" data-mod="live" style="display:none;">
+        <div class="demo-subtabs">
+          <button class="demo-subtab active" data-sub="summary">Summary</button>
+          <button class="demo-subtab" data-sub="broadcast">Live Channels</button>
+          <button class="demo-subtab" data-sub="results">Case Results</button>
+          <button class="demo-subtab" data-sub="history">Run History</button>
+        </div>
+
+        <!-- Batch Summary (new) -->
+        <div class="demo-panel active" data-sub="summary">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Batch Summary — 当前批次概览</h4>
+              <p>Live Channels 顶部 entry。当前 batch 跑成啥样了，一屏看清。</p>
+              <ul>
+                <li><strong>4 个 metric 卡</strong>：cases in batch / currently live / passed / failed</li>
+                <li><strong>当前 batch 信息</strong>：名字 + 创建时间 + status + pending 数量</li>
+                <li>多个 case 并发跑时 quick stats live 更新</li>
+                <li>跑完后可一键 <strong>Rerun failed</strong></li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Live Channels · Batch Summary</div>
+              <div class="demo-mock-body" style="padding:10px;">
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:8px;">
+                  <div style="font-weight:900; color:var(--navy); margin-bottom:8px; font-size:12px;">Batch Summary</div>
+                  <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--navy); font-size:20px;">11</b><span style="font-size:10px; color:var(--muted);">in batch</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--red); font-size:20px;">3</b><span style="font-size:10px; color:var(--muted);">live</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--green); font-size:20px;">7</b><span style="font-size:10px; color:var(--muted);">passed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:8px;"><b style="display:block; color:var(--amber); font-size:20px;">1</b><span style="font-size:10px; color:var(--muted);">failed</span></div>
+                  </div>
+                </div>
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px;">
+                  <div style="font-weight:900; color:var(--navy); margin-bottom:4px; font-size:12px;">Current Batch</div>
+                  <div style="font-weight:800; font-size:13px; color:var(--ink);">Full Regression · 11 cases</div>
+                  <div style="font-size:11px; color:var(--muted); margin-top:3px;">06/24 18:32 · status running · 0 pending</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live broadcast -->
+        <div class="demo-panel" data-sub="broadcast">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Live broadcast — 多 case 监视</h4>
+              <p>Live Channels Tab 的主视图。多 case 跑时这里同时看，但默认聚焦一个 case 主画面。</p>
+              <ul>
+                <li>顶部 sub-tabs：Summary / Live Channels / Case Results / Run History</li>
+                <li>右侧侧栏：每个 active case 一片 chip，状态实时更新</li>
+                <li>主区：16:9 broadcast + 步骤覆盖层 + Live log</li>
+                <li>每个 case 状态 <strong>实时</strong>（2.5s 轮询 <code>/runs/active</code>）</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Live Channels · 多 case 监视</div>
+              <div class="demo-mock-body" style="padding:10px;">
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px;">
+                  <div style="display:flex; gap:6px; padding-bottom:8px; border-bottom:1px solid var(--line);">
+                    <span class="flip-chip-mock active" style="font-size:10px; padding:4px 8px;"><span class="pulse-dot"></span>saptest4</span>
+                    <span class="flip-chip-mock" style="font-size:10px; padding:4px 8px;"><span class="pulse-dot"></span>saptest9</span>
+                    <span class="flip-chip-mock" style="font-size:10px; padding:4px 8px;"><span class="pulse-dot"></span>saptest11</span>
+                  </div>
+                  <div style="background:linear-gradient(180deg, #1e3a5f 0%, #0e1f35 100%); border-radius:6px; aspect-ratio:16/9; position:relative; margin:8px 0; border:1px solid #1c3a5c;">
+                    <div class="broadcast-overlay" style="padding:5px 9px; font-size:10px;">
+                      <b style="font-size:10.5px;">saptest4 · Supplier Balances</b>
+                      <span>Step 8/15</span>
+                    </div>
+                  </div>
+                  <div style="background:#0f1c2e; color:#cbd5e1; font-family:ui-monospace, Consolas, monospace; font-size:9.5px; padding:6px 8px; border-radius:5px; line-height:1.45; max-height:60px; overflow:hidden;">
+                    <div><span style="color:#64748b;">18:42:11</span> cache hit ✓</div>
+                    <div><span style="color:#64748b;">18:42:13</span> cache hit ✓</div>
+                    <div><span style="color:#64748b;">18:42:15</span> dispatching aiKeyboardPress(Enter)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Results -->
+        <div class="demo-panel" data-sub="results">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Recent Results — 跑完去哪儿看</h4>
+              <p>跑完后这里就是结果汇总入口。Reports sidebar 里 30 条 + 4 个 metric 卡。</p>
+              <ul>
+                <li><strong>顶部</strong>：total runs / passed / failed / with HTML report 四个 metric</li>
+                <li><strong>每行</strong>：caseId + 分类色 + 时间戳 + 耗时 + 截断 errorMessage</li>
+                <li><strong>Report 按钮</strong>：开新窗口看 Midscene HTML 报告</li>
+                <li><strong>View log 按钮</strong>：跳 Run History tab 自动展开这条 log</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Reports · Recent runs</div>
+              <div class="demo-mock-body" style="padding:10px;">
+                <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px;">
+                  <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-bottom:10px;">
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:18px;">42</b><span style="font-size:10px; color:var(--muted);">total runs</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:18px;">35</b><span style="font-size:10px; color:var(--muted);">passed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:18px;">7</b><span style="font-size:10px; color:var(--muted);">failed</span></div>
+                    <div style="border:1px solid var(--line); border-radius:6px; padding:6px;"><b style="display:block; color:var(--navy); font-size:18px;">28</b><span style="font-size:10px; color:var(--muted);">w/ report</span></div>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font-size:11px; align-items:center; margin-bottom:4px;">
+                    <span class="cat-tag cat-ap">AP Report</span>
+                    <div style="flex:1;"><strong>saptest4</strong> · 06/24 18:42 · 7m 14s</div>
+                    <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:10px;">Report</button>
+                  </div>
+                  <div style="display:flex; gap:6px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font-size:11px; align-items:center; margin-bottom:4px;">
+                    <span class="cat-tag cat-verify">Posting Verify</span>
+                    <div style="flex:1;"><strong>saptest9</strong> · 06/24 18:35 · 4m 51s</div>
+                    <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">Failed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:10px;">Log</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Run History -->
+        <div class="demo-panel" data-sub="history">
+          <div class="demo-panel-grid">
+            <div class="copy">
+              <h4>Run History — inline log 展开</h4>
+              <p>历史 run 日志回看。每条点 ▸ 直接在行下面展开 logTail，不用开新页。</p>
+              <ul>
+                <li>列 30 条最近 run（按时间倒序）</li>
+                <li>点 ▸ 触发 <code>GET /api/results/runs/:runId</code> 拿完整记录</li>
+                <li>terminal 风格 inline 展开，最高 240px 滚动</li>
+                <li>失败 run 的错误信息直接展示</li>
+                <li>支持深链：URL 带 runId 时自动定位 + 展开</li>
+              </ul>
+            </div>
+            <div class="demo-mock">
+              <div class="demo-mock-bar">Run History · inline log</div>
+              <div class="demo-mock-body" style="padding:10px;">
+                <div style="background:#fff; border:1px solid #93c0f5; border-radius:8px; box-shadow:0 4px 12px rgba(11,107,220,0.08);">
+                  <div style="display:grid; grid-template-columns:28px 1fr auto auto; gap:8px; padding:9px 10px; align-items:center; font-size:11px; cursor:pointer;">
+                    <span class="expand-mock expanded">▾</span>
+                    <div>
+                      <strong>saptest9</strong> · Check Invoice FI Posting
+                      <div style="font-size:10px; color:var(--muted);">06/24 18:35 · 4.8s · Document flow stale</div>
+                    </div>
+                    <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">Failed</span>
+                    <button class="mini-btn" style="padding:2px 6px; font-size:10px;">Report</button>
+                  </div>
+                  <div style="border-top:1px dashed var(--line); padding:8px 12px; background:#fbfcfe;">
+                    <div style="font-size:10px; font-weight:900; color:var(--navy); margin-bottom:4px; letter-spacing:0.4px; text-transform:uppercase;">▼ Log tail</div>
+                    <div style="background:#0f1c2e; color:#cbd5e1; font-family:ui-monospace, Consolas, monospace; font-size:9.5px; padding:6px 8px; border-radius:5px; line-height:1.5;">
+                      <div><span style="color:#64748b;">18:35:42</span> Step 14 aiTap("Environment") → cache hit</div>
+                      <div><span style="color:#64748b;">18:35:44</span> Step 15 aiTap("Document Flow") → cache hit</div>
+                      <div><span style="color:#64748b;">18:35:48</span> Step 16 aiTap("Central Finance") → MISS</div>
+                      <div><span style="color:#64748b;">18:35:51</span> recovery: Stage 1 popup check</div>
+                      <div><span style="color:#64748b;">18:35:54</span> <span style="color:#ef9a9a;">throw: stale xpath</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Now vs Next ───────── -->
+    <section class="section" id="now-vs-next">
+      <div class="section-head">
+        <h2>已完成 / 在做 / 待做</h2>
+        <p class="note">三栏对照表，按优先级标了 P0/P1/P2。每条对应到 Run Center 里的具体功能或 API。</p>
+      </div>
+
+      <div class="status-grid">
+
+        <!-- ───── DONE ───── -->
+        <div class="status-col done">
+          <h3>✅ 已完成 <span class="count">14</span></h3>
+          <div class="col-sub">已上线，能用，覆盖核心场景。</div>
+          <ul>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">每个 case 行内 Report + Log + Live 入口</div>
+                <div class="label-sub">project 展开后每行右侧根据状态智能切按钮：Live / Report / Log / Run，无需跳出当前页。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Edit batch 跳转修复</div>
+                <div class="label-sub">从 Sidebar Projects 点 Edit 强制切到 Run Center home，Run Console 进入"Editing"模式 + toast 反馈。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Run Console · 选 case + 一键起跑</div>
+                <div class="label-sub">全选 / 部分选 / Invert / Clear；4 类 category chips + Passed/Failed 筛选；search 联动。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Run 确认 Modal · 取名 + ×N + Cases 预览</div>
+                <div class="label-sub">所有 Run 入口都强制走这个 modal，避免误触；Enter 确认 / Esc 取消。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Live Takeover · 跑起来后主页接管</div>
+                <div class="label-sub">16:9 大屏 + flip chips（红脉冲点）+ Live Log 终端 + Compose new run 逃生口。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Live Log 实时 tail</div>
+                <div class="label-sub">轮询 <code>/api/midscene-js/runs/active</code> 拿 logTail，自动滚到最新。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Abort Modal · 按 case 选哪个 kill</div>
+                <div class="label-sub">不再"abort all"一刀切；Select all / Clear / 单选；走 <code>/runs/:runId/abort</code>。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">My Projects · 自建 batch 沉淀</div>
+                <div class="label-sub">命名 + 保存 + 展开看 case + Run/Edit/Rename/Delete；localStorage 落盘。</div>
+              </div>
+              <span class="pri p0">P0</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Case 行内编辑 · Description / Parameters / NL</div>
+                <div class="label-sub">点 ▸ 展开 → 看 description + 改参数 + 折叠展开 NL；走 PUT <code>/api/cases/:id</code>。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Run History · 历史 run 日志回看</div>
+                <div class="label-sub">列 30 条 → 点 ▸ 展开 inline 看 logTail；新 API <code>/api/results/runs/:runId</code>。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Reports 概览 + Failure Analytics</div>
+                <div class="label-sub">4 个 metric（total / passed / failed / with report）+ recent runs；top failing cases + 一键 Rerun。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">4 个 category bucket 智能分类</div>
+                <div class="label-sub">AP Report / Finance Report / Posting Verify / Create；关键词 + 兜底硬编码 map。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">Run × N 稳定性倍乘</div>
+                <div class="label-sub">每个 case 跑 1/2/3/5 次，并行调度，runner 端串行；适合 flaky case 验证。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+            <li>
+              <span class="check done"></span>
+              <div>
+                <div class="label-text">原控制台 ⇄ Run Center 双向跳转</div>
+                <div class="label-sub">原 console 加 "▶ 用户运行中心" 主蓝按钮；Run Center 顶部 "开发者控制台" 跳回。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ───── IN FLIGHT ───── -->
+        <div class="status-col in-flight">
+          <h3>🟡 在做 / 部分完成 <span class="count">3</span></h3>
+          <div class="col-sub">骨架在，细节还需打磨。</div>
+          <ul>
+            <li>
+              <span class="check partial"></span>
+              <div>
+                <div class="label-text">Live takeover 多 case 网格视图</div>
+                <div class="label-sub">现在多 case 用 chips 切换看一个；后续要 2×2 网格同时看多个屏。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check partial"></span>
+              <div>
+                <div class="label-text">Case Editor (单 case 高级编辑)</div>
+                <div class="label-sub">现保留旧 Project Detail 改名而来；后续要彻底统一到 Run Center 的展开行视图。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+            <li>
+              <span class="check partial"></span>
+              <div>
+                <div class="label-text">参数 schema 校验 + 历史比对</div>
+                <div class="label-sub">现允许任何字符串覆盖；后续要按 type / regex 校验，并展示和默认值的 diff。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ───── PENDING ───── -->
+        <div class="status-col pending">
+          <h3>⚪ 待完成 <span class="count">8</span></h3>
+          <div class="col-sub">下个阶段的 backlog。</div>
+          <ul>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">WebSocket 推 Live Log（不轮询）</div>
+                <div class="label-sub">目前 2.5s 轮询；新 <code>/ws/run/:runId</code> 让 log 真正实时。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">Run Schedule · 定时跑批</div>
+                <div class="label-sub">每个 project 配 cron 表达式，定时启动；落到 Reports 同一个时间线上。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">通知 · 飞书 / 邮件</div>
+                <div class="label-sub">batch 完成时按 status 发结果，附 report URL + 失败 case 列表。</div>
+              </div>
+              <span class="pri p1">P1</span>
+            </li>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">Project 协作 · 多人共享 batch</div>
+                <div class="label-sub">现在 batch 存 localStorage 只对当前浏览器可见；要上 server 让团队共用。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">失败聚类 · AI 分组</div>
+                <div class="label-sub">把 error message 喂 LLM 归类（页面挂 / 元素找不到 / 数据校验失败 / 网络），减少人工梳理。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">Cache 健康度面板</div>
+                <div class="label-sub">每个 case 的 pass cache 命中率、最近写入时间、需要 re-source 的提示。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">移动端 / 平板适配</div>
+                <div class="label-sub">现在两列布局窄屏会塞；需要纵向重排和触摸友好按钮尺寸。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+            <li>
+              <span class="check pending"></span>
+              <div>
+                <div class="label-text">SSO / 权限粒度</div>
+                <div class="label-sub">Run / Abort / Edit batch / Manage cases 拆出独立权限；按角色分发。</div>
+              </div>
+              <span class="pri p2">P2</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Features deep dive ───────── -->
+    <section class="section" id="features">
+      <div class="section-head">
+        <h2>核心交互细节</h2>
+        <p class="note">下面每块是一个已上线功能，左边写"用户看到啥 + 怎么操作"，右边给出 mockup 还原 Run Center 实际样子。</p>
+      </div>
+
+      <div class="feature-grid">
+
+        <!-- Feature 1 — Run Console -->
+        <article class="feature-block">
+          <div class="feature-head">
+            <div class="feature-num">1</div>
+            <div>
+              <h3>Run Console · 选 case + 命名 + 起跑</h3>
+              <div class="sub">Run Center 主页 hero · 用户的 95% 操作起点</div>
+            </div>
+            <span class="feature-status done">已上线</span>
+          </div>
+          <div class="feature-body">
+            <div class="copy">
+              <h4>看什么</h4>
+              <p>case 网格按 category 着色（AP Report / Finance Report / Posting Verify / Create 四种），右上角永远有大蓝色 <strong>▶ Run · N cases</strong> 按钮。</p>
+              <h4>操作</h4>
+              <ul>
+                <li>顶部虚线框 Bulk Bar：Select all / Select visible / Deselect visible / Clear all / Invert，右边实时计数。</li>
+                <li>chips 切 category 或 Passed/Failed only，搜索框联动过滤。</li>
+                <li>每个 case 点 ▸ 内联展开：Description + Parameters（直接改）+ 折叠的 Natural Language。</li>
+                <li>底部 BATCH NAME 输入框（自动建议名字，如 <code>AP Report Suite · 3 cases</code>）+ RUN × 1/2/3/5 + Save as batch。</li>
+                <li>大 Run 按钮 → 弹 Run 确认 modal（功能 #2）。</li>
+              </ul>
+              <div class="kbd-row">快捷键 <span class="kbd">Enter</span> 在 modal 内直接确认 · <span class="kbd">Esc</span> 取消</div>
+            </div>
+            <div>
+              <div class="mock">
+                <div class="mock-bar">
+                  <span class="traffic"></span><span class="traffic"></span><span class="traffic"></span>
+                  <span class="url">127.0.0.1:5174/run-center.html · Run Console</span>
+                </div>
+                <div class="mock-body" style="padding: 14px;">
+                  <div class="bulk-bar">
+                    <button class="mini-btn primary">Select all (11)</button>
+                    <button class="mini-btn">Select visible (4)</button>
+                    <button class="mini-btn">Clear all</button>
+                    <button class="mini-btn">Invert</button>
+                    <span class="bulk-count">3 selected</span>
+                  </div>
+                  <div class="chips-row">
+                    <span class="chip">All · 11</span>
+                    <span class="chip active">AP Report · 3</span>
+                    <span class="chip">Finance Report · 4</span>
+                    <span class="chip">Create · 2</span>
+                    <span class="chip">Posting Verify · 2</span>
+                  </div>
+                  <div class="case-grid">
+                    <div class="case-card checked">
+                      <span class="checkbox checked"></span>
+                      <div>
+                        <div class="title">saptest2 · SAP TEST 2</div>
+                        <div class="meta">AP Report</div>
+                      </div>
+                      <span class="cat-tag cat-ap">AP REPORT</span>
+                      <span class="expand-mock">▸</span>
+                    </div>
+                    <div class="case-card checked">
+                      <span class="checkbox checked"></span>
+                      <div>
+                        <div class="title">saptest3 · SAP TEST 3</div>
+                        <div class="meta">AP Report</div>
+                      </div>
+                      <span class="cat-tag cat-ap">AP REPORT</span>
+                      <span class="expand-mock">▸</span>
+                    </div>
+                    <div class="case-card checked">
+                      <span class="checkbox checked"></span>
+                      <div>
+                        <div class="title">saptest4 · SAP TEST 4</div>
+                        <div class="meta">AP Report</div>
+                      </div>
+                      <span class="cat-tag cat-ap">AP REPORT</span>
+                      <span class="expand-mock expanded">▾</span>
+                    </div>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px dashed var(--line); padding-top:12px;">
+                    <div>
+                      <label style="font-size:10.5px; font-weight:900; letter-spacing:0.5px; text-transform:uppercase; color:#475467;">Batch name</label>
+                      <div class="pseudo-input" style="width: 220px; padding: 8px 10px; margin-top: 4px;">AP Report Suite · 3 cases</div>
+                    </div>
+                    <button class="mock-cta">▶ Run · 3 cases</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Feature 2 — Run Confirmation Modal -->
+        <article class="feature-block">
+          <div class="feature-head">
+            <div class="feature-num">2</div>
+            <div>
+              <h3>Run 确认弹窗 · 跑之前再过一道</h3>
+              <div class="sub">所有 Run 入口都强制走这个 modal · 命名 + ×N + 预览 + 启动</div>
+            </div>
+            <span class="feature-status done">已上线</span>
+          </div>
+          <div class="feature-body">
+            <div class="copy">
+              <h4>看什么</h4>
+              <p>居中弹窗，背景虚化。三块字段：项目名（auto-suggest）+ 每个 case 跑几次 + 即将启动的 case 列表预览。</p>
+              <h4>设计意图</h4>
+              <ul>
+                <li>跑大批 / 跑全量回归不可逆，先让用户暂停 1.5 秒确认。</li>
+                <li>命名让 batch 在 My Projects 里成为可复用资产，不是匿名跑了就跑了。</li>
+                <li>×N 倍乘验证 flaky case：1（正常）/ 2 / 3 / 5 次。</li>
+                <li>底部 cases 列表防止"我以为我勾的不是这些"。</li>
+              </ul>
+              <div class="kbd-row">键盘：<span class="kbd">Enter</span> 启动 · <span class="kbd">Esc</span> 关闭</div>
+            </div>
+            <div style="display:flex; justify-content:center; padding: 20px 0;">
+              <div class="modal-mock">
+                <div class="modal-mock-head">
+                  <b>Confirm Run</b>
+                  <div class="sub">取个名字 → 跑起来，会出现在 My Projects 下次一键复用</div>
+                </div>
+                <div class="modal-mock-body">
+                  <label>Project name</label>
+                  <div class="pseudo-input">AP Report Suite · 3 cases</div>
+                  <label>Run × per case</label>
+                  <div class="run-count-row">
+                    <span class="x active">×1</span>
+                    <span class="x">×2</span>
+                    <span class="x">×3</span>
+                    <span class="x">×5</span>
+                  </div>
+                  <div style="font-size:11px; color:var(--muted); margin-bottom:14px;">3 × 1 = 3 executions</div>
+                  <label>Cases (3)</label>
+                  <div style="border:1px dashed var(--line); border-radius:7px; padding:8px 10px; font-size:11.5px; color:#344054; background: var(--paper);">
+                    saptest2 · SAP TEST 2<br/>
+                    saptest3 · SAP TEST 3<br/>
+                    saptest4 · SAP TEST 4
+                  </div>
+                </div>
+                <div class="modal-mock-foot">
+                  <button class="mini-btn">Cancel</button>
+                  <button class="mock-cta" style="padding:10px 18px; font-size:13px;">▶ Start running</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Feature 3 — Live Takeover -->
+        <article class="feature-block">
+          <div class="feature-head">
+            <div class="feature-num">3</div>
+            <div>
+              <h3>Live Takeover · 跑起来主页自动接管</h3>
+              <div class="sub">Run Console 自动隐藏，broadcast 占满 · 跑完自动还原</div>
+            </div>
+            <span class="feature-status done">已上线</span>
+          </div>
+          <div class="feature-body">
+            <div class="copy">
+              <h4>看什么</h4>
+              <p>顶部巨大标题 <strong>🔴 N cases running live</strong> + 红色脉冲点，flip chips（多 case 切换），16:9 大屏 broadcast，下方 Live Log 终端风格滚动。</p>
+              <h4>操作</h4>
+              <ul>
+                <li>点 chip 切换看哪个 case 的画面。当前 chip 深色 + 红脉冲点。</li>
+                <li>右上 <strong>＋ Compose new run</strong> 手动调回 Run Console（不影响正在跑的）。</li>
+                <li>右上大红 <strong>⏹ Abort N…</strong> 弹出 Abort modal（功能 #4）。</li>
+                <li>顶栏 Watch Live 按钮变红闪烁，标签变 <strong>🔴 LIVE · N</strong>。</li>
+                <li>所有 run 结束自动回到普通 Run Console + My Projects 视图。</li>
+              </ul>
+            </div>
+            <div class="takeover-mock">
+              <div class="takeover-mock-head">
+                <div class="takeover-mock-title">
+                  <span class="pulse-dot"></span>
+                  3 cases running live
+                </div>
+                <div style="display:flex; gap:8px;">
+                  <button class="mini-btn">＋ Compose new run</button>
+                  <button class="mock-cta danger" style="font-size:13px; padding:8px 14px;">⏹ Abort 3…</button>
+                </div>
+              </div>
+              <div style="display:flex; gap:7px; margin-bottom: 10px; flex-wrap:wrap;">
+                <span class="flip-chip-mock active"><span class="pulse-dot"></span>saptest4 <span class="step">step 8/15</span></span>
+                <span class="flip-chip-mock"><span class="pulse-dot"></span>saptest9 <span class="step">step 4/12</span></span>
+                <span class="flip-chip-mock"><span class="pulse-dot"></span>saptest11 <span class="step">step 11/18</span></span>
+              </div>
+              <div class="takeover-mock-screen">
+                <div class="broadcast-overlay">
+                  <b>saptest4 · Supplier Balances</b>
+                  <span>Step 8 / 15 · 在 Company Code 输入 8540</span>
+                </div>
+              </div>
+              <div style="font-size:11px; font-weight:900; letter-spacing:0.5px; text-transform:uppercase; color:var(--navy); margin: 8px 0 4px;">▼ Live log</div>
+              <div class="takeover-mock-log">
+                <div><span class="ts">18:42:11</span>Step 6 aiTap("Execute") → cache hit ✓</div>
+                <div><span class="ts">18:42:13</span>Step 7 aiInput("company code", "8540") → cache hit ✓</div>
+                <div><span class="ts">18:42:15</span>Step 8 dispatching aiKeyboardPress("Enter")</div>
+                <div><span class="ts">18:42:18</span>Step 8 screen changed 38% — confirmed</div>
+                <div><span class="ts">18:42:19</span>…</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Feature 4 — Abort Modal -->
+        <article class="feature-block">
+          <div class="feature-head">
+            <div class="feature-num">4</div>
+            <div>
+              <h3>Abort 弹窗 · 按 case 选哪个 kill</h3>
+              <div class="sub">告别一刀切；可以精准杀一个错跑的 case，其他继续</div>
+            </div>
+            <span class="feature-status done">已上线</span>
+          </div>
+          <div class="feature-body">
+            <div class="copy">
+              <h4>看什么</h4>
+              <p>列每个正在 run 的 case，前面有红脉冲点 + checkbox + 当前 step。底部一个动态变文字的大红按钮。</p>
+              <h4>操作</h4>
+              <ul>
+                <li>默认按你的入口给一个聪明的预选：从 Console 进来带 selected 的 case；从 takeover 进来全选。</li>
+                <li>Select all / Clear / 单勾，计数实时更新。</li>
+                <li>按钮文字自动跟选数变：<code>⏹ Abort all 3</code> / <code>⏹ Abort selected (2)</code> / <code>Select runs to abort</code>（禁用）。</li>
+                <li>走 <code>POST /api/midscene-js/runs/:runId/abort</code>；runner 会按 attachActiveRunCleanup 顺序清浏览器/页面句柄。</li>
+              </ul>
+            </div>
+            <div style="display:flex; justify-content:center; padding: 14px 0;">
+              <div class="modal-mock" style="max-width: 420px;">
+                <div class="modal-mock-head">
+                  <b>Abort runs</b>
+                  <div class="sub">选要 kill 的 run。runner 会清浏览器/页面句柄。</div>
+                </div>
+                <div class="modal-mock-body">
+                  <div style="display:flex; gap:6px; margin-bottom:12px;">
+                    <button class="mini-btn">Select all</button>
+                    <button class="mini-btn">Clear</button>
+                    <span style="margin-left:auto; font-size:11px; color:var(--muted);">2 of 3 selected</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; padding:10px; border:1px solid #fecaca; border-radius:8px; background:#fff5f5; margin-bottom:6px;">
+                    <span class="checkbox checked" style="background:var(--red); border-color:var(--red);"></span>
+                    <span class="pulse-dot"></span>
+                    <div style="flex:1; font-size:13px;">
+                      <strong>saptest4 · Supplier Balances</strong>
+                      <div style="font-size:11.5px; color:var(--muted);">Step 8/15 · 在 Company Code 输入 8540</div>
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; padding:10px; border:1px solid #fecaca; border-radius:8px; background:#fff5f5; margin-bottom:6px;">
+                    <span class="checkbox checked" style="background:var(--red); border-color:var(--red);"></span>
+                    <span class="pulse-dot"></span>
+                    <div style="flex:1; font-size:13px;">
+                      <strong>saptest9 · Check Invoice FI</strong>
+                      <div style="font-size:11.5px; color:var(--muted);">Step 4/12 · running…</div>
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--line); border-radius:8px; background:#fff; margin-bottom:6px;">
+                    <span class="checkbox"></span>
+                    <span class="pulse-dot"></span>
+                    <div style="flex:1; font-size:13px;">
+                      <strong>saptest11 · Sales Order</strong>
+                      <div style="font-size:11.5px; color:var(--muted);">Step 11/18 · running…</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-mock-foot">
+                  <button class="mini-btn">Cancel</button>
+                  <button class="mock-cta danger" style="font-size:13px; padding:10px 16px;">⏹ Abort selected (2)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Feature 5 — My Projects -->
+        <article class="feature-block">
+          <div class="feature-head">
+            <div class="feature-num">5</div>
+            <div>
+              <h3>My Projects · 把选择沉淀成可复用资产</h3>
+              <div class="sub">presets (Asset / Finance / AP Report etc.) + 用户自建</div>
+            </div>
+            <span class="feature-status done">已上线</span>
+          </div>
+          <div class="feature-body">
+            <div class="copy">
+              <h4>看什么</h4>
+              <p>每个 project 是一张卡：图标 + 名字 + count×runsPerCase + 状态徽章 + 展开按钮。</p>
+              <h4>操作</h4>
+              <ul>
+                <li>展开 ▸ 看 case 列表（带分类色 + 当前 status），底部四个按钮 Run / Edit / Rename / Delete。</li>
+                <li>Run → 弹 Confirm Modal，可改名/×N 再启动。</li>
+                <li>Edit → 整个 batch 倒回 Run Console，改完再 Save changes（覆盖）或新建。</li>
+                <li>顶部 <strong>+ New project from selection</strong>：把当前 Console 勾的 case 直接命名保存。</li>
+                <li>Sidebar Projects 入口看到完全相同的两张卡：SAP Automation Project（内置 11 case）+ My Projects。</li>
+              </ul>
+            </div>
+            <div>
+              <div class="mock">
+                <div class="mock-bar">
+                  <span class="traffic"></span><span class="traffic"></span><span class="traffic"></span>
+                  <span class="url">127.0.0.1:5174/run-center.html · Projects</span>
+                </div>
+                <div class="mock-body" style="padding:14px;">
+                  <!-- SAP Automation -->
+                  <div style="background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:10px; box-shadow:0 4px 10px rgba(21,48,79,0.04);">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:36px; height:36px; border-radius:8px; background:var(--navy); color:#fff; display:grid; place-items:center; font-weight:900;">S</div>
+                      <div style="flex:1; min-width:0;">
+                        <div style="font-weight:900; color:var(--navy); font-size:14px;">SAP Automation Project</div>
+                        <div style="font-size:11px; color:var(--muted);">11 validated cases · 11 passed · 0 failed</div>
+                      </div>
+                      <span class="cat-tag" style="background: #e5f6ed; color: #0b6a43; border:1px solid #bfe8d2;">READY</span>
+                      <span class="expand-mock expanded">▾</span>
+                    </div>
+                    <div style="border-top:1px dashed var(--line); margin-top:10px; padding-top:10px; display:grid; gap:4px;">
+                      <div style="display:flex; gap:8px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; font-size:11.5px; align-items:center;">
+                        <span class="cat-tag cat-fin">Finance Report</span>
+                        <span style="flex:1;">saptest1 · SAP TEST 1</span>
+                        <span class="cat-tag" style="background:#e5f6ed; color:#0b6a43; border:1px solid #bfe8d2;">Passed</span>
+                        <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Report</button>
+                        <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Log</button>
+                      </div>
+                      <div style="display:flex; gap:8px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; font-size:11.5px; align-items:center;">
+                        <span class="cat-tag cat-ap">AP Report</span>
+                        <span style="flex:1;">saptest4 · SAP TEST 4</span>
+                        <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">Live</span>
+                        <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px; background:#fff1f2; color:var(--red); border-color:#fecdd3;">🔴 Live</button>
+                      </div>
+                      <div style="display:flex; gap:8px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; font-size:11.5px; align-items:center;">
+                        <span class="cat-tag cat-create">Create</span>
+                        <span style="flex:1;">saptest11 · SAP TEST 11</span>
+                        <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">Failed</span>
+                        <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Report</button>
+                        <button class="mini-btn" style="padding:2px 6px; min-height:22px; font-size:10px;">Log</button>
+                      </div>
+                      <div style="display:flex; gap:6px; margin-top:8px;">
+                        <button class="mini-btn primary">▶ Run all</button>
+                        <button class="mini-btn">Open in Run Console</button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- My Projects header -->
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-weight:900; color:var(--navy);">My Projects · 2 custom</span>
+                    <button class="mini-btn primary">+ New project</button>
+                  </div>
+                  <div style="background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:6px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:36px; height:36px; border-radius:8px; background:var(--blue); color:#fff; display:grid; place-items:center; font-weight:900;">F</div>
+                      <div style="flex:1;">
+                        <div style="font-weight:900; color:var(--navy); font-size:14px;">FI Posting Daily Smoke</div>
+                        <div style="font-size:11px; color:var(--muted);">2 cases · ×2/case · 06/22 created</div>
+                      </div>
+                      <span class="cat-tag" style="background: #e5f6ed; color: #0b6a43; border:1px solid #bfe8d2;">PASSED</span>
+                      <span class="expand-mock">▸</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Feature 6 — Reports + Failure Analytics -->
+        <article class="feature-block">
+          <div class="feature-head">
+            <div class="feature-num">6</div>
+            <div>
+              <h3>Reports + Failure Analytics 复盘</h3>
+              <div class="sub">跑完之后的去处 · sidebar 里两个独立入口</div>
+            </div>
+            <span class="feature-status done">已上线</span>
+          </div>
+          <div class="feature-body">
+            <div class="copy">
+              <h4>Reports</h4>
+              <ul>
+                <li>顶部 4 metric：total runs / passed / failed / with HTML report。</li>
+                <li>Recent runs 列表（30 条）：caseId + 分类色标签 + 时间戳 + 耗时 + 截断的错误信息。</li>
+                <li>有 HTML report → 开新窗口看 Midscene 完整报告；没有 → View log 跳到 Run History 自动展开那条。</li>
+              </ul>
+              <h4>Failure Analytics</h4>
+              <ul>
+                <li>4 metric：total failures / failure rate% / cases ever failed / last failure date。</li>
+                <li>Top 5 failing cases，按失败次数排序；一键 <code>↺ Rerun all</code> 弹 modal。</li>
+                <li>Recent failures 时间线（15 条），每行 Report + Log 双按钮。</li>
+              </ul>
+              <h4>Run History (Live Channels → Run History)</h4>
+              <ul>
+                <li>点 ▸ inline 展开 logTail（新 API <code>/api/results/runs/:runId</code>，从磁盘加载）。</li>
+                <li>无需开新页就能看完整 log；适合快速回看一条 run 干了啥。</li>
+              </ul>
+            </div>
+            <div>
+              <div class="mock">
+                <div class="mock-bar">
+                  <span class="traffic"></span><span class="traffic"></span><span class="traffic"></span>
+                  <span class="url">127.0.0.1:5174/run-center.html · Failure Analytics</span>
+                </div>
+                <div class="mock-body" style="padding:14px;">
+                  <div style="background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:10px;">
+                    <div style="font-weight:900; color:var(--navy); margin-bottom:10px;">Overview</div>
+                    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;">
+                      <div style="border:1px solid var(--line); border-radius:8px; padding:10px;"><b style="display:block; font-size:20px; color:var(--navy);">7</b><span style="font-size:11px; color:var(--muted);">total failures</span></div>
+                      <div style="border:1px solid var(--line); border-radius:8px; padding:10px;"><b style="display:block; font-size:20px; color:var(--navy);">18%</b><span style="font-size:11px; color:var(--muted);">failure rate</span></div>
+                      <div style="border:1px solid var(--line); border-radius:8px; padding:10px;"><b style="display:block; font-size:20px; color:var(--navy);">3</b><span style="font-size:11px; color:var(--muted);">ever failed</span></div>
+                      <div style="border:1px solid var(--line); border-radius:8px; padding:10px;"><b style="display:block; font-size:13px; color:var(--navy);">06/24</b><span style="font-size:11px; color:var(--muted);">last failure</span></div>
+                    </div>
+                  </div>
+                  <div style="background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                      <span style="font-weight:900; color:var(--navy);">Top failing cases · 3</span>
+                      <button class="mock-cta danger" style="font-size:11.5px; padding:6px 12px; min-height:auto;">↺ Rerun all</button>
+                    </div>
+                    <div style="display:flex; gap:8px; padding:8px; border:1px solid var(--line); border-radius:7px; align-items:center; font-size:12px; margin-bottom:5px;">
+                      <div style="flex:1;">
+                        <strong>saptest4 · SAP TEST 4</strong>
+                        <div style="font-size:11px; color:var(--muted);">3 failures · last 06/24 · MISS at step 28</div>
+                      </div>
+                      <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">×3</span>
+                      <button class="mini-btn">↺ Rerun</button>
+                    </div>
+                    <div style="display:flex; gap:8px; padding:8px; border:1px solid var(--line); border-radius:7px; align-items:center; font-size:12px;">
+                      <div style="flex:1;">
+                        <strong>saptest9 · SAP TEST 9</strong>
+                        <div style="font-size:11px; color:var(--muted);">2 failures · last 06/23 · Document flow stale</div>
+                      </div>
+                      <span class="cat-tag" style="background:#ffe4e8; color:#9f1d2a; border:1px solid #fecdd3;">×2</span>
+                      <button class="mini-btn">↺ Rerun</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ───────── User Journey ───────── -->
+    <section class="section" id="journey">
+      <div class="section-head">
+        <h2>典型用户路径</h2>
+        <p class="note">业务用户从打开 Run Center 到拿到结果的 5 个步骤；每步都对应 UI 上的具体元素，没有"再点 6 层菜单"的脑负担。</p>
+      </div>
+      <div class="journey">
+        <div class="journey-step">
+          <div class="journey-num">1</div>
+          <h4>打开 Run Center</h4>
+          <div class="step-sub">原控制台顶 bar 主蓝按钮，或直接走 <code>/run-center.html</code></div>
+          <div style="font-size:11.5px; color:#475467;">看到 11 个 SAP cases + 4 个 category bucket + Saved batches。</div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">2</div>
+          <h4>选 case</h4>
+          <div class="step-sub">勾 checkbox / 用 Select all / chip 筛 <code>AP Report</code></div>
+          <div style="font-size:11.5px; color:#475467;">每个 case 可展开行内改参数 + 折叠看 NL，不必跳出。</div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">3</div>
+          <h4>命名 + 起跑</h4>
+          <div class="step-sub">▶ Run · N cases → 弹 Confirm Modal</div>
+          <div style="font-size:11.5px; color:#475467;">输 batch 名字 + 选 ×N → Enter / 点 Start running 启动。</div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">4</div>
+          <h4>实时看转播</h4>
+          <div class="step-sub">Run Console 自动隐藏，Live Takeover 接管</div>
+          <div style="font-size:11.5px; color:#475467;">大屏 broadcast + flip chips 切 case + Live Log + Abort 弹窗。</div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">5</div>
+          <h4>复盘 + 复跑</h4>
+          <div class="step-sub">My Projects 卡片每行 Report / Log</div>
+          <div style="font-size:11.5px; color:#475467;">挑失败 case → ↺ Rerun，或者 Edit batch 调整后再跑。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── API surface ───────── -->
+    <section class="section" id="api">
+      <div class="section-head">
+        <h2>后端 API 速查</h2>
+        <p class="note">Run Center 完全跑在这套 REST + 文件持久化上面。所有端点都过 <code>requireAuth()</code>，部分还要 <code>requirePermission</code>。</p>
+      </div>
+      <div class="api-table">
+        <div class="api-row header">
+          <div>METHOD</div>
+          <div>PATH</div>
+          <div>用途</div>
+          <div>权限</div>
+        </div>
+        <div class="api-row">
+          <span class="api-method get">GET</span>
+          <span class="api-path">/api/cases</span>
+          <div class="desc">列出所有 case（含 summary: title / transactionCode / description）。前端分类器靠这个 hay 去匹配。</div>
+          <span class="who">cases:read</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method get">GET</span>
+          <span class="api-path">/api/cases/:id</span>
+          <div class="desc">单 case 完整 detail（含 parsed.apiGuide / naturalLanguage / params）。展开行内编辑参数时拿。</div>
+          <span class="who">cases:read</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method put">PUT</span>
+          <span class="api-path">/api/cases/:id</span>
+          <div class="desc">改参数 / 自然语言落盘。Save parameters 走这个。</div>
+          <span class="who">cases:write</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method post">POST</span>
+          <span class="api-path">/api/midscene-js/cases/:id/run?cache=read</span>
+          <div class="desc">触发跑一个 case，body 里传 headed。Confirm modal 点 Start 后每个 case 各发一次。</div>
+          <span class="who">runs:execute</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method get">GET</span>
+          <span class="api-path">/api/midscene-js/runs/active</span>
+          <div class="desc">当前 active run 列表 + logTail（每 run 最近 30 行）+ screenshots 索引。轮询 2.5s。</div>
+          <span class="who">runs:read</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method post">POST</span>
+          <span class="api-path">/api/midscene-js/runs/:runId/abort</span>
+          <div class="desc">Best-effort 杀掉某个 run 的浏览器 / 页面句柄。Abort modal 勾哪个走这个。</div>
+          <span class="who">runs:execute</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method get">GET</span>
+          <span class="api-path">/api/midscene-js/runs/:runId/screenshots</span>
+          <div class="desc">某 run 的所有 step 截图列表 + 单张 URL。Live Broadcast 拿最新一张作为 cover。</div>
+          <span class="who">runs:read</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method get">GET</span>
+          <span class="api-path">/api/results/recent?limit=300</span>
+          <div class="desc">最近 N 个 run summary（含 status / runId / report.url / errorMessage / durationMs）。Reports / Failure Analytics / 每行 Report+Log 都靠这个。</div>
+          <span class="who">results:read</span>
+        </div>
+        <div class="api-row">
+          <span class="api-method get">GET</span>
+          <span class="api-path">/api/results/runs/:runId</span>
+          <div class="desc">单 run 完整记录（含 logTail + events）。Run History inline 展开走这个。本次新增。</div>
+          <span class="who">results:read</span>
+        </div>
+      </div>
+      <div style="margin-top: 14px; font-size: 12px; color: var(--muted);">
+        非 API 持久化：用户自建 batches 存 <code>localStorage.userRunCenter.batches</code>（最多 20 条），后续 v3 会迁到 server-side。
+      </div>
+    </section>
+
+    <!-- ───────── Design decisions ───────── -->
+    <section class="section" id="decisions">
+      <div class="section-head">
+        <h2>关键设计取舍</h2>
+        <p class="note">每条都是用户用过后吐槽 → 我们重新选的方向。把"为什么这么做"显式写出来，便于后续 review 不走回头路。</p>
+      </div>
+      <div class="decisions">
+
+        <article class="decision">
+          <div class="why">Why · 误触保护</div>
+          <h4>所有 Run 入口强制走 Confirm Modal</h4>
+          <div class="versus">
+            <div class="choice win">点 Run → 弹窗 → 命名 → 真启动</div>
+            <div class="choice lose">点 Run → 直接开始跑</div>
+          </div>
+          <p>跑 11 个 case × ×5 次 = 55 次浏览器拉起，启动成本不可逆。命名让 batch 沉淀成 My Projects 复用资产，不是匿名空跑。</p>
+        </article>
+
+        <article class="decision">
+          <div class="why">Why · 视觉一致</div>
+          <h4>开发者控制台 ⇄ 用户控制台 双向链接</h4>
+          <div class="versus">
+            <div class="choice win">两个页面顶 bar 互链 + 不同主题</div>
+            <div class="choice lose">合并成一个页面"模式切换"</div>
+          </div>
+          <p>开发场景（编辑 case JSON / 调 cache / 看截图）和运行场景（选 case / 跑 / 监控）操作密度差异大。强行合并会两边都做不好。</p>
+        </article>
+
+        <article class="decision">
+          <div class="why">Why · 实时性 vs 资源</div>
+          <h4>2.5s 轮询 active runs，先不上 WebSocket</h4>
+          <div class="versus">
+            <div class="choice win">setInterval 2500ms + 屏幕指纹比对</div>
+            <div class="choice lose">WebSocket 实时推</div>
+          </div>
+          <p>当前 active run 上限 10 个、log 30 行/run = 单次 payload &lt;10KB，2.5s 间隔足够。WebSocket 留到 v3，需要做断线重连 + 鉴权。</p>
+        </article>
+
+        <article class="decision">
+          <div class="why">Why · 状态机简化</div>
+          <h4>Live Takeover 自动接管，不留"Run + Live"双视图</h4>
+          <div class="versus">
+            <div class="choice win">跑起来 → Console 隐藏 → 自动还原</div>
+            <div class="choice lose">永远显示 Console + Live 分裂屏</div>
+          </div>
+          <p>用户启动后 95% 时间在看 broadcast，5% 想加新 case。Compose new run 逃生口照顾后者，主路径不被 Console 干扰。</p>
+        </article>
+
+        <article class="decision">
+          <div class="why">Why · 分类要"够用"</div>
+          <h4>4 个 category bucket（AP / FI / Verify / Create）</h4>
+          <div class="versus">
+            <div class="choice win">4 个粗 bucket + 颜色 + 重复 label</div>
+            <div class="choice lose">11 个独立精细 label / 透传 TCODE</div>
+          </div>
+          <p>11 个 case 不到分 10 类的体量。用户要的是"按业务领域批量跑"，TCODE 是码农工具。重复 label 反而帮用户视觉聚类。</p>
+        </article>
+
+        <article class="decision">
+          <div class="why">Why · 失败自救</div>
+          <h4>所有 renderXxx 包 try/catch + safeRender</h4>
+          <div class="versus">
+            <div class="choice win">单个 panel 报错只挂自己，不影响 tab/sidebar</div>
+            <div class="choice lose">一处 throw → 整个页面卡死</div>
+          </div>
+          <p>localStorage 残留脏数据 / 接口偶发返回奇怪 shape 都不该让全页崩。错误 panel 还会附"清空缓存"按钮让用户自救。</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ───────── Architecture ───────── -->
+    <section class="section" id="architecture">
+      <div class="section-head">
+        <h2>页面结构 / Tab 关系</h2>
+        <p class="note">三个顶部 Tab + 内部 sidebar，按使用频率排列：日常运行走 Run Center，单 case 编辑去 Case Editor，多 case 监视去 Live Channels。</p>
+      </div>
+      <div class="mock">
+        <div class="mock-bar">
+          <span class="traffic"></span><span class="traffic"></span><span class="traffic"></span>
+          <span class="url">127.0.0.1:5174/run-center.html · 总览</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-tabs">
+            <button class="mock-tab active">Run Center</button>
+            <button class="mock-tab">Case Editor</button>
+            <button class="mock-tab">Live Channels</button>
+          </div>
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="mock-sidebar-title">TestOps Command Center</div>
+              <a href="#" class="active">Run Center</a>
+              <a href="#">Projects</a>
+              <a href="#">Reports</a>
+              <a href="#">Failure Analytics</a>
+            </aside>
+            <div class="mock-panel">
+              <div class="mock-panel-head">
+                <div>
+                  <div class="mock-panel-title">Run Center</div>
+                  <div class="mock-panel-sub">一键启动批量运行、保存常用 batch、按类别 Quick Run</div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                  <button class="mini-btn">Watch Live</button>
+                  <button class="mock-cta">▶ Run · 3 cases</button>
+                </div>
+              </div>
+              <div style="font-size:13px; color:#475467;">
+                <strong style="color:var(--navy);">▼ Run Console（hero）</strong> — case 网格 + bulk-bar + chips + batch-name + Run × N + Run CTA<br/>
+                <strong style="color:var(--navy);">▼ My Projects</strong> — 自建 batches，可展开看 case + Run/Edit/Rename/Delete<br/>
+                <em style="color:var(--muted);">↳ 一旦 ≥1 case 在跑：Run Console + My Projects 被 Live Takeover 替代</em>
+              </div>
+              <div style="margin-top:14px; padding:14px; background:var(--paper); border-radius:8px; border:1px dashed var(--line);">
+                <strong style="color:var(--navy); font-size:13px;">Sidebar 切到 Projects:</strong>
+                <div style="font-size:12px; color:#475467; margin-top:5px;">SAP Automation Project（11 cases，内置）+ My Projects（自建）两个大卡片</div>
+                <strong style="color:var(--navy); font-size:13px; margin-top:10px; display:block;">Sidebar 切到 Reports:</strong>
+                <div style="font-size:12px; color:#475467; margin-top:5px;">Overview metrics + Recent runs 列表，可跳 HTML report 或 inline log</div>
+                <strong style="color:var(--navy); font-size:13px; margin-top:10px; display:block;">Sidebar 切到 Failure Analytics:</strong>
+                <div style="font-size:12px; color:#475467; margin-top:5px;">Failure overview + Top failing + Recent failures，一键重跑</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Roadmap ───────── -->
+    <section class="section" id="roadmap">
+      <div class="section-head">
+        <h2>落地路线</h2>
+        <p class="note">v1（2026-06-23 之前）→ v2（now）→ v3（next）→ later。每一阶段对应可演示的产品状态。</p>
+      </div>
+      <div class="roadmap">
+        <div class="phase shipped">
+          <div class="stage">v1 已完成</div>
+          <h4>开发者控制台</h4>
+          <div class="timeline">至 2026-06-23</div>
+          <ul>
+            <li>单 case 编辑 / 运行 / cache 调试</li>
+            <li>Midscene runner + 三层兜底</li>
+            <li>cache pass/fail slot 模型</li>
+            <li>Cinema 单 case live 转播</li>
+          </ul>
+        </div>
+        <div class="phase shipped">
+          <div class="stage">v2 已完成</div>
+          <h4>用户运行中心 v2</h4>
+          <div class="timeline">2026-06-23 ~ 2026-06-24</div>
+          <ul>
+            <li>独立 /run-center.html</li>
+            <li>Run Console + My Projects</li>
+            <li>Live Takeover + Abort modal</li>
+            <li>Reports + Failure Analytics</li>
+            <li>4 个 category bucket 分类</li>
+          </ul>
+        </div>
+        <div class="phase next">
+          <div class="stage">v3 下一阶段</div>
+          <h4>实时化 + 协作</h4>
+          <div class="timeline">7 月 - 8 月</div>
+          <ul>
+            <li>WebSocket 替代 2.5s 轮询</li>
+            <li>Server-side batches（多人共享）</li>
+            <li>定时调度 cron</li>
+            <li>飞书 / 邮件通知</li>
+            <li>多 case 2×2 broadcast 网格</li>
+          </ul>
+        </div>
+        <div class="phase later">
+          <div class="stage">later</div>
+          <h4>智能化 + 扩面</h4>
+          <div class="timeline">Q4</div>
+          <ul>
+            <li>失败聚类 LLM 分类</li>
+            <li>Cache 健康度仪表盘</li>
+            <li>移动 / 平板适配</li>
+            <li>SSO + 细粒度权限</li>
+            <li>跨项目对比报告</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Footer ───────── -->
+    <section class="section" style="text-align:center; border-top:1px dashed var(--line); padding-top:30px; margin-top: 50px;">
+      <div style="color: var(--muted); font-size: 13px;">
+        Test Run Center 产品方案 v2 · saptest1 项目 · <a href="/run-center.html" style="color:var(--blue);">▶ 直接体验</a> · <a href="/" style="color:var(--blue);">开发者控制台</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- macOS Dock-style side nav — always visible, hover to magnify -->
+  <nav class="dock-nav" id="dockNav" aria-label="Quick navigation">
+    <a class="dock-item" href="#top" data-target="top" title="页首">
+      <span class="dock-icon">↑</span>
+      <span class="dock-label">页首</span>
+    </a>
+    <div class="dock-divider"></div>
+    <a class="dock-item" href="#demo" data-target="demo" title="界面演示">
+      <span class="dock-icon">▶</span>
+      <span class="dock-label">界面交互演示</span>
+    </a>
+    <a class="dock-item" href="#now-vs-next" data-target="now-vs-next" title="已完成 / 待完成">
+      <span class="dock-icon">✓</span>
+      <span class="dock-label">已完成 / 待完成</span>
+    </a>
+    <a class="dock-item" href="#features" data-target="features" title="功能交互">
+      <span class="dock-icon">⚙</span>
+      <span class="dock-label">功能交互细节</span>
+    </a>
+    <a class="dock-item" href="#journey" data-target="journey" title="用户路径">
+      <span class="dock-icon">→</span>
+      <span class="dock-label">典型用户路径</span>
+    </a>
+    <a class="dock-item" href="#api" data-target="api" title="API 速查">
+      <span class="dock-icon">⚡</span>
+      <span class="dock-label">后端 API 速查</span>
+    </a>
+    <a class="dock-item" href="#decisions" data-target="decisions" title="设计取舍">
+      <span class="dock-icon">⚖</span>
+      <span class="dock-label">关键设计取舍</span>
+    </a>
+    <a class="dock-item" href="#architecture" data-target="architecture" title="页面结构">
+      <span class="dock-icon">▦</span>
+      <span class="dock-label">页面结构</span>
+    </a>
+    <a class="dock-item" href="#roadmap" data-target="roadmap" title="落地路线">
+      <span class="dock-icon">⛳</span>
+      <span class="dock-label">落地路线</span>
+    </a>
+    <div class="dock-divider"></div>
+    <a class="dock-item cta" href="/run-center.html" title="打开 Run Center">
+      <span class="dock-icon">⌂</span>
+      <span class="dock-label">打开 Run Center</span>
+    </a>
+  </nav>
+
+  <script>
+    // ── Architecture-mock tab switcher (already existed) ──
+    document.querySelectorAll('.mock-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const group = tab.parentElement;
+        group.querySelectorAll('.mock-tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // ── Interactive demo: two-level tab switching ──
+    (function setupDemoTabs() {
+      const demoSection = document.getElementById('demo');
+      if (!demoSection) return;
+      // Top-level: modules
+      demoSection.querySelectorAll('.demo-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const mod = tab.dataset.mod;
+          demoSection.querySelectorAll('.demo-tab').forEach((t) => {
+            t.classList.toggle('active', t === tab);
+            t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+          });
+          demoSection.querySelectorAll('.demo-module').forEach((m) => {
+            m.style.display = m.dataset.mod === mod ? '' : 'none';
+          });
+        });
+      });
+      // Sub-level: per-module sub-tabs
+      demoSection.querySelectorAll('.demo-module').forEach((module) => {
+        module.querySelectorAll('.demo-subtab').forEach((subtab) => {
+          subtab.addEventListener('click', () => {
+            const sub = subtab.dataset.sub;
+            module.querySelectorAll('.demo-subtab').forEach((s) => s.classList.toggle('active', s === subtab));
+            module.querySelectorAll('.demo-panel').forEach((p) => p.classList.toggle('active', p.dataset.sub === sub));
+          });
+        });
+      });
+    })();
+
+    // ── Dock nav: smooth scroll-spy active-state highlight ──
+    (function setupDockNav() {
+      const dock = document.getElementById('dockNav');
+      if (!dock) return;
+      const links = dock.querySelectorAll('.dock-item[data-target]');
+      const sections = [...links].map((a) => ({ link: a, id: a.dataset.target }));
+
+      let raf = 0;
+      function updateActive() {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          const y = window.scrollY + window.innerHeight * 0.30;
+          let activeId = sections[0]?.id;
+          for (const s of sections) {
+            const node = s.id === 'top' ? document.body : document.getElementById(s.id);
+            if (!node) continue;
+            const top = s.id === 'top' ? 0 : node.getBoundingClientRect().top + window.scrollY;
+            if (top <= y) activeId = s.id;
+          }
+          for (const s of sections) s.link.classList.toggle('active', s.id === activeId);
+        });
+      }
+      window.addEventListener('scroll', updateActive, { passive: true });
+      updateActive();
+    })();
+  </script>
+</body>
+</html>

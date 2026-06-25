@@ -63,3 +63,26 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+## 5. Code Discovery — Always Use codebase-memory First
+
+This project is indexed in the `codebase-memory` knowledge graph as
+**`C-Users-BOG1SGH-saptest1`**. Graph queries return precise structural
+answers in ~500 tokens vs ~80K for a wide grep, so they are both faster
+and dramatically cheaper.
+
+**For any code exploration, the first tool must be `mcp__codebase-memory-mcp__*`:**
+- Find a function/class/route → `search_graph(name_pattern=...)` or `search_graph(label=...)`
+- Read exact source of a symbol → `get_code_snippet(qualified_name=...)`
+- Who calls X / what does X call → `trace_path(function_name=..., mode=calls|data_flow|cross_service)`
+- Project layout / clusters / packages → `get_architecture(project="C-Users-BOG1SGH-saptest1")`
+- Complex structural questions → `query_graph` with Cypher
+- Text-only searches across non-code or where the graph misses → `search_code` (graph-augmented grep)
+
+Only fall back to `Grep`/`Glob`/`Read` for: configs, non-code files (`.md`, `.yaml`, `.html`,
+`.json`), reading a known path before editing it, or when the graph genuinely doesn't cover
+the question. **Always `Read` a file before editing it.**
+
+If `index_status` reports stale or the user has done large refactors since indexing, run
+`detect_changes()` first; re-index with `index_repository(repo_path="c:/Users/BOG1SGH/saptest1")`
+only when changes are substantial.

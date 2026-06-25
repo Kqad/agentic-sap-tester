@@ -119,4 +119,19 @@ router.get('/recent', async (req, res) => {
   res.json({ runs: runs.slice(0, limit) });
 });
 
+// Full record for a single past run — including events and logTail.
+// Live Channels' run history needs the persisted log lines to show what
+// happened on a completed run, not just the summary.
+router.get('/runs/:runId', async (req, res) => {
+  const runId = String(req.params.runId || '').replace(/[^a-zA-Z0-9._-]/g, '');
+  if (!runId) return res.status(400).json({ error: 'bad runId' });
+  try {
+    const raw = await fs.readFile(path.join(RUNS_DIR, `${runId}.json`), 'utf8');
+    res.json(JSON.parse(raw));
+  } catch (err) {
+    if (err?.code === 'ENOENT') return res.status(404).json({ error: 'no such run' });
+    res.status(500).json({ error: err?.message || 'read failed' });
+  }
+});
+
 export default router;

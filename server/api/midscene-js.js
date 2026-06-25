@@ -131,7 +131,9 @@ router.post(
   '/cases/:id/run',
   requirePermission('runs:execute'),
   async (req, res) => {
-    const c = await loadCase(req.params.id);
+    // `let` so we can swap in a clone with merged project-level param
+    // overrides without mutating the on-disk library case.
+    let c = await loadCase(req.params.id);
     if (!c) return res.status(404).json({ error: 'case not found' });
 
     const cacheMode = req.query.cache === 'read' ? 'read' : 'write';
@@ -147,6 +149,21 @@ router.post(
     // even when the run dies before reaching the end. Default false
     // (= existing pass-only-keep policy).
     const keepCacheOnFailure = req.body?.keepCacheOnFailure === true;
+    // Project-level parameter overrides — the Run Center sends per-case
+    // overrides when running from a project. They merge ON TOP of the
+    // library case's default params. Library file stays untouched; only
+    // this one run sees the overrides.
+    const paramsOverride = (req.body?.params && typeof req.body.params === 'object' && !Array.isArray(req.body.params))
+      ? req.body.params
+      : null;
+    if (paramsOverride) {
+      // Clone the case so we don't mutate the loaded library object.
+      // Merge: existing case params + project overrides (project wins).
+      const merged = { ...(c.params || {}), ...paramsOverride };
+      // Persist to a per-run shallow clone, NOT to disk.
+      // eslint-disable-next-line no-param-reassign
+      c = { ...c, params: merged };
+    }
 
     await audit(req, 'midscene-js.run.started', {
       caseId: c.id,
@@ -155,6 +172,7 @@ router.post(
       headed,
       noCacheSteps,
       keepCacheOnFailure,
+      hasParamOverride: !!paramsOverride,
     });
 
     try {
