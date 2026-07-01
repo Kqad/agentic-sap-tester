@@ -146,15 +146,23 @@ function isExecuteStep(step) {
   return /\bexecute\b/i.test(text);
 }
 
+function isImplicitFocusedInputLocator(locator) {
+  const text = String(locator ?? '').trim().toLowerCase();
+  return /^(?:\u8f93\u5165\u6846|\u5f53\u524d\u8f93\u5165\u6846|\u5f53\u524d\u5149\u6807|\u7126\u70b9\u8f93\u5165\u6846|\u5149\u6807\u6240\u5728\u8f93\u5165\u6846|focused input|current input|active input|search input)$/.test(text);
+}
+
 function extractStepLocatorPrompts(step) {
   const code = step?.exampleCode || '';
   if (!code) return [];
   const out = [];
   // aiTap / aiInput / aiHover: locator is the FIRST string arg. Their
   // locate result is what gets cached, so these prompts ARE the cache keys.
-  const re1 = /agent\.ai(?:Tap|Input|Hover)\s*\(\s*(['"`])([\s\S]*?)\1/g;
+  const re1 = /agent\.ai(Tap|Input|Hover)\s*\(\s*(['"`])([\s\S]*?)\2/g;
   let m;
-  while ((m = re1.exec(code)) !== null) out.push(m[2]);
+  while ((m = re1.exec(code)) !== null) {
+    if (m[1] === 'Input' && isImplicitFocusedInputLocator(m[3])) continue;
+    out.push(m[3]);
+  }
   // aiKeyboardPress — two signatures, only ONE of them uses a locator:
   //   · 1-arg form `aiKeyboardPress("Enter")` — first arg is the KEY NAME,
   //     not a locator. Midscene dispatches the key to the currently-focused

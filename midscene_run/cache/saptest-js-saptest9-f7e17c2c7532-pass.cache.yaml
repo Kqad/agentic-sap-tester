@@ -1,5 +1,5 @@
 midsceneVersion: 1.8.1
-cacheId: saptest-js-saptest9-a2c8ac9af657-pass
+cacheId: saptest-js-saptest9-f7e17c2c7532-pass
 caches:
   - type: locate
     prompt: 左上角矩形
@@ -60,7 +60,7 @@ caches:
     prompt: 选择 Central Finance document
     cache:
       xpaths:
-        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[3]/td[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/table[1]/tbody[2]/tr[2]/td[1]/div[1]/div[2]/table[1]/tbody[1]/tr[4]/td[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/span[1]/span[normalize-space()="Central Finance document 2600000071"]
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[3]/td[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/table[1]/tbody[2]/tr[2]/td[1]/div[1]/div[2]/table[1]/tbody[1]/tr[7]/td[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/span[1]/span[normalize-space()="Central Finance document 2200000013"]
   - type: locate
     prompt: 点击 Display Document
     cache:

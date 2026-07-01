@@ -20,6 +20,8 @@ import fs from 'node:fs';
 import { stripCacheEntriesByPrompt } from './cache-scrub.js';
 import { copyCacheFileForId } from './cache-id.js';
 
+const LEGACY_INPUT_PROMPT_SUFFIX = '\u53f3\u4fa7\u8f93\u5165\u6846\u672c\u8eab\uff0c\u4e0d\u8981\u5b9a\u4f4d\u5de6\u4fa7\u6807\u7b7e\u6587\u5b57';
+
 // Extract the cache-key prompt(s) from a step's exampleCode — same
 // rules the recovery layer + runner use elsewhere. The cache YAML
 // indexes entries by these strings, so to "exclude this step from
@@ -36,6 +38,39 @@ export function extractStepLocatorPrompts(step) {
   const re2 = /agent\.aiScroll\s*\(\s*(?:\{[\s\S]*?\}|(['"`])[\s\S]*?\1)\s*,\s*(['"`])([\s\S]*?)\2/g;
   while ((m = re2.exec(code)) !== null) out.push(m[3]);
   return out;
+}
+
+function extractAiInputLocatorPrompts(step) {
+  const code = step?.exampleCode || '';
+  if (!code) return [];
+  const out = [];
+  const re = /agent\.aiInput\s*\(\s*(['"`])([\s\S]*?)\1/g;
+  let m;
+  while ((m = re.exec(code)) !== null) out.push(m[2]);
+  return out;
+}
+
+function rewriteLegacyInputPromptAliases(cachePath, apiGuideSteps) {
+  const aliases = new Map();
+  for (const step of apiGuideSteps || []) {
+    for (const prompt of extractAiInputLocatorPrompts(step)) {
+      const current = String(prompt ?? '').trim();
+      if (!current) continue;
+      aliases.set(`${current} ${LEGACY_INPUT_PROMPT_SUFFIX}`, current);
+    }
+  }
+  if (aliases.size === 0 || !fs.existsSync(cachePath)) return 0;
+
+  let rewrites = 0;
+  const raw = fs.readFileSync(cachePath, 'utf8');
+  const next = raw.replace(/^(\s*prompt:\s*)(.*?)(\s*)$/gm, (line, prefix, value, suffix) => {
+    const replacement = aliases.get(String(value ?? '').trim());
+    if (!replacement) return line;
+    rewrites += 1;
+    return `${prefix}${replacement}${suffix}`;
+  });
+  if (rewrites > 0) fs.writeFileSync(cachePath, next);
+  return rewrites;
 }
 
 // Given a list of step orders to exclude + the case's apiGuide.steps,
@@ -71,6 +106,7 @@ export function buildCacheSlot({
     entriesRemoved: 0,
     promptsExcluded: [],
     droppedTail: 0,
+    promptsRewritten: 0,
   };
 
   // No source → empty slot. Remove any stale target file so Midscene
@@ -88,6 +124,7 @@ export function buildCacheSlot({
     fs.copyFileSync(sourceSnapshotPath, targetSlotPath);
   }
   report.sourceUsed = sourceSnapshotPath;
+  report.promptsRewritten = rewriteLegacyInputPromptAliases(targetSlotPath, steps);
 
   // Compute the prompt set to strip: manual excludes + (optionally)
   // the last N steps' prompts. Tail-strip uses the steps in

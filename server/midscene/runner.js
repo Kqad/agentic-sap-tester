@@ -403,16 +403,40 @@ async function dispatchStep(agent, step, ctx) {
     // 3) Fallback: real AI assertion (slow, costs tokens). Midscene's
     //    aiAssert records its own card, but only on SUCCESS. If it throws
     //    we add a fail card so the step doesn't disappear from the timeline.
+    //
+    //    Retry policy: on the first failure we wait 8s and re-run the
+    //    assertion once. SAP pages frequently haven't finished painting
+    //    by the time the assert step fires, so a single retry catches the
+    //    transient cases without doubling cost on the common pass path.
     try {
       await agent.aiAssert(instruction);
       return undefined;
-    } catch (err) {
+    } catch (firstErr) {
+      const ASSERT_RETRY_DELAY_MS = 8000;
+      ctx.log?.(`  …aiAssert failed (${firstErr?.message || firstErr}); waiting ${ASSERT_RETRY_DELAY_MS}ms before single retry`);
       try {
-        await agent.recordToReport?.('AI assertion · FAIL', {
-          content: `Instruction: ${instruction}\nError: ${err?.message ?? err}`,
+        await agent.recordToReport?.('AI assertion · first attempt FAIL (will retry)', {
+          content: `Instruction: ${instruction}\nError: ${firstErr?.message ?? firstErr}\nWaiting ${ASSERT_RETRY_DELAY_MS}ms then retrying once.`,
         });
       } catch { /* */ }
-      throw err;
+      await new Promise((r) => setTimeout(r, ASSERT_RETRY_DELAY_MS));
+      try {
+        await agent.aiAssert(instruction);
+        try {
+          await agent.recordToReport?.('AI assertion · pass on retry', {
+            content: `Instruction: ${instruction}\nFirst attempt failed: ${firstErr?.message ?? firstErr}\nPassed on second attempt after ${ASSERT_RETRY_DELAY_MS}ms wait.`,
+          });
+        } catch { /* */ }
+        ctx.log?.(`  …aiAssert passed on retry`);
+        return undefined;
+      } catch (retryErr) {
+        try {
+          await agent.recordToReport?.('AI assertion · FAIL (after retry)', {
+            content: `Instruction: ${instruction}\nFirst error: ${firstErr?.message ?? firstErr}\nRetry error: ${retryErr?.message ?? retryErr}`,
+          });
+        } catch { /* */ }
+        throw retryErr;
+      }
     }
   }
 
@@ -989,6 +1013,9 @@ export async function runJavascript(caseObj, opts = {}) {
     const srcLabel = slotBuildReport.sourceUsed ? path.basename(slotBuildReport.sourceUsed) : '(empty)';
     log(`Cache slot rebuilt from ${srcLabel} · stripped ${slotBuildReport.entriesRemoved} entries` +
         (slotBuildReport.droppedTail > 0 ? ` (incl. last ${slotBuildReport.droppedTail} tail steps)` : ''));
+    if (slotBuildReport.promptsRewritten > 0) {
+      log(`Cache slot prompt compatibility: rewrote ${slotBuildReport.promptsRewritten} legacy input prompt(s) to current case locators`);
+    }
   }
   if (slotSourceNote) log(`Cache slot source: ${slotSourceNote}`);
 
@@ -1373,7 +1400,13 @@ export async function runJavascript(caseObj, opts = {}) {
 // ── small helpers used only here ─────────────────────────────────────
 function newRunId(caseId) {
   const ts = new Date().toISOString().replace(/[:.]/g, '-').replace('Z', '');
-  const slug = String(caseId).slice(0, 8);
+  // Slug is purely cosmetic — for human-readability of the filename. The
+  // authoritative caseId lives inside the JSON record. Cap at 16 chars so
+  // `saptest10` / `saptest11` / `saptest12` / any-future-saptestN no longer
+  // collapse to `saptest1` (the old `slice(0, 8)` chopped the trailing
+  // digit). Long ids still get truncated but at a length that covers every
+  // realistic case-naming pattern.
+  const slug = String(caseId).slice(0, 16);
   return `${ts}-jsrun-${slug}-${crypto.randomBytes(2).toString('hex')}`;
 }
 

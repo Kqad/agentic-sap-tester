@@ -416,6 +416,63 @@ router.delete(
   },
 );
 
+// GET cache file content — used by Case Studio's Cache Inspector to show
+// the raw YAML prompts → xpaths mapping. Read-only; tight name guard same
+// as the DELETE endpoint above.
+router.get(
+  '/cases/:id/cache/:file/content',
+  requirePermission('cases:read'),
+  async (req, res) => {
+    const c = await loadCase(req.params.id);
+    if (!c) return res.status(404).json({ error: 'case not found' });
+    const file = req.params.file;
+    const expectedPrefix = `saptest-js-${c.id}-`;
+    if (!file.startsWith(expectedPrefix) || !file.endsWith('.cache.yaml') || file.includes('/') || file.includes('\\')) {
+      return res.status(400).json({ error: 'invalid cache filename for this case' });
+    }
+    const full = path.join(CACHE_DIR, file);
+    try {
+      const txt = await fs.readFile(full, 'utf8');
+      res.json({ name: file, content: txt, bytes: Buffer.byteLength(txt, 'utf8') });
+    } catch (e) {
+      if (e.code === 'ENOENT') return res.status(404).json({ error: 'cache file not found' });
+      res.status(500).json({ error: e.message });
+    }
+  },
+);
+
+// Restore the current slot cache from a per-run snapshot. Use case:
+// "this run passed cleanly, copy its cache YAML into the live slot so the
+// next regression pass starts from a known-good state." Source-of-truth
+// snapshot lives at run-history/cache-snapshots/<runId>.cache.yaml.
+router.post(
+  '/cases/:id/cache/restore/:runId',
+  requirePermission('runs:execute'),
+  async (req, res) => {
+    const c = await loadCase(req.params.id);
+    if (!c) return res.status(404).json({ error: 'case not found' });
+    const slot = req.query.slot === 'fail' ? 'fail' : 'pass';
+    const runId = String(req.params.runId || '').trim();
+    if (!runId || runId.includes('/') || runId.includes('\\')) {
+      return res.status(400).json({ error: 'invalid runId' });
+    }
+    const snapPath = resolveSnapshotPath(runId);
+    if (!existsSync(snapPath)) return res.status(404).json({ error: 'snapshot not found for this run' });
+
+    const baseCacheId = buildJavascriptCacheId(c);
+    const slotPath = resolveSlotCachePath(baseCacheId, slot);
+    try {
+      const buf = await fs.readFile(snapPath);
+      await fs.mkdir(path.dirname(slotPath), { recursive: true });
+      await fs.writeFile(slotPath, buf);
+      await audit(req, 'midscene-js.cache.restored', { caseId: c.id, runId, slot, bytes: buf.length });
+      res.json({ ok: true, slot, bytes: buf.length, slotPath: path.basename(slotPath) });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  },
+);
+
 // -------------------------------------------------------------------- API
 // Cache-debug endpoints. Power the Cache Debug modal in the workbench —
 // per-case config for the two cache slots (pass + fail) plus a listing

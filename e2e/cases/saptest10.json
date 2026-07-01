@@ -80,7 +80,7 @@
       {
         "order": 9,
         "title": "等10s",
-        "midsceneApi": "agent.aiTap()",
+        "midsceneApi": "sleep()",
         "naturalLanguageInstruction": "等10s",
         "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
         "exampleCode": "await sleep(10000);"
@@ -88,7 +88,7 @@
       {
         "order": 10,
         "title": "记录total amount after vat 右边的...",
-        "midsceneApi": "agent.aiQuery()",
+        "midsceneApi": "agent.aiTap()",
         "naturalLanguageInstruction": "记录total amount after vat 右边的数字部分为变量A1",
         "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
         "exampleCode": "const result = await agent.aiQuery(\"string, 记录total amount after vat 右边的数字部分为变量A1\");"
@@ -104,16 +104,16 @@
       {
         "order": 12,
         "title": "等10s",
-        "midsceneApi": "agent.aiTap()",
+        "midsceneApi": "sleep()",
         "naturalLanguageInstruction": "等10s",
         "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
         "exampleCode": "await sleep(10000);"
       },
       {
         "order": 13,
-        "title": "在 左上角矩形输入框 输入 VF03",
+        "title": "在 左上角矩形输入框 输入 VF01",
         "midsceneApi": "agent.aiInput()",
-        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 VF03",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 VF01",
         "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
         "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"VF03\" });"
       },
@@ -168,7 +168,7 @@
       {
         "order": 20,
         "title": "等10s",
-        "midsceneApi": "agent.aiTap()",
+        "midsceneApi": "sleep()",
         "naturalLanguageInstruction": "等10s",
         "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
         "exampleCode": "await sleep(10000);"
@@ -176,7 +176,7 @@
       {
         "order": 21,
         "title": "记录Display document 页面显示的 amo...",
-        "midsceneApi": "agent.aiQuery()",
+        "midsceneApi": "agent.aiTap()",
         "naturalLanguageInstruction": "记录Display document 页面显示的 amount 列表 中的第一个数字为A2",
         "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
         "exampleCode": "const result = await agent.aiQuery(\"string, 记录Display document 页面显示的 amount 列表 中的第一个数字为A2\");"
@@ -184,7 +184,7 @@
       {
         "order": 22,
         "title": "如果A1=A2则case通过",
-        "midsceneApi": "agent.aiAssert()",
+        "midsceneApi": "agent.aiTap()",
         "naturalLanguageInstruction": "如果A1=A2则case通过",
         "reason": "结果校验或变量比较,适合断言 API。",
         "exampleCode": "await agent.aiAssert(\"如果A1=A2则case通过\");"
@@ -213,11 +213,11 @@
   },
   "cacheSlotConfig": {
     "pass": {
-      "source": "2026-06-16T09-16-15-064-jsrun-saptest1-2a0f",
+      "source": "2026-06-30T03-23-44-611-jsrun-saptest1-ec76",
       "excludeSteps": []
     },
     "fail": {
-      "source": "2026-06-16T08-10-45-126-jsrun-saptest1-6c0b",
+      "source": "2026-06-16T08-34-59-649-jsrun-saptest1-b1fc",
       "excludeSteps": [
         15
       ],

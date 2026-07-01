@@ -54,9 +54,9 @@
       },
       {
         "order": 6,
-        "title": "在 矩形输入框 输入 S_ALR_87012083",
+        "title": "在 矩形输入框 输入 S_ALR_870120831",
         "midsceneApi": "agent.aiInput()",
-        "naturalLanguageInstruction": "在 矩形输入框 输入 S_ALR_87012083",
+        "naturalLanguageInstruction": "在 矩形输入框 输入 S_ALR_870120831",
         "reason": "这是向明确字段输入值，适合拆成独立输入步骤，提升稳定性。",
         "exampleCode": "await agent.aiInput(\"矩形\", { value: \"S_ALR_87012083\" });"
       },
@@ -159,7 +159,7 @@
       {
         "order": 19,
         "title": "页面底部显示绿色√符号加download xxx文件即为...",
-        "midsceneApi": "agent.aiAssert()",
+        "midsceneApi": "agent.aiTap()",
         "naturalLanguageInstruction": "页面底部显示绿色√符号加download xxx文件即为成功",
         "reason": "这是结果校验或变量比较，适合使用断言 API 判断测试是否通过。",
         "exampleCode": "await agent.aiAssert(\"页面底部显示绿色√符号加download xxx文件即为成功\");"

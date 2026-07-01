@@ -1532,7 +1532,7 @@ function render() {
 // Run actions delegate to the existing openJsRunModal() flow — no new server
 // surface is introduced, no field/contract is altered.
 // ═══════════════════════════════════════════════════════════════════════════
-VIEWS.dashboard = async () => {
+VIEWS.dashboard = async (route = state.route) => {
   const canReadCases   = hasPerm('cases:read');
   const canReadResults = hasPerm('results:read');
   const canRun         = hasPerm('runs:execute');
@@ -1568,6 +1568,10 @@ VIEWS.dashboard = async () => {
   for (const r of allRuns) {
     if (r.caseId && !lastRunByCase.has(r.caseId)) lastRunByCase.set(r.caseId, r);
   }
+  const routeRest = route?.params?.rest || [];
+  const decodeRoutePart = (value) => {
+    try { return decodeURIComponent(value || ''); } catch { return value || ''; }
+  };
 
   // ── Workbench DOM scaffold (see .workbench in styles.css) ──
   const root = h('div', { class: 'workbench' });
@@ -3265,6 +3269,111 @@ VIEWS.dashboard = async () => {
     setTimeout(() => URL.revokeObjectURL(a.href), 1500);
   }
 
+  const latestStatusAliases = {
+    'latest-failed': 'failed',
+    'latest-fail': 'failed',
+    failed: 'failed',
+    fail: 'failed',
+    'latest-success': 'passed',
+    'latest-successful': 'passed',
+    'latest-passed': 'passed',
+    'latest-pass': 'passed',
+    success: 'passed',
+    successful: 'passed',
+    passed: 'passed',
+    pass: 'passed',
+  };
+
+  function latestIntentFromRoute() {
+    if (routeRest[0] === 'latest') {
+      const status = latestStatusAliases[routeRest[1]];
+      return status ? { status, queryStart: 2 } : null;
+    }
+    const status = latestStatusAliases[routeRest[0]];
+    return status ? { status, queryStart: 1 } : null;
+  }
+
+  function focusQueryFromRest(start) {
+    return routeRest.slice(start).map(decodeRoutePart).join(' ').trim().toLowerCase();
+  }
+
+  function caseSearchText(caseId, run) {
+    const c = cases.find((x) => x.id === caseId);
+    const summary = summarizeCase(c || {});
+    const parsed = c?.parsed || {};
+    return [
+      caseId,
+      run?.caseTitle,
+      parsed.title,
+      parsed.naturalLanguage,
+      parsed.transactionCode,
+      parsed.favoritesEntry,
+      c?.summary?.transactionCode,
+      c?.summary?.favoritesEntry,
+      summary,
+      c ? caseModule(c) : '',
+    ].filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function runMatchesFocusQuery(run, query) {
+    if (!query) return true;
+    const haystack = caseSearchText(run.caseId, run);
+    return query.split(/\s+/).filter(Boolean).every((part) => haystack.includes(part));
+  }
+
+  function dashboardFocusIntent() {
+    if (routeRest[0] === 'case' && routeRest[1]) {
+      const caseId = decodeRoutePart(routeRest[1]);
+      return { kind: 'case', caseId, run: lastRunByCase.get(caseId) || null };
+    }
+    if (routeRest[0] === 'run' && routeRest[1]) {
+      const runId = decodeRoutePart(routeRest[1]);
+      const run = allRuns.find((r) => r.runId === runId);
+      return run?.caseId ? { kind: 'run', caseId: run.caseId, run } : { kind: 'missing-run', runId };
+    }
+    const latestIntent = latestIntentFromRoute();
+    if (latestIntent) {
+      const caseIdsAvailable = new Set(cases.map((c) => c.id));
+      const query = focusQueryFromRest(latestIntent.queryStart);
+      const run = allRuns
+        .filter((r) =>
+          r.status === latestIntent.status &&
+          r.caseId &&
+          caseIdsAvailable.has(r.caseId) &&
+          runMatchesFocusQuery(r, query)
+        )
+        .sort((a, b) => new Date(b.finishedAt || b.startedAt || 0) - new Date(a.finishedAt || a.startedAt || 0))[0];
+      const kind = latestIntent.status === 'passed' ? 'latest-success' : 'latest-failed';
+      return run
+        ? { kind, status: latestIntent.status, query, caseId: run.caseId, run }
+        : { kind: 'missing-' + kind, status: latestIntent.status, query };
+    }
+    return null;
+  }
+
+  function announceDashboardFocus(intent, caseExists) {
+    if (!intent) return;
+    if (!caseExists) {
+      const missing = intent.caseId || intent.runId || intent.query || '';
+      toast(
+        LANG === 'zh'
+          ? `没有找到可跳转的 project${missing ? `：${missing}` : ''}`
+          : `Could not find a project to open${missing ? `: ${missing}` : ''}`,
+        'warn',
+        7000,
+      );
+      return;
+    }
+    const runBit = intent.run?.runId ? ` · run ${intent.run.runId}` : '';
+    const queryBit = intent.query ? ` (${intent.query})` : '';
+    const prefix = intent.kind === 'latest-failed'
+      ? (LANG === 'zh' ? '已定位最新失败 project：' : 'Opened latest failed project: ')
+      : intent.kind === 'latest-success'
+        ? (LANG === 'zh' ? '已定位最新成功 project：' : 'Opened latest successful project: ')
+        : (LANG === 'zh' ? '已定位 project：' : 'Opened project: ');
+    toast(prefix + intent.caseId + queryBit + runBit, intent.run?.status === 'failed' ? 'err' : 'ok', 7000);
+  }
+
   async function wbBulkRun() {
     const ids = [...wbState.selectedIds];
     if (!ids.length) return;
@@ -3410,14 +3519,27 @@ VIEWS.dashboard = async () => {
   // Each candidate must still exist in `cases` (id might have been
   // renamed / deleted since the run record was written).
   const caseIdsAvailable = new Set(cases.map((c) => c.id));
+  const focusIntent = dashboardFocusIntent();
   const activeCaseId = (activeRes.active || [])
     .map((a) => a.caseId)
     .find((id) => caseIdsAvailable.has(id));
   const latestRunCaseId = (recentRes.runs || [])
     .map((r) => r.caseId)
     .find((id) => caseIdsAvailable.has(id));
-  const initialPickId = activeCaseId || latestRunCaseId || (cases[0] && cases[0].id);
-  if (initialPickId) selectCase(initialPickId);
+  const focusCaseExists = !!(focusIntent?.caseId && caseIdsAvailable.has(focusIntent.caseId));
+  const initialPickId = (focusCaseExists && focusIntent.caseId) || activeCaseId || latestRunCaseId || (cases[0] && cases[0].id);
+  if (initialPickId) {
+    selectCase(initialPickId);
+    if (focusIntent) {
+      if ((focusIntent.kind === 'latest-failed' || focusIntent.kind === 'latest-success') && focusCaseExists) {
+        wbState.resultsFilter = focusIntent.status === 'passed' ? 'pass' : 'fail';
+        const sel = resultsToolbar.querySelector('[data-bind=results-filter]');
+        if (sel) sel.value = wbState.resultsFilter;
+        renderResults();
+      }
+      announceDashboardFocus(focusIntent, focusCaseExists);
+    }
+  }
 
   // ── WebSocket + active-run poller (reuse existing endpoints) ──
   try { runWs?.close(); } catch {}
@@ -5045,7 +5167,21 @@ VIEWS.run     = async () => { go('cases'); return h('div', { class: 'muted' }, t
 // midscene_run/report. Per-case history is still on the case detail page;
 // this view exists so users can pull up any historical report without
 // remembering which case produced it.
-VIEWS.results = async () => {
+VIEWS.results = async (route = state.route) => {
+  const resultsRest = route?.params?.rest || [];
+  const latestRouteHeads = new Set([
+    'latest',
+    'latest-failed',
+    'latest-fail',
+    'latest-success',
+    'latest-successful',
+    'latest-passed',
+    'latest-pass',
+  ]);
+  if (latestRouteHeads.has(resultsRest[0])) {
+    go('dashboard/' + resultsRest.map(encodeURIComponent).join('/'));
+    return h('div', { class: 'muted' }, t('shell.loading'));
+  }
   const wrap = h('div', { class: 'grid' });
 
   const filterInput = h('input', {
@@ -5089,15 +5225,31 @@ VIEWS.results = async () => {
     for (const it of filtered) {
       const run = it.run || {};
       const caseLabel = run.caseTitle || run.caseId || '—';
+      const workbenchHref = run.caseId ? '#/dashboard/case/' + encodeURIComponent(run.caseId) : null;
       tbody.appendChild(h('tr', {},
         h('td', {}, h('span', { class: kindTagClass(it.kind) }, t('results.kind.' + it.kind))),
-        h('td', { style: { maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, title: run.caseId || '' }, caseLabel),
+        h('td', {
+          style: { maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+          title: run.caseId ? `${run.caseId}${run.caseTitle ? ' · ' + run.caseTitle : ''}` : '',
+        }, run.caseId
+          ? h('a', {
+              href: workbenchHref,
+              class: 'mono',
+              style: { borderBottom: 'none' },
+            }, run.caseTitle ? `${run.caseId} · ${run.caseTitle}` : run.caseId)
+          : caseLabel),
         h('td', {}, statusCell(run.status)),
         h('td', { class: 'mono' }, run.durationMs != null ? fmtMs(run.durationMs) : '—'),
         h('td', { class: 'mono', style: { wordBreak: 'break-all', maxWidth: '520px' } }, it.name),
         h('td', {}, fmtDate(it.modifiedAt)),
         h('td', { class: 'mono' }, fmtBytes(it.bytes)),
         h('td', { class: 'actions' },
+          workbenchHref && h('a', {
+            class: 'btn sm primary',
+            href: workbenchHref,
+            style: { borderBottom: 'none' },
+          }, LANG === 'zh' ? 'AI Workbench' : 'AI Workbench'),
+          workbenchHref && ' ',
           h('button', { class: 'btn sm', onClick: () => openReportModal(it) }, t('dashboard.report.preview')),
           ' ',
           h('a', { class: 'btn sm', href: reportPreviewUrl(it.url), target: '_blank', rel: 'noopener' }, t('results.col.openTab')),
