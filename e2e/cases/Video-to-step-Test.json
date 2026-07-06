@@ -1,0 +1,94 @@
+{
+  "$schema": "Cloned from template — edit NL then Regen API Guide.",
+  "title": "",
+  "description": "",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "",
+  "naturalLanguage": "1.进入 Menu， 点击setting，点击visualization  并启用show Ok code field, 并保存。\n2.在 左上角矩形输入框 输入 xxxx ，点击右下角execute",
+  "apiGuide": {
+    "summary": "SAP TEST 1",
+    "assumptions": [
+      "从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");"
+      },
+      {
+        "order": 2,
+        "title": "点击setting",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击setting",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击setting\");"
+      },
+      {
+        "order": 3,
+        "title": "点击visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击visualization",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击visualization\");"
+      },
+      {
+        "order": 4,
+        "title": "启用show Ok code field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用show Ok code field",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"启用show Ok code field\");"
+      },
+      {
+        "order": 5,
+        "title": "保存",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"保存\");"
+      },
+      {
+        "order": 6,
+        "title": "在 左上角矩形输入框 输入 S_ALR_87011990",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 S_ALR_87011990",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"S_ALR_87011990\" });"
+      },
+      {
+        "order": 7,
+        "title": "点击右下角execute",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "点击右下角execute",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      }
+    ],
+    "recommendedYamlSnippet": "",
+    "docReferences": [],
+    "warnings": [
+      "已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。",
+      "本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+    ],
+    "markdown": "## SAP TEST 1\n\n### 前提假设\n- 从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。\n\n### API 步骤\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - 指令: 进入 Menu\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"进入 Menu\");`\n2. 点击setting\n   - API: `agent.aiTap()`\n   - 指令: 点击setting\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击setting\");`\n3. 点击visualization\n   - API: `agent.aiTap()`\n   - 指令: 点击visualization\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击visualization\");`\n4. 启用show Ok code field\n   - API: `agent.aiTap()`\n   - 指令: 启用show Ok code field\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"启用show Ok code field\");`\n5. 保存\n   - API: `agent.aiTap()`\n   - 指令: 保存\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"保存\");`\n6. 在 左上角矩形输入框 输入 S_ALR_87011990\n   - API: `agent.aiInput()`\n   - 指令: 在 左上角矩形输入框 输入 S_ALR_87011990\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"左上角矩形\", { value: \"S_ALR_87011990\" });`\n7. 点击右下角execute\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 点击右下角execute\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Enter\");`\n8. 在 company code 字段 输入 8540\n   - API: `agent.aiInput()`\n   - 指令: 在 company code 字段 输入 8540\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"company code\", { value: \"8540\" });`\n9. 在 Asset number 字段 输入 1010001...\n   - API: `agent.aiInput()`\n   - 指令: 在 Asset number 字段 输入 1010001732\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Asset number\", { value: \"1010001732\" });`\n10. 点击跳出栏目的第一个\n   - API: `agent.aiTap()`\n   - 指令: 点击跳出栏目的第一个\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击跳出栏目的第一个\");`\n11. 在 Report date 字段 输入 上个月的最后一个...\n   - API: `agent.aiInput()`\n   - 指令: 在 Report date 字段 输入 上个月的最后一个自然日\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Report date\", { value: \"上个月的最后一个自然日\" });`\n12. 勾选 List assets 复选框\n   - API: `agent.aiTap()`\n   - 指令: 勾选 List assets 复选框\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"勾选 List assets 复选框\");`\n13. 点击 Execute 按钮执行查询\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Enter\");`\n14. 在查询到的Asset History Sheet页面中滑...\n   - API: `agent.aiScroll()`\n   - 指令: 在查询到的Asset History Sheet页面中滑动到最右边\n   - 原因: 滚动或横向移动界面,适合滚动 API。\n   - 示例: `await agent.aiAct(\"底部的横向滚动条的滑块当前大概在屏幕左下角附近,按住它一路拖到最右端\");`\n15. 从查询结果表格中读取 Curr.bk.val.列，保存为...\n   - API: `agent.aiQuery()`\n   - 指令: 从查询结果表格中读取 Curr.bk.val.列，保存为变量 A1\n   - 原因: 从 SAP 查询结果/表格列提取值,适合数据提取 API。\n   - 示例: `const result = await agent.aiQuery(\"string, 从查询结果表格中读取 Curr.bk.val.列，保存为变量 A1\");`\n16. 返回 SAP 主页\n   - API: `agent.aiTap()`\n   - 指令: 返回 SAP 主页\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"返回 SAP 主页\");`\n17. 展开 Favorites 文件夹并选择 Asset Ba...\n   - API: `agent.aiTap()`\n   - 指令: 展开 Favorites 文件夹并选择 Asset Balances\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"展开 Favorites 文件夹并选择 Asset Balances\");`\n18. 点击 Execute 按钮执行查询\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Enter\");`\n19. 在 company code 字段 输入 8540\n   - API: `agent.aiInput()`\n   - 指令: 在 company code 字段 输入 8540\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"company code\", { value: \"8540\" });`\n20. 在 Asset number 字段 输入 1010001...\n   - API: `agent.aiInput()`\n   - 指令: 在 Asset number 字段 输入 1010001732\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Asset number\", { value: \"1010001732\" });`\n21. 点击跳出栏目的第一个\n   - API: `agent.aiTap()`\n   - 指令: 点击跳出栏目的第一个\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"点击跳出栏目的第一个\");`\n22. 在 Report date 字段 输入 31.05.20...\n   - API: `agent.aiInput()`\n   - 指令: 在 Report date 字段 输入 31.05.2026\n   - 原因: 向明确字段输入值,拆成独立输入步骤以提升稳定性。\n   - 示例: `await agent.aiInput(\"Report date\", { value: \"31.05.2026\" });`\n23. 勾选 List assets 复选框\n   - API: `agent.aiTap()`\n   - 指令: 勾选 List assets 复选框\n   - 原因: 点击菜单/按钮/复选框的界面动作,适合点击 API。\n   - 示例: `await agent.aiTap(\"勾选 List assets 复选框\");`\n24. 点击 Execute 按钮执行查询\n   - API: `agent.aiKeyboardPress()`\n   - 指令: 点击 Execute 按钮执行查询\n   - 原因: SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。\n   - 示例: `await agent.aiKeyboardPress(\"Enter\");`\n25. 从查询结果表格中读取 查询到的数据表格 第一行Book ...\n   - API: `agent.aiQuery()`\n   - 指令: 从查询结果表格中读取 查询到的数据表格 第一行Book val.l列，保存为变量 A2\n   - 原因: 从 SAP 查询结果/表格列提取值,适合数据提取 API。\n   - 示例: `const result = await agent.aiQuery(\"string, 从查询结果表格中读取 查询到的数据表格 第一行Book val.l列，保存为变量 A2\");`\n26. 如果变量 A1 和 A2 相等，则测试用例执行成功，否则...\n   - API: `agent.aiAssert()`\n   - 指令: 如果变量 A1 和 A2 相等，则测试用例执行成功，否则失败\n   - 原因: 结果校验或变量比较,适合断言 API。\n   - 示例: `await agent.aiAssert(\"如果变量 A1 和 A2 相等，则测试用例执行成功，否则失败\");`\n\n### 注意事项\n- 已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。\n- 本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+  },
+  "apiGuideNaturalLanguage": "1.进入 Menu， 点击setting，点击visualization  并启用show Ok code field, 并保存。\n2.在 左上角矩形输入框 输入 S_ALR_87011990 ，点击右下角execute\n3. company code输入8540， Asset number 输入1010001732\n4. 点击跳出栏目的第一个。 \n5.Report date 输入上个月的最后一个自然日, 并勾选List assets, 执行Execute 查询。\n6.在查询到的Asset History Sheet页面中滑动到最右边，查找Curr.bk.val.列的值记录为变量A1.\n7. 返回 SAP 主页, 选择Favorites文件夹下面的Asset Balances, 执行Execute。\n8.company code处输入8540, Asset number输入1010001732。\n9. 点击跳出栏目的第一个。  \n10. Report date输入31.05.2026, 勾选List assets, 执行Execute。 \n11. 记录查询到的数据表格 第一行Book val.l列的值为变量A2.\n12. 如果A1和A2相等则测试用例执行成功。\n\n\n ",
+  "yamlScript": "",
+  "tags": [],
+  "cacheSlotConfig": {
+    "pass": {
+      "source": "auto",
+      "excludeSteps": []
+    },
+    "fail": {
+      "source": "2026-06-17T04-33-13-433-jsrun-saptest1-f0e4",
+      "excludeSteps": [],
+      "dropTailCount": 4
+    }
+  },
+  "cacheStrategy": "first-5-only"
+}

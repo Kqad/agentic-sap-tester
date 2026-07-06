@@ -1,0 +1,1423 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>企业级 Test Run Center 需求拆解</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee8;
+      --panel: #ffffff;
+      --paper: #f5f7fb;
+      --soft: #eef3f8;
+      --navy: #183153;
+      --teal: #08786f;
+      --blue: #2367d1;
+      --green: #16845b;
+      --amber: #b66b02;
+      --red: #ba2f39;
+      --violet: #6941c6;
+      --shadow: 0 18px 48px rgba(24, 49, 83, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, #eef4fb 0, #f8fafc 280px, #ffffff 680px);
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+
+    .shell {
+      width: min(1240px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 28px 0 68px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+      gap: 26px;
+      align-items: stretch;
+      min-height: 430px;
+      padding: 28px 0 18px;
+    }
+
+    .hero-copy {
+      padding: 26px 0 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--teal);
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-bottom: 14px;
+    }
+
+    .pulse {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--teal);
+      box-shadow: 0 0 0 7px rgba(8, 120, 111, 0.13);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1.04;
+      letter-spacing: 0;
+      color: var(--navy);
+      max-width: 820px;
+    }
+
+    .lead {
+      max-width: 790px;
+      margin: 18px 0 0;
+      color: #4c5d73;
+      font-size: 17px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 700;
+      min-height: 42px;
+      transition: 0.16s ease;
+      box-shadow: 0 1px 0 rgba(24, 49, 83, 0.05);
+    }
+    .btn:hover { border-color: #aeb8c7; transform: translateY(-1px); }
+    .btn.primary {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+
+    .broadcast-card {
+      background: #0e1f35;
+      color: #eaf2ff;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 410px;
+    }
+
+    .broadcast-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #baf4df;
+      font-weight: 800;
+    }
+
+    .screen {
+      margin: 14px;
+      height: 230px;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 7px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(135deg, #173353, #0f243c 45%, #153f43);
+      background-size: 34px 34px, 34px 34px, auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .browser-bar {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      height: 34px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      color: #526171;
+      font-size: 12px;
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 999px; background: #9aa7b7; }
+    .url {
+      flex: 1;
+      min-width: 0;
+      background: #eef2f7;
+      color: #475467;
+      border-radius: 5px;
+      padding: 3px 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sap-panel {
+      position: absolute;
+      left: 32px;
+      right: 32px;
+      bottom: 26px;
+      padding: 16px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.93);
+      color: var(--ink);
+      box-shadow: 0 18px 34px rgba(0,0,0,0.24);
+    }
+    .sap-title { font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+    .sap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sap-field {
+      height: 32px;
+      border-radius: 5px;
+      background: #eef2f7;
+      border: 1px solid #d5dbe5;
+    }
+
+    .channel-list {
+      display: grid;
+      gap: 8px;
+      padding: 0 14px 14px;
+    }
+    .channel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .channel strong { display: block; font-size: 13px; }
+    .channel span { display: block; color: #b9c7d8; font-size: 12px; }
+    .watch {
+      border: 1px solid rgba(186,244,223,0.55);
+      color: #d6fff0;
+      background: rgba(8, 120, 111, 0.2);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-weight: 800;
+      min-width: 78px;
+    }
+
+    .section {
+      margin-top: 30px;
+      padding: 26px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(24, 49, 83, 0.07);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 25px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .section-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: var(--navy);
+      letter-spacing: 0;
+    }
+    .card p { margin: 0; color: var(--muted); }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .metric {
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+    }
+    .metric b {
+      display: block;
+      color: var(--navy);
+      font-size: 25px;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    .metric span { color: var(--muted); font-size: 13px; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #475467;
+      font-weight: 700;
+    }
+    .chip.active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+
+    .requirements {
+      display: grid;
+      gap: 12px;
+    }
+    .req {
+      display: grid;
+      grid-template-columns: 98px 1fr 180px;
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .priority {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      border-radius: 7px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0;
+    }
+    .p0 { background: var(--red); }
+    .p1 { background: var(--blue); }
+    .p2 { background: var(--teal); }
+    .p3 { background: var(--violet); }
+    .req h3 { margin: 0 0 5px; font-size: 17px; }
+    .req p { margin: 0; color: var(--muted); }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: #475467;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .owner {
+      border-left: 3px solid var(--line);
+      padding-left: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .owner b { color: var(--ink); }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #475467;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-weight: 800;
+    }
+    .tab.active {
+      background: var(--teal);
+      color: #fff;
+      border-color: var(--teal);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .interaction-guide,
+    .mock-explanation {
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      border: 1px solid #c6d7e6;
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      background: #f3f8fd;
+    }
+    .interaction-guide { margin: 0 0 16px; }
+    .interaction-guide h3,
+    .mock-explanation h3 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 16px;
+    }
+    .interaction-guide p,
+    .mock-explanation p {
+      margin: 0;
+      color: #4c5d73;
+    }
+    .mock-explanation ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #4c5d73;
+    }
+    .mock-explanation li { margin: 4px 0; }
+
+    .mock {
+      display: grid;
+      grid-template-columns: 240px 1fr 300px;
+      min-height: 520px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .mock-nav {
+      background: #132946;
+      color: #d9e7f8;
+      padding: 18px 14px;
+    }
+    .mock-logo { font-weight: 900; color: #fff; margin-bottom: 24px; }
+    .mock-nav a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 7px;
+      margin-bottom: 6px;
+      color: #c8d7ea;
+      text-decoration: none;
+    }
+    .mock-nav a.active { background: rgba(255,255,255,0.12); color: #fff; }
+    .mock-main { padding: 18px; background: #f7f9fc; }
+    .mock-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .mock-title h3 { margin: 0; color: var(--navy); }
+    .run-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .run-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 96px;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .run-name strong { display: block; }
+    .run-name span { color: var(--muted); font-size: 12px; }
+    .status {
+      display: inline-flex;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .running { color: #075e56; background: #dff8f1; }
+    .passed { color: #0b6a43; background: #e1f6ea; }
+    .failed { color: #981b27; background: #ffe3e6; }
+    .pending { color: #855700; background: #fff1cf; }
+    .mock-side {
+      padding: 18px;
+      background: #fff;
+      border-left: 1px solid var(--line);
+    }
+    .mini-live {
+      height: 170px;
+      border-radius: 8px;
+      border: 1px solid #c9d3df;
+      background: linear-gradient(135deg, #163254, #0d2238);
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mini-live::after {
+      content: "Live Browser";
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      color: #fff;
+      font-weight: 900;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+      color: #475467;
+    }
+    .step i {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-style: normal;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      background: var(--teal);
+    }
+    .step.current i { background: var(--blue); }
+    .step.fail i { background: var(--red); }
+
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .phase {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+    }
+    .phase h3 { margin: 0 0 8px; color: var(--navy); }
+    .phase ul { margin: 0; padding-left: 18px; color: var(--muted); }
+
+    .decision {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 10px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .decision-body {
+      display: none;
+      border: 1px solid var(--line);
+      border-top: 0;
+      border-radius: 0 0 8px 8px;
+      padding: 14px 16px;
+      color: var(--muted);
+      background: #fbfcfe;
+    }
+    .decision.open { border-radius: 8px 8px 0 0; border-color: #bac4d2; }
+    .decision.open + .decision-body { display: block; }
+
+    @media (max-width: 1000px) {
+      .hero,
+      .grid-3,
+      .grid-2,
+      .metric-row,
+      .roadmap {
+        grid-template-columns: 1fr;
+      }
+      .mock { grid-template-columns: 1fr; }
+      .mock-side { border-left: 0; border-top: 1px solid var(--line); }
+      .req { grid-template-columns: 1fr; }
+      .owner { border-left: 0; border-top: 1px solid var(--line); padding: 12px 0 0; }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 22px, 1240px); padding-top: 16px; }
+      .section { padding: 18px; }
+      .section-head { display: block; }
+      .hero { min-height: 0; padding-top: 8px; }
+      .hero-copy { padding-top: 10px; }
+      .run-row { grid-template-columns: 1fr; }
+      .broadcast-card { min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span>Enterprise Test Run Center</div>
+        <h1>面向真实用户执行场景的企业级自动化运行中心</h1>
+        <p class="lead">
+          本文档把现有“项目 / case 执行、并发运行、Live 转播、运行历史”重新组织为一个企业级解决方案：
+          用户可以按项目批量运行或单独运行 case，并在同一个运行中心看到每个 case 的实时转播入口、进度、结果和历史追踪。
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#mockup">查看交互方案</a>
+          <a class="btn" href="#requirements">查看功能优先级</a>
+          <a class="btn" href="#roadmap">查看落地路线</a>
+        </div>
+        <div class="metric-row">
+          <div class="metric"><b>3</b><span>核心产品能力</span></div>
+          <div class="metric"><b>4</b><span>落地阶段</span></div>
+          <div class="metric"><b>18</b><span>用户功能需求</span></div>
+          <div class="metric"><b>P0</b><span>先解决运行可信感</span></div>
+        </div>
+      </div>
+
+      <aside class="broadcast-card" aria-label="Live Execution Broadcast preview">
+        <div class="broadcast-top">
+          <div class="live-badge"><span class="pulse"></span>LIVE EXECUTION</div>
+          <span>Project SAP FI Batch #042</span>
+        </div>
+        <div class="screen">
+          <div class="browser-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="url">https://sap-webgui.example/sap/bc/gui/sap/its/webgui</span>
+          </div>
+          <div class="sap-panel">
+            <div class="sap-title">Create Billing Document</div>
+            <div class="sap-row">
+              <div class="sap-field"></div>
+              <div class="sap-field"></div>
+              <div class="sap-field"></div>
+              <div class="sap-field"></div>
+            </div>
+          </div>
+        </div>
+        <div class="channel-list">
+          <div class="channel">
+            <div><strong>Case 01 · Invoice FI Posting</strong><span>Step 8 / 15 · 输入 Company Code</span></div>
+            <button class="watch" type="button">Watch</button>
+          </div>
+          <div class="channel">
+            <div><strong>Case 02 · Credit Note</strong><span>Step 4 / 12 · 正在等待页面加载</span></div>
+            <button class="watch" type="button">Watch</button>
+          </div>
+          <div class="channel">
+            <div><strong>Case 03 · Sales Order</strong><span>Step 11 / 18 · 失败点可回看</span></div>
+            <button class="watch" type="button">Replay</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="definition">
+      <div class="section-head">
+        <div>
+          <h2>需求定义</h2>
+          <p class="section-note">这不是一个调试者 history 面板，而是给业务用户、测试负责人、自动化执行人员使用的运行控制台。</p>
+        </div>
+      </div>
+      <div class="grid-3">
+        <article class="card">
+          <h3>Run Orchestration</h3>
+          <p>用户以项目为单位选择 case，可以运行整个项目、勾选多个 case 批量运行，也可以单独运行某一个 case。</p>
+        </article>
+        <article class="card">
+          <h3>Multi-Case Live Monitor</h3>
+          <p>系统已经有单 case Live 转播能力，新的 UI 要在并发运行时为每个 case 提供清晰的 Live 入口。</p>
+        </article>
+        <article class="card">
+          <h3>Result Intelligence</h3>
+          <p>每一次运行都成为完整的 run batch，记录进度、结果、截图、失败原因、报告和后续分析。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="mockup">
+      <div class="section-head">
+        <div>
+          <h2>交互方案</h2>
+          <p class="section-note">推荐把已有 Live 功能变成运行页的一级入口：多个 case 就是多个 Live Channel。</p>
+        </div>
+      </div>
+
+      <div class="interaction-guide">
+        <h3>这一栏怎么看</h3>
+        <p>先点上方三个大按钮切换核心页面，再点左侧小分区；每个分区底部会出现对应说明，说明这个页面实际要实现什么、重点看什么。</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" type="button" data-tab="run">Run Center</button>
+        <button class="tab" type="button" data-tab="project">Project Detail</button>
+        <button class="tab" type="button" data-tab="live">Live Channels</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-run">
+        <div class="mock">
+          <nav class="mock-nav">
+            <div class="mock-logo">TestOps Command Center</div>
+            <a class="active" href="#mockup">Run Center</a>
+            <a href="#mockup">Projects</a>
+            <a href="#mockup">Reports</a>
+            <a href="#mockup">Failure Analytics</a>
+          </nav>
+          <section class="mock-main">
+            <div class="mock-title">
+              <h3>All Running Batches</h3>
+              <button class="btn primary" type="button">Run Project</button>
+            </div>
+            <div class="run-grid">
+              <div class="run-row">
+                <div class="run-name"><strong>SAP FI Posting · Batch #042</strong><span>18 cases · 9 passed · 2 failed · 4 running</span></div>
+                <span class="status running">Running</span>
+                <button class="btn" type="button">Open</button>
+              </div>
+              <div class="run-row">
+                <div class="run-name"><strong>SAP Sales Order · Batch #041</strong><span>12 cases · 12 passed · 18m 22s</span></div>
+                <span class="status passed">Passed</span>
+                <button class="btn" type="button">Report</button>
+              </div>
+              <div class="run-row">
+                <div class="run-name"><strong>SAP Credit Note · Batch #040</strong><span>8 cases · 1 failed · failure replay available</span></div>
+                <span class="status failed">Failed</span>
+                <button class="btn" type="button">Review</button>
+              </div>
+              <div class="run-row">
+                <div class="run-name"><strong>SAP Regression Pack · Batch #039</strong><span>32 cases · queued after current capacity frees up</span></div>
+                <span class="status pending">Queued</span>
+                <button class="btn" type="button">Queue</button>
+              </div>
+            </div>
+          </section>
+          <aside class="mock-side">
+            <h3>Operations Snapshot</h3>
+            <div class="metric"><b>4</b><span>active live channels</span></div>
+            <div class="metric"><b>91%</b><span>last 7 runs pass rate</span></div>
+            <div class="metric"><b>2</b><span>cases need review</span></div>
+          </aside>
+        </div>
+        <div class="mock-explanation">
+          <h3>Run Center · 说明</h3>
+          <p>这里是全局运行中心，用来查看所有项目的运行批次。用户能一眼看到哪些 batch 正在跑、哪些已完成、哪些失败，并从 Open/Report/Review 进入详情。</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-project">
+        <div class="mock">
+          <nav class="mock-nav">
+            <div class="mock-logo">Project Console</div>
+            <a href="#mockup">Overview</a>
+            <a class="active" href="#mockup">Cases</a>
+            <a href="#mockup">Runs</a>
+            <a href="#mockup">Reports</a>
+          </nav>
+          <section class="mock-main">
+            <div class="mock-title">
+              <h3>SAP FI Posting Cases</h3>
+              <button class="btn primary" type="button">Run Selected</button>
+            </div>
+            <div class="run-grid">
+              <div class="run-row">
+                <div class="run-name"><strong>Case 01 · Check Invoice FI Posting</strong><span>Selected · last passed · 7m 14s</span></div>
+                <span class="status passed">Ready</span>
+                <button class="btn" type="button">Run</button>
+              </div>
+              <div class="run-row">
+                <div class="run-name"><strong>Case 02 · Credit Note With Reference</strong><span>Selected · last failed · replay available</span></div>
+                <span class="status failed">Review</span>
+                <button class="btn" type="button">Run</button>
+              </div>
+              <div class="run-row">
+                <div class="run-name"><strong>Case 03 · Sales Order Creation</strong><span>Not selected · last passed</span></div>
+                <span class="status passed">Ready</span>
+                <button class="btn" type="button">Run</button>
+              </div>
+            </div>
+          </section>
+          <aside class="mock-side">
+            <h3>Project Health</h3>
+            <div class="metric"><b>26</b><span>total cases</span></div>
+            <div class="metric"><b>84%</b><span>last run pass rate</span></div>
+            <div class="metric"><b>3</b><span>frequent failures</span></div>
+          </aside>
+        </div>
+        <div class="mock-explanation">
+          <h3>Cases · 说明</h3>
+          <p>这里是项目内 case 管理页。用户可以选择多个 case 批量运行，也可以单独运行某个 case，并看到每个 case 最近一次执行状态。</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-live">
+        <div class="mock">
+          <nav class="mock-nav">
+            <div class="mock-logo">Batch #042</div>
+            <a href="#mockup">Summary</a>
+            <a class="active" href="#mockup">Live Channels</a>
+            <a href="#mockup">Case Results</a>
+            <a href="#mockup">Logs</a>
+          </nav>
+          <section class="mock-main">
+            <div class="mock-title">
+              <h3>Multi-Case Live Monitor</h3>
+              <button class="btn" type="button">Rerun Failed</button>
+            </div>
+            <div class="run-grid">
+              <div class="run-row">
+                <div class="run-name"><strong>Case 01 · Invoice FI Posting</strong><span>Step 8 / 15 · latest frame 3s ago</span></div>
+                <span class="status running">Live</span>
+                <button class="btn primary" type="button">Watch</button>
+              </div>
+              <div class="run-row">
+                <div class="run-name"><strong>Case 02 · Credit Note</strong><span>Step 4 / 12 · waiting for navigation</span></div>
+                <span class="status running">Live</span>
+                <button class="btn primary" type="button">Watch</button>
+              </div>
+              <div class="run-row">
+                <div class="run-name"><strong>Case 03 · Sales Order</strong><span>Failed at Step 11 · screenshot replay ready</span></div>
+                <span class="status failed">Failed</span>
+                <button class="btn" type="button">Replay</button>
+              </div>
+            </div>
+          </section>
+          <aside class="mock-side">
+            <div class="mini-live"></div>
+            <div class="step"><i>1</i><span>Open SAP WebGUI · passed</span></div>
+            <div class="step"><i>2</i><span>Login and enter transaction · passed</span></div>
+            <div class="step current"><i>3</i><span>Fill billing data · running</span></div>
+            <div class="step fail"><i>4</i><span>Validation message · failed in previous run</span></div>
+          </aside>
+        </div>
+        <div class="mock-explanation">
+          <h3>Live Channels · 说明</h3>
+          <p>这里展示多个并行 case 的 Live 入口。每个 running case 都有 Watch 按钮，用户可以进入对应直播画面查看当前网页截图和 step 进度。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="requirements">
+      <div class="section-head">
+        <div>
+          <h2>功能拆解与优先级</h2>
+          <p class="section-note">优先级按“能不能支撑真实用户跑项目”和“能不能展示已有 Live 转播价值”排序。</p>
+        </div>
+        <div class="filters" aria-label="Priority filters">
+          <button class="chip active" type="button" data-filter="all">全部</button>
+          <button class="chip" type="button" data-filter="P0">P0 必须先做</button>
+          <button class="chip" type="button" data-filter="P1">P1 核心体验</button>
+          <button class="chip" type="button" data-filter="P2">P2 企业增强</button>
+          <button class="chip" type="button" data-filter="P3">P3 高级能力</button>
+        </div>
+      </div>
+
+      <div class="requirements">
+        <article class="req" data-priority="P0">
+          <span class="priority p0">P0</span>
+          <div>
+            <h3>项目级运行入口</h3>
+            <p>用户进入某个项目后，可以看到项目下全部 case，并支持“运行整个项目”“选择 case 后运行”“单独运行 case”。</p>
+            <div class="tags"><span class="tag">Project</span><span class="tag">Case Selection</span><span class="tag">Batch Run</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户不需要进入调试面板，就能从项目页面发起真实业务运行。</div>
+        </article>
+
+        <article class="req" data-priority="P0">
+          <span class="priority p0">P0</span>
+          <div>
+            <h3>Run Batch 概念</h3>
+            <p>每次点击运行都生成一次独立运行批次，包含项目、case 范围、执行人、开始时间、状态、耗时和环境信息。</p>
+            <div class="tags"><span class="tag">Run ID</span><span class="tag">Traceability</span><span class="tag">Audit</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />运行记录不再只是 latest run，而是可追踪的完整批次。</div>
+        </article>
+
+        <article class="req" data-priority="P0">
+          <span class="priority p0">P0</span>
+          <div>
+            <h3>多 case Live 转播入口</h3>
+            <p>并行运行时，每个 running case 都显示独立 Live 按钮。用户可以点击任意 case 查看对应的实时网页转播。</p>
+            <div class="tags"><span class="tag">Live Button</span><span class="tag">Parallel Cases</span><span class="tag">Existing Feature</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户一眼知道每个 case 是否可看直播，并能进入对应 live 页面。</div>
+        </article>
+
+        <article class="req" data-priority="P0">
+          <span class="priority p0">P0</span>
+          <div>
+            <h3>运行总览与状态分布</h3>
+            <p>Run Detail 顶部展示总进度、成功数、失败数、运行中、等待中、总耗时和当前运行 case。</p>
+            <div class="tags"><span class="tag">Dashboard</span><span class="tag">Progress</span><span class="tag">Status</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户不用打开日志，也能判断整个项目运行是否健康。</div>
+        </article>
+
+        <article class="req" data-priority="P1">
+          <span class="priority p1">P1</span>
+          <div>
+            <h3>Live 按钮状态化</h3>
+            <p>Live 入口根据状态显示 Watch Live、Queued、Replay、View Failure，并在失败时直接定位到失败步骤。</p>
+            <div class="tags"><span class="tag">Live State</span><span class="tag">Failure Focus</span><span class="tag">Replay</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />按钮本身能表达 case 当前处于可看、等待、完成或失败。</div>
+        </article>
+
+        <article class="req" data-priority="P1">
+          <span class="priority p1">P1</span>
+          <div>
+            <h3>Case 级 step 进度</h3>
+            <p>每个 case 行显示当前 step、step 总数、最近截图更新时间、当前操作摘要。</p>
+            <div class="tags"><span class="tag">Step Timeline</span><span class="tag">Screenshot Time</span><span class="tag">Current Action</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户不进入 live 页面，也能知道 case 大概跑到哪里。</div>
+        </article>
+
+        <article class="req" data-priority="P1">
+          <span class="priority p1">P1</span>
+          <div>
+            <h3>Run Center 全局运行中心</h3>
+            <p>提供跨项目视角，显示所有正在运行、最近完成、失败、等待中的 run batch。</p>
+            <div class="tags"><span class="tag">Global Runs</span><span class="tag">Cross Project</span><span class="tag">Operations</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户跑完一个项目去看另一个项目时，不丢失整体运行感知。</div>
+        </article>
+
+        <article class="req" data-priority="P1">
+          <span class="priority p1">P1</span>
+          <div>
+            <h3>Run Detail 完整详情页</h3>
+            <p>一次运行有独立详情页，包含 case 列表、Live channels、step 时间线、报告入口、日志和失败摘要。</p>
+            <div class="tags"><span class="tag">Run Detail</span><span class="tag">Report</span><span class="tag">Logs</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />一次运行结束后仍然能完整复盘，而不是只看到最后状态。</div>
+        </article>
+
+        <article class="req" data-priority="P1">
+          <span class="priority p1">P1</span>
+          <div>
+            <h3>失败聚焦与重跑入口</h3>
+            <p>失败 case 高亮显示失败 step、失败截图、错误摘要，并提供 rerun case 或 rerun failed cases。</p>
+            <div class="tags"><span class="tag">Failure</span><span class="tag">Rerun</span><span class="tag">Recovery</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />失败不是一个红点，而是可理解、可处理、可重跑的结果。</div>
+        </article>
+
+        <article class="req" data-priority="P2">
+          <span class="priority p2">P2</span>
+          <div>
+            <h3>Project Detail 质量概览</h3>
+            <p>项目页展示最近一次运行、近 7 次成功率、常失败 case、平均耗时和 case 覆盖数量。</p>
+            <div class="tags"><span class="tag">Quality Trend</span><span class="tag">Project Health</span><span class="tag">KPIs</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户进入项目时能知道这个项目自动化质量状态。</div>
+        </article>
+
+        <article class="req" data-priority="P2">
+          <span class="priority p2">P2</span>
+          <div>
+            <h3>运行筛选与搜索</h3>
+            <p>Run Center 支持按项目、状态、时间、执行人、环境、case 名称筛选。</p>
+            <div class="tags"><span class="tag">Search</span><span class="tag">Filter</span><span class="tag">Enterprise Ops</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />历史运行多起来后仍然能快速找到目标记录。</div>
+        </article>
+
+        <article class="req" data-priority="P2">
+          <span class="priority p2">P2</span>
+          <div>
+            <h3>报告导出与分享</h3>
+            <p>支持打开 HTML report、下载日志、导出运行摘要，便于发给业务或管理层。</p>
+            <div class="tags"><span class="tag">Export</span><span class="tag">HTML Report</span><span class="tag">Share</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />运行结果可以从平台带到会议、邮件或缺陷流转中。</div>
+        </article>
+
+        <article class="req" data-priority="P2">
+          <span class="priority p2">P2</span>
+          <div>
+            <h3>多项目并行监控</h3>
+            <p>当多个项目同时有运行任务时，首页显示项目运行卡片、队列状态、并发占用和异常提醒。</p>
+            <div class="tags"><span class="tag">Queue</span><span class="tag">Parallel Projects</span><span class="tag">Capacity</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户离开单个项目后还能掌握后台所有运行。</div>
+        </article>
+
+        <article class="req" data-priority="P3">
+          <span class="priority p3">P3</span>
+          <div>
+            <h3>运行对比</h3>
+            <p>支持比较两次 run batch 的成功率、失败 case、耗时变化和失败原因变化。</p>
+            <div class="tags"><span class="tag">Compare</span><span class="tag">Regression</span><span class="tag">Trend</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />用户可以判断一次改动后自动化结果是否变好或变差。</div>
+        </article>
+
+        <article class="req" data-priority="P3">
+          <span class="priority p3">P3</span>
+          <div>
+            <h3>角色与审计</h3>
+            <p>记录执行人、触发来源、环境、配置版本，并支持权限控制和审计追踪。</p>
+            <div class="tags"><span class="tag">RBAC</span><span class="tag">Audit</span><span class="tag">Compliance</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />满足企业内部测试执行与责任追踪要求。</div>
+        </article>
+
+        <article class="req" data-priority="P3">
+          <span class="priority p3">P3</span>
+          <div>
+            <h3>智能失败归因</h3>
+            <p>聚合失败截图、日志、AI 判断和历史相似失败，生成业务可读的失败原因建议。</p>
+            <div class="tags"><span class="tag">AI Analysis</span><span class="tag">Root Cause</span><span class="tag">Knowledge</span></div>
+          </div>
+          <div class="owner"><b>验收标准</b><br />失败结果从“看日志”升级为“看结论和证据”。</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="roadmap">
+      <div class="section-head">
+        <div>
+          <h2>落地路线</h2>
+          <p class="section-note">建议先把“能跑、能看直播、能回看结果”做稳，再补充趋势、导出、审计和智能分析。</p>
+        </div>
+      </div>
+      <div class="roadmap">
+        <article class="phase">
+          <h3>Phase 1 · MVP</h3>
+          <ul>
+            <li>项目级运行入口</li>
+            <li>Run Batch 数据结构</li>
+            <li>case 列表状态展示</li>
+            <li>每个 running case 的 Live 按钮</li>
+          </ul>
+        </article>
+        <article class="phase">
+          <h3>Phase 2 · Core UX</h3>
+          <ul>
+            <li>Run Center 全局视图</li>
+            <li>Run Detail 完整详情</li>
+            <li>Live / Replay / Failure 状态化</li>
+            <li>失败聚焦与重跑失败 case</li>
+          </ul>
+        </article>
+        <article class="phase">
+          <h3>Phase 3 · Enterprise</h3>
+          <ul>
+            <li>跨项目筛选搜索</li>
+            <li>报告导出与分享</li>
+            <li>项目质量概览</li>
+            <li>多项目并发队列监控</li>
+          </ul>
+        </article>
+        <article class="phase">
+          <h3>Phase 4 · Intelligence</h3>
+          <ul>
+            <li>运行对比</li>
+            <li>失败归因</li>
+            <li>角色权限与审计</li>
+            <li>趋势和稳定性分析</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="decisions">
+      <div class="section-head">
+        <div>
+          <h2>关键产品决策</h2>
+          <p class="section-note">这些决策会直接影响 UI 是“调试工具”还是“企业级解决方案”。</p>
+        </div>
+      </div>
+      <button class="decision" type="button">1. Live 转播是一级能力，不是日志附件</button>
+      <div class="decision-body">因为用户看不到后台弹出的浏览器，Live 转播承担的是“过程可信感”。UI 上要把它放在 Run Detail 和 case 行的显眼位置。</div>
+
+      <button class="decision" type="button">2. 每次运行必须形成 Run Batch</button>
+      <div class="decision-body">用户关注的是“一次项目执行任务”的完整结果，不是孤立 latest run。Run Batch 是后续历史、筛选、对比、报告和审计的基础。</div>
+
+      <button class="decision" type="button">3. 多 case 并发时使用 Live Channels 模型</button>
+      <div class="decision-body">每个 running case 都是一个 channel。用户可以在总览页面看到多个 Watch 按钮，并按需进入对应 live 转播页或面板。</div>
+
+      <button class="decision" type="button">4. 失败结果要可处理</button>
+      <div class="decision-body">失败卡片应该直接提供失败 step、截图回放、错误摘要、日志入口和重跑动作，减少用户从红色状态跳进日志里找原因的成本。</div>
+    </section>
+  </main>
+
+  <script>
+    const chips = document.querySelectorAll(".chip");
+    const requirements = document.querySelectorAll(".req");
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        chips.forEach((item) => item.classList.remove("active"));
+        chip.classList.add("active");
+        const filter = chip.dataset.filter;
+        requirements.forEach((req) => {
+          req.style.display = filter === "all" || req.dataset.priority === filter ? "grid" : "none";
+        });
+      });
+    });
+
+    const tabs = document.querySelectorAll(".tab");
+    const panels = document.querySelectorAll(".tab-panel");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((item) => item.classList.remove("active"));
+        panels.forEach((panel) => panel.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active");
+      });
+    });
+
+    const decisions = document.querySelectorAll(".decision");
+    decisions.forEach((decision) => {
+      decision.addEventListener("click", () => {
+        decision.classList.toggle("open");
+      });
+    });
+
+    const mockViews = {
+      "Run Center": {
+        title: "All Running Batches",
+        action: "Run Project",
+        rows: [
+          ["SAP FI Posting · Batch #042", "18 cases · 9 passed · 2 failed · 4 running", "Running", "running", "Open"],
+          ["SAP Sales Order · Batch #041", "12 cases · 12 passed · 18m 22s", "Passed", "passed", "Report"],
+          ["SAP Credit Note · Batch #040", "8 cases · 1 failed · failure replay available", "Failed", "failed", "Review"],
+          ["SAP Regression Pack · Batch #039", "32 cases · queued after current capacity frees up", "Queued", "pending", "Queue"]
+        ],
+        side: `
+          <h3>Operations Snapshot</h3>
+          <div class="metric"><b>4</b><span>active live channels</span></div>
+          <div class="metric"><b>91%</b><span>last 7 runs pass rate</span></div>
+          <div class="metric"><b>2</b><span>cases need review</span></div>
+        `
+      },
+      "Projects": {
+        title: "Project Portfolio",
+        action: "New Batch",
+        rows: [
+          ["SAP FI Posting Automation", "26 cases · last run failed · 4 live channels available", "Active", "running", "Open"],
+          ["SAP Sales Order Regression", "18 cases · stable · 96% pass rate", "Healthy", "passed", "Open"],
+          ["SAP Credit Note Pack", "11 cases · 3 frequent failures", "Risk", "failed", "Review"],
+          ["SAP Master Data Smoke", "9 cases · scheduled for nightly run", "Planned", "pending", "Schedule"]
+        ],
+        side: `
+          <h3>Project Health</h3>
+          <div class="metric"><b>4</b><span>projects monitored</span></div>
+          <div class="metric"><b>64</b><span>total managed cases</span></div>
+          <div class="metric"><b>3</b><span>projects with active runs</span></div>
+          <div class="card" style="margin-top:12px">
+            <h3>实际要做</h3>
+            <p>项目列表需要展示每个项目的 case 数、最近运行状态、成功率、最后运行时间，并提供进入项目详情和直接运行入口。</p>
+          </div>
+        `
+      },
+      "Reports": {
+        title: "Run Reports",
+        action: "Export",
+        rows: [
+          ["Batch #042 · SAP FI Posting", "Running report · live screenshots still updating", "Live", "running", "Open"],
+          ["Batch #041 · SAP Sales Order", "Final HTML report · 12 / 12 passed", "Ready", "passed", "View"],
+          ["Batch #040 · SAP Credit Note", "Failure report · 1 failed case with replay", "Failed", "failed", "Review"],
+          ["Weekly Quality Summary", "Cross-project pass rate and duration trend", "Ready", "passed", "Export"]
+        ],
+        side: `
+          <h3>Report Center</h3>
+          <div class="metric"><b>28</b><span>reports generated</span></div>
+          <div class="metric"><b>7</b><span>days quality trend</span></div>
+          <div class="metric"><b>5</b><span>reports shared this week</span></div>
+          <div class="card" style="margin-top:12px">
+            <h3>实际要做</h3>
+            <p>报告中心需要支持查看 HTML report、下载日志、导出运行摘要，并按项目、时间、状态筛选。</p>
+          </div>
+        `
+      },
+      "Failure Analytics": {
+        title: "Failure Analytics",
+        action: "Rerun Failed",
+        rows: [
+          ["Case 02 · Credit Note With Reference", "Failed at Step 7 · document number validation", "Failed", "failed", "Replay"],
+          ["Case 11 · Sales Order Update", "Failed at Step 3 · popup recovery triggered", "Failed", "failed", "Inspect"],
+          ["Case 09 · Invoice Search", "Flaky · 3 failures in last 7 runs", "Risk", "pending", "Analyze"],
+          ["Case 01 · FI Posting", "Recovered by cache replay · now passing", "Recovered", "passed", "View"]
+        ],
+        side: `
+          <h3>Failure Focus</h3>
+          <div class="mini-live"></div>
+          <div class="step fail"><i>7</i><span>Validation failed · screenshot replay ready</span></div>
+          <div class="step"><i>8</i><span>Suggested action · rerun failed case</span></div>
+          <div class="step"><i>9</i><span>Attach logs and HTML report to defect</span></div>
+          <div class="card" style="margin-top:12px">
+            <h3>实际要做</h3>
+            <p>失败分析页需要按失败 step 聚合截图、错误摘要、日志入口和重跑动作，让用户直接处理问题。</p>
+          </div>
+        `
+      },
+      "Overview": {
+        title: "Project Overview",
+        action: "Run Project",
+        rows: [
+          ["Last Run · Batch #042", "18 cases · 9 passed · 2 failed · 4 running", "Running", "running", "Open"],
+          ["Automation Coverage", "26 cases mapped to SAP FI posting flows", "84%", "passed", "Details"],
+          ["Frequent Failures", "Credit Note, Invoice Search, Sales Order Update", "3 risks", "failed", "Review"],
+          ["Next Scheduled Run", "Tonight 22:00 · QA environment", "Planned", "pending", "Edit"]
+        ],
+        side: `
+          <h3>Project Snapshot</h3>
+          <div class="metric"><b>26</b><span>total cases</span></div>
+          <div class="metric"><b>84%</b><span>last run pass rate</span></div>
+          <div class="metric"><b>18m</b><span>average duration</span></div>
+        `
+      },
+      "Cases": {
+        title: "SAP FI Posting Cases",
+        action: "Run Selected",
+        rows: [
+          ["Case 01 · Check Invoice FI Posting", "Selected · last passed · 7m 14s", "Ready", "passed", "Run"],
+          ["Case 02 · Credit Note With Reference", "Selected · last failed · replay available", "Review", "failed", "Run"],
+          ["Case 03 · Sales Order Creation", "Not selected · last passed", "Ready", "passed", "Run"]
+        ],
+        side: `
+          <h3>Case Selection</h3>
+          <div class="metric"><b>2</b><span>selected cases</span></div>
+          <div class="metric"><b>1</b><span>case needs review</span></div>
+          <div class="metric"><b>Live</b><span>available after execution starts</span></div>
+        `
+      },
+      "Runs": {
+        title: "Project Run History",
+        action: "Run Again",
+        rows: [
+          ["Batch #042", "Today 10:24 · 18 cases · running", "Running", "running", "Open"],
+          ["Batch #041", "Yesterday 17:11 · 18 cases · all passed", "Passed", "passed", "Report"],
+          ["Batch #040", "Yesterday 09:08 · 2 failed cases", "Failed", "failed", "Review"],
+          ["Batch #039", "Monday 21:30 · scheduled nightly run", "Passed", "passed", "Compare"]
+        ],
+        side: `
+          <h3>History Trend</h3>
+          <div class="metric"><b>7</b><span>recent batches</span></div>
+          <div class="metric"><b>+12%</b><span>pass rate improvement</span></div>
+          <div class="metric"><b>2</b><span>runs can compare</span></div>
+        `
+      },
+      "Project Console|Reports": {
+        title: "Project Reports",
+        action: "Export Project",
+        rows: [
+          ["Latest Project Report", "Batch #042 · running summary and live frames", "Live", "running", "Open"],
+          ["Last Passed Report", "Batch #041 · all FI posting cases passed", "Ready", "passed", "View"],
+          ["Failure Review Pack", "Batch #040 · 2 failed cases with replay", "Failed", "failed", "Review"],
+          ["Monthly Project Summary", "Pass rate, duration trend and frequent failures", "Ready", "passed", "Export"]
+        ],
+        side: `
+          <h3>Project Report Pack</h3>
+          <div class="metric"><b>12</b><span>project reports</span></div>
+          <div class="metric"><b>4</b><span>replay-enabled reports</span></div>
+          <div class="metric"><b>1</b><span>latest report running</span></div>
+        `
+      },
+      "Summary": {
+        title: "Batch #042 Summary",
+        action: "Stop Batch",
+        rows: [
+          ["Total Progress", "13 / 18 cases completed · 4 running · 1 queued", "Running", "running", "Open"],
+          ["Passed Cases", "9 cases passed with reports ready", "Passed", "passed", "View"],
+          ["Failed Cases", "2 cases failed · replay and logs available", "Failed", "failed", "Review"],
+          ["Live Channels", "4 active browser broadcasts", "Live", "running", "Watch"]
+        ],
+        side: `
+          <h3>Batch Control</h3>
+          <div class="metric"><b>72%</b><span>batch progress</span></div>
+          <div class="metric"><b>4</b><span>live broadcasts</span></div>
+          <div class="metric"><b>2</b><span>failures to review</span></div>
+        `
+      },
+      "Live Channels": {
+        title: "Multi-Case Live Monitor",
+        action: "Rerun Failed",
+        rows: [
+          ["Case 01 · Invoice FI Posting", "Step 8 / 15 · latest frame 3s ago", "Live", "running", "Watch"],
+          ["Case 02 · Credit Note", "Step 4 / 12 · waiting for navigation", "Live", "running", "Watch"],
+          ["Case 03 · Sales Order", "Failed at Step 11 · screenshot replay ready", "Failed", "failed", "Replay"]
+        ],
+        side: `
+          <div class="mini-live"></div>
+          <div class="step"><i>1</i><span>Open SAP WebGUI · passed</span></div>
+          <div class="step"><i>2</i><span>Login and enter transaction · passed</span></div>
+          <div class="step current"><i>3</i><span>Fill billing data · running</span></div>
+          <div class="step fail"><i>4</i><span>Validation message · failed in previous run</span></div>
+        `
+      },
+      "Case Results": {
+        title: "Case Results",
+        action: "Export Cases",
+        rows: [
+          ["Case 01 · Invoice FI Posting", "Passed · 15 steps · report ready", "Passed", "passed", "Report"],
+          ["Case 02 · Credit Note", "Running · Step 4 / 12", "Live", "running", "Watch"],
+          ["Case 03 · Sales Order", "Failed · Step 11 · replay ready", "Failed", "failed", "Replay"],
+          ["Case 04 · Invoice Search", "Queued · will start after slot frees", "Queued", "pending", "Queue"]
+        ],
+        side: `
+          <h3>Result Breakdown</h3>
+          <div class="metric"><b>9</b><span>passed</span></div>
+          <div class="metric"><b>2</b><span>failed</span></div>
+          <div class="metric"><b>4</b><span>running</span></div>
+        `
+      },
+      "Logs": {
+        title: "Execution Logs",
+        action: "Download Logs",
+        rows: [
+          ["10:24:08 · Batch started", "User triggered selected project run", "Info", "passed", "View"],
+          ["10:26:31 · Case 01 step 8", "Live screenshot captured and indexed", "Live", "running", "Open"],
+          ["10:29:12 · Case 03 failed", "Validation message detected on SAP page", "Failed", "failed", "Inspect"],
+          ["10:31:04 · Recovery suggested", "Rerun failed case or open failure replay", "Action", "pending", "Apply"]
+        ],
+        side: `
+          <h3>Log Tools</h3>
+          <div class="metric"><b>1.2k</b><span>events in this batch</span></div>
+          <div class="metric"><b>36</b><span>screenshots indexed</span></div>
+          <div class="metric"><b>3</b><span>download formats</span></div>
+        `
+      }
+    };
+
+    const renderRows = (rows) => rows.map(([name, meta, label, state, action]) => `
+      <div class="run-row">
+        <div class="run-name"><strong>${name}</strong><span>${meta}</span></div>
+        <span class="status ${state}">${label}</span>
+        <button class="btn${action === "Watch" ? " primary" : ""}" type="button">${action}</button>
+      </div>
+    `).join("");
+
+    const mockExplanations = {
+      "Run Center": [
+        "Run Center · 说明",
+        "这里是全局运行中心，用来查看所有项目的运行批次。用户能一眼看到哪些 batch 正在跑、哪些已完成、哪些失败，并从 Open/Report/Review 进入详情。"
+      ],
+      "Projects": [
+        "Projects · 说明",
+        "这里是项目组合视图，用来管理多个自动化项目。重点看每个项目的 case 数、最近运行状态、成功率和是否有活跃 Live 通道。"
+      ],
+      "Reports": [
+        "Reports · 说明",
+        "这里是报告中心，用来沉淀每次运行后的 HTML report、日志和摘要。用户可以按项目或运行批次打开、导出和分享结果。"
+      ],
+      "Failure Analytics": [
+        "Failure Analytics · 说明",
+        "这里是失败分析视图，用来聚合失败 case、失败 step、截图回放和重跑入口。重点是让用户快速知道失败在哪里、下一步怎么处理。"
+      ],
+      "Overview": [
+        "Overview · 说明",
+        "这里是单个项目的总览页，用来展示项目健康度、最近运行、覆盖 case 数和风险 case。用户进入项目后先看这里判断整体状态。"
+      ],
+      "Cases": [
+        "Cases · 说明",
+        "这里是项目内 case 管理页。用户可以选择多个 case 批量运行，也可以单独运行某个 case，并看到每个 case 最近一次执行状态。"
+      ],
+      "Runs": [
+        "Runs · 说明",
+        "这里是当前项目的运行历史。每一次执行都是一个 Run Batch，用户可以回看报告、对比历史、进入失败复盘。"
+      ],
+      "Project Console|Reports": [
+        "Project Reports · 说明",
+        "这里是单个项目的报告页，只展示这个项目相关的运行报告、失败回放包和趋势摘要，方便项目负责人复盘。"
+      ],
+      "Summary": [
+        "Summary · 说明",
+        "这里是某一次运行批次的总览。用户可以看整体进度、成功/失败/运行中数量，以及是否需要停止、重跑或进入详情。"
+      ],
+      "Live Channels": [
+        "Live Channels · 说明",
+        "这里展示多个并行 case 的 Live 入口。每个 running case 都有 Watch 按钮，用户可以进入对应直播画面查看当前网页截图和 step 进度。"
+      ],
+      "Case Results": [
+        "Case Results · 说明",
+        "这里是本次 batch 的 case 结果列表。用户可以查看每个 case 的最终状态，并进入 Report、Watch 或 Replay。"
+      ],
+      "Logs": [
+        "Logs · 说明",
+        "这里是执行事件和日志视图。用户可以查看批次启动、截图采集、失败事件、恢复建议，并下载日志用于排查。"
+      ]
+    };
+
+    const mockLinks = document.querySelectorAll(".mock-nav a");
+    mockLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const nav = link.closest(".mock-nav");
+        const mock = link.closest(".mock");
+        const label = link.textContent.trim();
+        const logo = mock.querySelector(".mock-logo")?.textContent.trim();
+        const key = `${logo}|${label}`;
+        nav.querySelectorAll("a").forEach((item) => item.classList.remove("active"));
+        link.classList.add("active");
+
+        const view = mockViews[key] || mockViews[label];
+        if (view) {
+          const main = mock.querySelector(".mock-main");
+          const side = mock.querySelector(".mock-side");
+          main.innerHTML = `
+            <div class="mock-title">
+              <h3>${view.title}</h3>
+              <button class="btn primary" type="button">${view.action}</button>
+            </div>
+            <div class="run-grid">${renderRows(view.rows)}</div>
+          `;
+          side.innerHTML = view.side;
+          const explanation = mock.closest(".tab-panel").querySelector(".mock-explanation");
+          const copy = mockExplanations[key] || mockExplanations[label];
+          if (explanation && copy) {
+            explanation.innerHTML = `<h3>${copy[0]}</h3><p>${copy[1]}</p>`;
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

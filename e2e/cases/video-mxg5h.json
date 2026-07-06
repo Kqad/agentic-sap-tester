@@ -1,0 +1,185 @@
+{
+  "$schema": "Cold-read draft from _frames/video-queue/pending/2026-07-06T02-53-55-bdd1e8/frames/ · 9 sampled frames · NO reference to any existing case json. See log.md for per-step reasoning.",
+  "title": "SAP FAGLL07 · G/L Account Line Item Browser · 加 Oper.Div. 列",
+  "description": "MHL 系统里跑 FAGLL07，按 Company Code 8540 + All Items + Posting Date 2025-12-01 到 2025-12-31 查询 G/L Account 明细。默认结果表里没有 Oper.Div. 列，通过 Change Layout → Find → 加列的方式让 Oper.Div. 列在结果表中显示。",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "FAGLL07",
+  "naturalLanguage": "1. 在 左上角矩形输入框 输入 FAGLL07\n2. 按 Enter 回车键\n3. 在 Company Code 输入框 输入 8540\n4. 点击 Status 区域的 All Items 单选圆钮\n5. 在 Details for selection of All Items · Posting Date 起始输入框 输入 01.12.2025\n6. 在 Details for selection of All Items · Posting Date to 输入框 输入 31.12.2025\n7. 按 Enter 执行查询（Execute）\n8. 等 10s\n9. 点击结果表顶部工具栏里的 Change Layout / 排版布局 图标（表格上方一排小按钮里的一个）\n10. 在新弹出的 Change Layout 对话框中，点击 Find 按钮\n11. 在新弹出的 Find 子对话框中的 Search Term 输入框 输入 operating division\n12. 按 Enter 触发搜索\n13. 在 Change Layout 对话框右侧 Column Set 里选中 operating division 那一行，然后点击中间向左移动的 ← 箭头按钮，把它加到左侧 Displayed Columns\n14. 按 Enter 确认关闭 Change Layout 对话框\n15. 在结果表里横向滚到最右，直到 Oper.Div. 列可见\n16. 等 5s\n17. 验证结果表里能看到 Oper.Div. 列，即为测试成功",
+  "apiGuide": {
+    "summary": "SAP FAGLL07 · Add Oper.Div. column to G/L line item browser layout",
+    "assumptions": [
+      "从 MHL (011) 系统的 SAP Easy Access 主页开始（f_001）",
+      "Company Code 8540 已在测试系统里存在",
+      "视频里 Change Layout 弹窗内 add-to-displayed 的交互过程未被抽帧捕获，步骤 13 是从 SAP 通用 layout 交互推测的（confidence: low）"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 FAGLL07",
+        "confidence": "high",
+        "reason": "T-code 提交前的字段填入，走 aiInput",
+        "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"FAGLL07\" });"
+      },
+      {
+        "order": 2,
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "confidence": "high",
+        "reason": "KB 规则：T-code 提交必须走回车键（有 aiTap 兜底）",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 3,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Company Code 输入框 输入 8540",
+        "confidence": "high",
+        "reason": "sc_0030.57 光标位、f_060 显示 8540",
+        "exampleCode": "await agent.aiInput(\"General Restrictions 区域第一行 Company Code 输入框\", { value: \"8540\" });"
+      },
+      {
+        "order": 4,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Status 区域的 All Items 单选圆钮",
+        "confidence": "high",
+        "reason": "Radio 从 Open Items 切到 All Items（sc_0030.57 → f_060 明显变化）",
+        "exampleCode": "await agent.aiTap(\"Line Item Selection · Status 区域下面第三个圆钮（Cleared Items 下方），紧挨 All Items 文字左侧\");"
+      },
+      {
+        "order": 5,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Details for selection of All Items 里 Posting Date 起始输入框 输入 01.12.2025",
+        "confidence": "high",
+        "reason": "f_060 里已有 01.12.2025",
+        "exampleCode": "await agent.aiInput(\"Details for selection of All Items 区域里 Posting Date 一行、to 字左侧的日期输入框\", { value: \"01.12.2025\" });"
+      },
+      {
+        "order": 6,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Details for selection of All Items 里 Posting Date to 输入框 输入 31.12.2025",
+        "confidence": "high",
+        "reason": "f_060 里已有 31.12.2025",
+        "exampleCode": "await agent.aiInput(\"Details for selection of All Items 区域里 Posting Date 一行、to 字右侧的日期输入框\", { value: \"31.12.2025\" });"
+      },
+      {
+        "order": 7,
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 执行查询（Execute）",
+        "confidence": "high",
+        "reason": "KB 规则：Execute 走回车（有 aiTap 兜底会打右下角 Execute 按钮）",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 8,
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等 10s",
+        "confidence": "high",
+        "reason": "查询要跑 60,914 行，需要足够时间",
+        "exampleCode": "await sleep(10000);"
+      },
+      {
+        "order": 9,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击结果表顶部工具栏里的 Change Layout 图标",
+        "confidence": "medium",
+        "reason": "采样帧里未直接抓到 icon 点击，是从 f_105 弹窗状态倒推的",
+        "exampleCode": "await agent.aiTap(\"G/L Account Line Item Browser 结果表上方那排工具栏里，倒数第 5-6 个左右的 Change Layout / 排版布局 小图标\");"
+      },
+      {
+        "order": 10,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在新弹出的 Change Layout 对话框中，点击 Find 按钮",
+        "confidence": "high",
+        "reason": "f_105 里 Find 子对话框已打开",
+        "exampleCode": "await agent.aiTap(\"新弹出的 Change Layout 对话框中，Displayed Columns 表格上方工具栏里的 Find（放大镜）图标\");"
+      },
+      {
+        "order": 11,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在新弹出的 Find 子对话框中的 Search Term 输入框 输入 operating division",
+        "confidence": "high",
+        "reason": "f_105 明确显示输入框内 operating division 字样",
+        "exampleCode": "await agent.aiInput(\"新弹出的 Find 子对话框中央 Search Term 输入框（label 在左侧）\", { value: \"operating division\" });"
+      },
+      {
+        "order": 12,
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 触发搜索",
+        "confidence": "high",
+        "reason": "KB 规则：搜索/提交走回车",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 13,
+        "midsceneApi": "agent.aiAct()",
+        "naturalLanguageInstruction": "在 Change Layout 对话框右侧 Column Set 里选中 operating division 那一行，然后点击中间向左移动的 ← 箭头把它加到左侧 Displayed Columns",
+        "confidence": "low",
+        "reason": "帧未捕获此交互，SAP 通用 layout 交互推测；走 aiAct 让视觉模型综合处理",
+        "exampleCode": "await agent.aiAct(\"在 Change Layout 对话框右侧 Column Set 面板中找到高亮的 operating division 行，选中它后点击左右两个面板中间的向左移动 ← 箭头按钮，把这一列从 Column Set 移到左边 Displayed Columns\");"
+      },
+      {
+        "order": 14,
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 确认 Change Layout 对话框",
+        "confidence": "high",
+        "reason": "sc_0124.40 显示弹窗已关；KB 规则：确认/关闭对话框走回车",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 15,
+        "midsceneApi": "agent.aiAct()",
+        "naturalLanguageInstruction": "在结果表里横向滚到最右，直到 Oper.Div. 列可见",
+        "confidence": "medium",
+        "reason": "f_130 里 Oper.Div. 列在最右；表格滚动 KB 规则走 aiAct",
+        "exampleCode": "await agent.aiAct(\"把结果表的底部水平滚动条一直拖到最右端，让最右侧的 Oper.Div. 列出现在可视区域内\");"
+      },
+      {
+        "order": 16,
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等 5s",
+        "confidence": "high",
+        "reason": "aiAssert 前 KB 规则内置 5s 稳定期，此处显式再等一次防止列渲染未完成",
+        "exampleCode": "await sleep(5000);"
+      },
+      {
+        "order": 17,
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "验证结果表里能看到 Oper.Div. 列，即为测试成功",
+        "confidence": "high",
+        "reason": "用户填的 assertion 原话；f_130 里 Oper.Div. 列可见",
+        "exampleCode": "await agent.aiAssert(\"G/L Account Line Item Browser 结果表最右侧能看到 Oper.Div. 列，列名可读且列下有值（如 BT / GS / PT / CENT 等）\");"
+      }
+    ]
+  },
+  "conversionMeta": {
+    "elapsedSec": 210.4,
+    "totalTokens": 158420,
+    "inputTokens": 147580,
+    "outputTokens": 10840,
+    "cost": 0.605,
+    "model": "cold-read-manual",
+    "stepsGenerated": 17,
+    "framesUsed": 9
+  },
+  "tags": [
+    "video-generated",
+    "cold-read",
+    "fagll07",
+    "gl-account",
+    "layout"
+  ],
+  "source": {
+    "generator": "cold-read-from-9-keyframes",
+    "videoPath": "_frames/video-queue/pending/2026-07-06T02-53-55-bdd1e8/2026-07-06_10h48_13.mp4",
+    "referenceCase": "(deliberately NOT used)",
+    "keyframesUsed": 9,
+    "totalFramesAvailable": 130,
+    "guideVersion": "server/data/kb/conversion/video-to-case-guide.md",
+    "confidenceBreakdown": {
+      "high": 12,
+      "medium": 3,
+      "low": 1,
+      "total": 17
+    }
+  }
+}

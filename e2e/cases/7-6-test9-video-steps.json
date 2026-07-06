@@ -1,0 +1,219 @@
+{
+  "$schema": "video-to-case · cold-read v3 (post-optimization) · queue 2026-07-06T05-26-52-7c9aa7 · excludeRef=saptest9,video-saptest9-friday · pipeline improvements: image downscale to 1280 · frame focus 12/121 · new KB rules for icon locators/aiTap-over-aiAct/SAP-logo/scroll-to-position",
+  "title": "SAPTEST9 · 视频转换对照实验（2026-07-06 · 优化后）",
+  "description": "对照 video-saptest9-friday 的重新转换。视频内容一致（VF03 · BX00000028 → BX00000063 · Central Finance GL verify），excludeRef 过滤掉了标准答案 saptest9 和 Friday 的转换结果，纯冷读。第一遍 VF03 拉 BX00000028，走 Menu → Billing Document → Issue Output To → Output Details 弹窗 → 打印预览。第二遍 VF03 拉 BX00000063，工具栏直接点 Display Document Flow → 树里选中 Central Finance document → Display Document → 页面出现 G/L account 列表，验证 2410110000 / 5010100003 / 4610360000 三个 GL 账号。",
+  "sapUrl": "https://q4t.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "VF03",
+  "naturalLanguage": "1. 在 左上角矩形输入框 输入 VF03\n2. 按 Enter 回车键\n3. 在 Billing document 输入框 输入 BX00000028\n4. 点击页面左上角 Menu 下拉按钮\n5. 点击菜单里出现的 Billing Document 一级项\n6. 点击 Billing Document 子菜单里的 Issue Output To\n7. 点击 Output Details 弹窗第一行左侧的空心圆钮\n8. 点击 Output Details 弹窗底部工具栏左侧的打印预览小图标\n9. 等 10s\n10. 点击 SAP 图标返回主页\n11. 等 10s\n12. 在 左上角矩形输入框 输入 VF03\n13. 按 Enter 回车键\n14. 在 Billing document 输入框 输入 BX00000063\n15. 按 Enter 回车键\n16. 点击页面顶部工具栏里的 Display Document Flow 按钮\n17. 点击 Document Flow 树里 Central Finance document 那一行\n18. 点击 Document Flow 页面顶部工具栏里 Overview 右边的 Display Document 按钮\n19. 等 10s\n20. 验证 Display Document 页面显示的 G/L Account 列同时包含 2410110000、5010100003、4610360000 GL 账号",
+  "apiGuide": {
+    "summary": "SAPTEST9 · Two-pass VF03 · BX00000028 → BX00000063 · Central Finance GL verify",
+    "assumptions": [
+      "从 SAP Easy Access Q4T (011) 主页开始（f_001 显示 T-code 输入框已可见 · 不需要前置 Show OK Code Field 4 步）",
+      "步骤 7、8 是 Output Details 弹窗内的操作 · 采样帧未捕获弹窗本体（scene-change 阈值 + fps=1 挡不住短弹窗）· locator 走纯视觉描述、confidence 低 · 建议用户复查时 F12 抠 xpath 兜底"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 VF03",
+        "confidence": "high",
+        "reason": "f_001 顶部 Menu ▽ 右侧有空的 T-code 输入框；sc_0014.37 页面已经跳转到 Display Billing Documents，说明 VF03 已被输入并提交",
+        "exampleCode": "await agent.aiInput(\"页面顶栏 Menu ▽ 按钮右边紧邻的那个矩形灰色输入框（T Code 输入位）\", { value: \"VF03\" });"
+      },
+      {
+        "order": 2,
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "confidence": "high",
+        "reason": "KB §4 规则：T-code 提交走 Enter · runner 有 aiTap 兜底",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 3,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Billing document 输入框 输入 BX00000028",
+        "confidence": "high",
+        "reason": "sc_0014.37 显示 Billing Document 字段空且光标可能定位在此；f_045 已能触发 Menu → Billing Document → Issue Output To（说明 Billing Document 已填）",
+        "exampleCode": "await agent.aiInput(\"Display Billing Documents 页面顶部、Billing Document 标签右侧的输入框\", { value: \"BX00000028\" });"
+      },
+      {
+        "order": 4,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击页面左上角 Menu 下拉按钮",
+        "confidence": "high",
+        "reason": "f_045 显示 Menu 下拉已展开 · 说明用户点了 Menu 按钮",
+        "exampleCode": "await agent.aiTap(\"Display Billing Documents 页面左上角、SAP logo 右边紧邻的 Menu 下拉按钮（带 ▽ 三角）\");"
+      },
+      {
+        "order": 5,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击菜单里出现的 Billing Document 一级项",
+        "confidence": "high",
+        "reason": "f_045 里 Menu 下拉展开后 Billing Document 一级项右侧有二级子菜单展开",
+        "exampleCode": "await agent.aiTap(\"新展开的 Menu 下拉里、最顶端的 Billing Document 一级菜单项（右边带 ▶ 三角表示有子菜单）\");"
+      },
+      {
+        "order": 6,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Billing Document 子菜单里的 Issue Output To",
+        "confidence": "high",
+        "reason": "f_045 里光标黄圈就停在 Issue Output To 上",
+        "exampleCode": "await agent.aiTap(\"Billing Document 子菜单里、Issue Output To 文字所在的那一行（在 Billing Due List 下方 · Exit 上方几行）\");"
+      },
+      {
+        "order": 7,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Output Details 弹窗第一行左侧的空心圆钮",
+        "confidence": "low",
+        "reason": "sc_0058.77 已经是 Print Preview 页 · 中间必然出现过 Output Details 弹窗（有第一行 radio + 打印预览 icon）· 采样帧未直接捕获此步 · 按 SAP 通用 Issue-Output-To 交互推的 · locator 走视觉描述 · 建议 F12 抠 xpath 兜底",
+        "exampleCode": "await agent.aiTap(\"新弹出的 Output Details 弹窗中、Output 表格第一行最左侧的空心单选圆钮（圆形轮廓 · 直径 12px 左右 · 位于行号左边）\");"
+      },
+      {
+        "order": 8,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Output Details 弹窗底部工具栏左侧的打印预览小图标",
+        "confidence": "low",
+        "reason": "同步骤 7 · sc_0058.77 显示 Print Preview 页说明打印预览已触发 · 弹窗本体未捕获 · locator 只描述形状：放大镜叠在页面轮廓上的复合图标 · 建议 F12 抠 xpath 兜底",
+        "exampleCode": "await agent.aiTap(\"Output Details 弹窗底部工具栏、左侧那一小排图标里、绿色 ✓ 右边第 2-3 个的『放大镜叠在纸张页面轮廓上』的复合小图标\");"
+      },
+      {
+        "order": 9,
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等 10s",
+        "confidence": "high",
+        "reason": "Print Preview 完整加载可能超过 runner 默认 7s Execute-类 gap · 加显式等待",
+        "exampleCode": "await sleep(10000);"
+      },
+      {
+        "order": 10,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 SAP 图标返回主页",
+        "confidence": "high",
+        "reason": "sc_0058.77 是 Print Preview · f_075 已经回到 SAP Easy Access 主页 · KB §6 规则：唯一正确做法是点 SAP logo（不要点 ← 返回箭头 · 那是事务栈上一步）",
+        "exampleCode": "await agent.aiTap(\"页面左上角的 SAP 蓝色 logo 图标（回到 SAP Easy Access 主页）\");"
+      },
+      {
+        "order": 11,
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等 10s",
+        "confidence": "high",
+        "reason": "主页渲染 · KB 规则：aiQuery 前 5s + Execute 前 7s runner 默认 gap 可能不够",
+        "exampleCode": "await sleep(10000);"
+      },
+      {
+        "order": 12,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 VF03",
+        "confidence": "high",
+        "reason": "f_075 显示 T-code 输入框已填 VF03（第二遍进入）",
+        "exampleCode": "await agent.aiInput(\"SAP Easy Access 主页顶栏 Menu ▽ 按钮右边紧邻的那个矩形灰色输入框（T Code 输入位）\", { value: \"VF03\" });"
+      },
+      {
+        "order": 13,
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "confidence": "high",
+        "reason": "T-code 二次提交",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 14,
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Billing document 输入框 输入 BX00000063",
+        "confidence": "high",
+        "reason": "f_095 页面标题变成 Credit Note Returns CPT BX00000063 · 说明用户输入 BX00000063 并触发查询",
+        "exampleCode": "await agent.aiInput(\"Display Billing Documents 页面顶部、Billing Document 标签右侧的输入框\", { value: \"BX00000063\" });"
+      },
+      {
+        "order": 15,
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "confidence": "high",
+        "reason": "查询提交 · 走 Enter",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 16,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击页面顶部工具栏里的 Display Document Flow 按钮",
+        "confidence": "high",
+        "reason": "f_095 里 toolbar 直接有可点的 Display Document Flow 蓝色顶层按钮 · 无需走 Menu → Environment 路径",
+        "exampleCode": "await agent.aiTap(\"Credit Note Returns CPT BX00000063 页面顶部蓝色工具栏里、Accounting 按钮左侧的 Display Document Flow 按钮\");"
+      },
+      {
+        "order": 17,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Document Flow 树里 Central Finance document 那一行",
+        "confidence": "high",
+        "reason": "f_105 里树能看到 Credit Note Returns CPT BX00000063 下面缩进一层的 Central Finance document 2200000013 这一行",
+        "exampleCode": "await agent.aiTap(\"Document Flow 页面左侧树里、Credit Note Returns CPT BX00000063 那一行下面缩进一层、名字带 Central Finance document 2200000013 的那一行文字\");"
+      },
+      {
+        "order": 18,
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Document Flow 页面顶部工具栏里 Overview 右边的 Display Document 按钮",
+        "confidence": "high",
+        "reason": "f_105 toolbar 里 Details / Overview / Display Document / Service Documents / Additional Links 是并排 · Display Document 在 Overview 右边一格",
+        "exampleCode": "await agent.aiTap(\"Document Flow 页面顶部蓝色工具栏里、Overview 按钮右边紧邻的 Display Document 按钮（Service Documents 左边）\");"
+      },
+      {
+        "order": 19,
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等 10s",
+        "confidence": "high",
+        "reason": "Data Entry View 加载 GL 明细 · 可能需要额外时间",
+        "exampleCode": "await sleep(10000);"
+      },
+      {
+        "order": 20,
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "验证 Display Document 页面显示的 G/L Account 列同时包含 2410110000、5010100003、4610360000 GL 账号",
+        "confidence": "high",
+        "reason": "用户在 assertion 里填写的原话 · f_120 帧里 G/L Account 列可直接读到这三个数字",
+        "exampleCode": "await agent.aiAssert(\"Display Document: Data Entry View 页面里的 G/L Account 列里同时能看到 2410110000、5010100003 和 4610360000 三个账号\");"
+      }
+    ]
+  },
+  "conversionMeta": {
+    "elapsedSec": 50.2,
+    "inputTokens": 48520,
+    "outputTokens": 10180,
+    "totalTokens": 58700,
+    "cost": 0.298,
+    "model": "claude-sonnet-4-6",
+    "stepsGenerated": 20,
+    "framesUsed": 12,
+    "framesTotal": 121,
+    "imageWidth": 1280,
+    "imageHeight": 630,
+    "excludeRef": [
+      "saptest9",
+      "video-saptest9-friday"
+    ],
+    "comparedTo": "video-saptest9-friday",
+    "improvementNote": "对比 Friday: cost -19% ($0.366 → $0.298) · tokens -21% (74.4k → 58.7k) · frames used -60% (30 → 12) · locator 描述质量提升（SAP logo 回主页 · 图标 locator 纯视觉 · aiTap 拆分 · 步骤 7/8 明确标 low confidence）"
+  },
+  "tags": [
+    "video-generated",
+    "cold-read",
+    "vf03",
+    "billing",
+    "gl-account",
+    "ab-comparison-2026-07-06"
+  ],
+  "source": {
+    "generator": "cold-read-v3-post-optimization",
+    "videoPath": "_frames/video-queue/pending/2026-07-06T05-26-52-7c9aa7/2026-07-03_16h53_19.mp4",
+    "videoSha": "44f04f60eff291391357360cd7bc185bab0d3ce77632bb41d683a579964e074f",
+    "referenceCase": "excluded via ?excludeRef=saptest9,video-saptest9-friday",
+    "keyframesUsed": 12,
+    "totalFramesAvailable": 121,
+    "guideVersion": "server/data/kb/conversion/video-to-case-guide.md",
+    "confidenceBreakdown": {
+      "high": 18,
+      "medium": 0,
+      "low": 2,
+      "total": 20
+    }
+  }
+}

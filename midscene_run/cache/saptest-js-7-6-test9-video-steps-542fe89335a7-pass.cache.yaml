@@ -1,0 +1,272 @@
+midsceneVersion: 1.8.1
+cacheId: saptest-js-7-6-test9-video-steps-542fe89335a7-pass
+caches:
+  - type: plan
+    prompt: |-
+      🔁 Cache Miss 兜底 · 第3步 · 点击visualization
+
+      📋 已注入上下文:
+        · 完整流程 (26 步,标记当前卡住步)
+        · 研判思路 (流程 = ground truth,对照屏幕判定偏离了几步)
+        · 常见型态参考 (弹窗 / 元素折叠 / 路径偏离 / 控件改名)
+        · 硬性约束 (准备状态,不替 runner 做第3步)
+        · 多步操作时,每步之间插 Sleep 10s 让屏幕过渡
+        · action 词表 (Tap / Input / Scroll / Hover / KeyboardPress / Drag / Sleep)
+
+      🎯 目标: 让第3步能正常 cache hit,runner 自动重试,你不直接执行
+    yamlWorkflow: |
+      tasks:
+        - name: |-
+            🔁 Cache Miss 兜底 · 第3步 · 点击visualization
+
+            📋 已注入上下文:
+              · 完整流程 (26 步,标记当前卡住步)
+              · 研判思路 (流程 = ground truth,对照屏幕判定偏离了几步)
+              · 常见型态参考 (弹窗 / 元素折叠 / 路径偏离 / 控件改名)
+              · 硬性约束 (准备状态,不替 runner 做第3步)
+              · 多步操作时,每步之间插 Sleep 10s 让屏幕过渡
+              · action 词表 (Tap / Input / Scroll / Hover / KeyboardPress / Drag / Sleep)
+
+            🎯 目标: 让第3步能正常 cache hit,runner 自动重试,你不直接执行
+          flow:
+            - aiTap: ''
+              locate: Menu dropdown button in the top-left corner
+            - aiTap: ''
+              locate: Settings... option in the Menu dropdown
+            - Sleep: ''
+              timeMs: 10000
+  - type: plan
+    prompt: |-
+      🏠 Stage 2 · 回主页 + cache 重放 · 第15步 · 从查询结果表格中读取 Curr.bk.val.列，保存为变量 A1
+
+      📋 已注入上下文:
+        · 完整流程 (26 步,标记当前卡住步 + 🏠 事务码入口)
+        · 唯一操作: 点击屏幕左上角 SAP logo 回主页
+        · 回到主页后立即 <complete>,runner 会自动从第1步用 cache 重放到第14步,再重试第15步
+
+      🎯 目标: 把屏幕重置到主页,后续重放交给 runner
+    yamlWorkflow: |
+      tasks:
+        - name: |-
+            🏠 Stage 2 · 回主页 + cache 重放 · 第15步 · 从查询结果表格中读取 Curr.bk.val.列，保存为变量 A1
+
+            📋 已注入上下文:
+              · 完整流程 (26 步,标记当前卡住步 + 🏠 事务码入口)
+              · 唯一操作: 点击屏幕左上角 SAP logo 回主页
+              · 回到主页后立即 <complete>,runner 会自动从第1步用 cache 重放到第14步,再重试第15步
+
+            🎯 目标: 把屏幕重置到主页,后续重放交给 runner
+          flow:
+            - aiTap: ''
+              locate: 左上角 SAP logo
+            - Sleep: ''
+              timeMs: 10000
+  - type: locate
+    prompt: 进入 Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: 点击setting
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[3]/span[normalize-space()="Settings..."]
+  - type: locate
+    prompt: 点击visualization
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[2]/span[1]/span[1]/span[normalize-space()="Visualization"]
+  - type: locate
+    prompt: 启用show Ok code field
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/section[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]/span[1]/span[2]
+  - type: locate
+    prompt: 保存
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[2]/footer[1]/div[1]/div[normalize-space()="Save Emphasized"]
+  - type: locate
+    prompt: 左上角矩形
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[2]/span[1]/input[1]
+  - type: locate
+    prompt: 点击右下角execute
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[1]
+  - type: locate
+    prompt: company code
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Company code"]
+  - type: locate
+    prompt: Asset number
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[6]/span[1]/label[1]/span[normalize-space()="Asset number"]
+  - type: locate
+    prompt: 点击跳出栏目的第一个
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[4]/div[1]/div[1]/div[4]/span[1]
+  - type: locate
+    prompt: Report date
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[17]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Report date"]
+  - type: locate
+    prompt: 勾选 List assets 复选框
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[17]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[9]/span[1]/span[normalize-space()="List assets"]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: 在查询到的Asset History Sheet页面中
+    cache:
+      xpaths:
+        - /html/body/div[1]
+  - type: locate
+    prompt: 底部横向滚动条的滑块（当前在左下角附近）
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
+  - type: locate
+    prompt: 底部横向滚动条的最右端位置
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
+  - type: locate
+    prompt: 底部横向滚动条滑块的当前位置（左端）
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
+  - type: locate
+    prompt: 底部横向滚动条的最右端
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
+  - type: locate
+    prompt: 返回 SAP 主页
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[2]/span[1]
+  - type: locate
+    prompt: 展开 Favorites 文件夹并选择 Asset Balances
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[2]/tr[1]/td[1]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/span[1]/span[normalize-space()="Asset Balances -> Asset Lists -> Asset Balances -> ... by Asset Number"]
+  - type: locate
+    prompt: 底部横向滚动条的滑块
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/span[1]/span[1]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: company code
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Company code"]
+  - type: locate
+    prompt: Asset number
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[6]/span[1]/label[1]/span[normalize-space()="Asset number"]
+  - type: locate
+    prompt: 点击跳出栏目的第一个
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[4]/span[1]
+  - type: locate
+    prompt: Report date
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[16]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/span[1]/label[1]/span[normalize-space()="Report date"]
+  - type: locate
+    prompt: 勾选 List assets 复选框
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[16]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[9]/span[1]/span[normalize-space()="List assets"]
+  - type: locate
+    prompt: 点击 Execute 按钮执行查询
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Execute Emphasized"]
+  - type: locate
+    prompt: Asset History Sheet 的数据表格区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/table[1]/thead[1]/tr[2]/th[1]/div[1]/div[1]/div[normalize-space()="Line 1"]
+  - type: locate
+    prompt: Asset History Sheet 的数据表格区域
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/section[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/table[1]/thead[1]/tr[2]/th[1]/div[1]/div[1]/div[normalize-space()="Line 1"]
+  - type: locate
+    prompt: Change Layout 对话框右上角的关闭按钮（×）
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[11]/div[1]/header[1]/div[4]/button[1]
+  - type: locate
+    prompt: Asset History Sheet 主数据表格区域（含资产编号和描述行）
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[151]
+  - type: locate
+    prompt: 用户标识 'MHL (011)' 右侧的下拉箭头
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[2]/span[1]/a[normalize-space()="MHL (011)"]
+  - type: locate
+    prompt: 顶部导航栏中的 'User Menu' 按钮
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[3]/div[normalize-space()="User Menu"]
+  - type: locate
+    prompt: 左上角带下拉箭头的 'Menu' 按钮
+    cache:
+      xpaths: []
+  - type: locate
+    prompt: SAP Menu button in the top navigation bar
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[4]/div[normalize-space()="SAP Menu"]
+  - type: locate
+    prompt: Expand arrow next to 'Tools' in the SAP Menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[2]/tr[1]/td[1]/div[1]/div[2]/table[1]/tbody[1]/tr[14]/td[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/span[1]
+  - type: locate
+    prompt: Customizing option under Tools menu
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[2]/tr[1]/td[1]/div[1]/div[2]/table[1]/tbody[1]/tr[16]/td[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/table[1]/tbody[1]/tr[1]/td[3]/div[1]/span[1]/span[normalize-space()="Customizing"]
+  - type: locate
+    prompt: Menu dropdown button in the top-left corner
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]/div[normalize-space()="Menu"]
+  - type: locate
+    prompt: Settings... option in the Menu dropdown
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/span[1]/div[1]/div[2]/table[1]/tbody[1]/tr[11]/td[normalize-space()="Settings..."]
+  - type: locate
+    prompt: the close button of the Search Results popup
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[4]/div[normalize-space()="See all search results..."]
+  - type: locate
+    prompt: 左上角 SAP logo
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[2]/span[1]

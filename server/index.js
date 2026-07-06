@@ -27,6 +27,8 @@ import resultsRouter from './api/results.js';
 import generateRouter from './api/generate.js';
 import searchRouter from './api/search.js';
 import agentRouter from './api/agent.js';
+import caseAgentRouter from './api/case-agent.js';
+import caseAgentVideoRouter from './api/case-agent-video.js';
 import usersRouter from './api/users.js';
 import auditRouter from './api/audit.js';
 import { mountRunRouter, registerRunWebsocket } from './api/run.js';
@@ -85,6 +87,15 @@ app.use('/api/search',   searchRouter);
 // /api/chat and /api/search, different KB (automation-kb.md) and a
 // stricter "JSON only" system prompt.
 app.use('/api/agent',    agentRouter);
+// Case Studio debug agent — analyses a failing case (error snippet +
+// step context) and proposes ONE minimal fix (setStepLocator /
+// insertSleepAfter / changeStepApi). Stage 1 is human-in-the-loop:
+// /analyze returns the proposal, /apply mutates the case JSON on disk.
+app.use('/api/case-agent', caseAgentRouter);
+// Video → Case pipeline. Mounted on a distinct path so its raw() body
+// parser (video bytes) doesn't clash with the JSON parser used by the
+// rest of /api/case-agent/*.
+app.use('/api/case-agent/video-to-case', caseAgentVideoRouter);
 app.use('/api/users',    usersRouter);
 app.use('/api/audit',    auditRouter);
 mountRunRouter(app);

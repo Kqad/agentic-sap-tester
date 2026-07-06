@@ -1,6 +1,32 @@
 midsceneVersion: 1.8.1
 cacheId: saptest-js-saptest7-80d00e9e5548-pass
 caches:
+  - type: plan
+    prompt: |-
+      🏠 Stage 2 · 回主页 + cache 重放 · 第19步 · 点击visualization
+
+      📋 已注入上下文:
+        · 完整流程 (25 步,标记当前卡住步 + 🏠 事务码入口)
+        · 唯一操作: 点击屏幕左上角 SAP logo 回主页
+        · 回到主页后立即 <complete>,runner 会自动从第1步用 cache 重放到第18步,再重试第19步
+
+      🎯 目标: 把屏幕重置到主页,后续重放交给 runner
+    yamlWorkflow: |
+      tasks:
+        - name: |-
+            🏠 Stage 2 · 回主页 + cache 重放 · 第19步 · 点击visualization
+
+            📋 已注入上下文:
+              · 完整流程 (25 步,标记当前卡住步 + 🏠 事务码入口)
+              · 唯一操作: 点击屏幕左上角 SAP logo 回主页
+              · 回到主页后立即 <complete>,runner 会自动从第1步用 cache 重放到第18步,再重试第19步
+
+            🎯 目标: 把屏幕重置到主页,后续重放交给 runner
+          flow:
+            - aiTap: ''
+              locate: 左上角的 SAP logo
+            - Sleep: ''
+              timeMs: 10000
   - type: locate
     prompt: 进入 Menu
     cache:
@@ -111,3 +137,8 @@ caches:
     cache:
       xpaths:
         - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[5]/div[1]/div[1]/div[1]/span[2]/div[normalize-space()="Master data Emphasized"]
+  - type: locate
+    prompt: 左上角的 SAP logo
+    cache:
+      xpaths:
+        - /html/body/table[1]/tbody[1]/tr[1]/td[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/span[2]/span[1]

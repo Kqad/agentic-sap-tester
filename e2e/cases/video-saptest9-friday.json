@@ -1,0 +1,197 @@
+{
+  "$schema": "video-to-case · queue id 2026-07-03T11-29-06-d021fa · synced 2026-07-06 for A/B comparison",
+  "title": "SAPTEST9 · 视频转换首次结果（2026-07-03 · 未做优化前）",
+  "description": "从视频抽帧后推导：起点 SAP Easy Access，两次走 VF03。第一次 (BX00000028) 走 Issue Output To 检查打印预览；第二次 (BX00000063) 走 Display Document Flow → Central Finance document → Display Document，验证 GL Account 列表中同时出现 2410110000 / 5010100003 / 4610360000。",
+  "sapUrl": "https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "VF03",
+  "naturalLanguage": "\n1.在 左上角矩形输入框 输入 VF03。\n2.按 Enter 回车键。\n3.在 Billing document 输入框 输入 BX00000028。\n4.按左上角menu。\n5.点击新出现的 Billing Document。\n6.点击新出现的 Issue Output To。\n7.点击 Output Details 弹窗表格首行左侧的圆形 radio 单选按钮（同一行文本为 YC30 Inv Output Original）。\n8.点击 Output Details 弹窗底部右下角、Print Options 文字左边的打印预览小图标（打印机形状）。\n9.等10s。\n10.点击 SAP 返回主页。\n11.等10s。\n12.在 左上角矩形输入框 输入 VF03。\n13.按 Enter 回车键。\n14.在 Billing document 输入框 输入 BX00000063。\n15.按 Enter 回车键。\n16.选择 Display Document Flow。\n17.选择 Central Finance document。\n18.点击 Display Document。\n19.等10s。\n20.验证 Display document 页面显示的 GL accounts 列表 中同时包含2410110000、5010100003、4610360000 GL 账号。",
+  "jsSource": "async function run(agent) {\n  await agent.aiInput(\"左上角矩形\", { value: \"VF03\" });\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiInput(\"Billing document\", { value: \"BX00000028\" });\n  await agent.aiTap(\"按左上角menu\");\n  await agent.aiTap(\"点击新出现的 Billing Document\");\n  await agent.aiTap(\"点击新出现的 Issue Output To\");\n  await agent.aiTap(\"Output Details 弹窗表格首行左侧的圆形 radio 单选按钮（同一行文本为 YC30 Inv Output Original）\");\n  await agent.aiTap(\"Output Details 弹窗底部右下角、Print Options 文字左边的打印预览小图标（打印机形状）\");\n  await sleep(10000);\n  await agent.aiTap(\"点击 SAP 返回主页\");\n  await sleep(10000);\n  await agent.aiInput(\"左上角矩形\", { value: \"VF03\" });\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiInput(\"Billing document\", { value: \"BX00000063\" });\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiTap(\"选择 Display Document Flow\");\n  await agent.aiTap(\"选择 Central Finance document\");\n  await agent.aiTap(\"点击 Display Document\");\n  await sleep(10000);\n  await agent.aiAssert(\"验证 Display document 页面显示的 GL accounts 列表 中同时包含2410110000、5010100003、4610360000 GL 账号\");\n}",
+  "apiGuide": {
+    "summary": "Video-to-step-Test",
+    "assumptions": [
+      "从 https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "在 左上角矩形输入框 输入 VF03",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 VF03",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"VF03\" });"
+      },
+      {
+        "order": 2,
+        "title": "按 Enter 回车键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 3,
+        "title": "在 Billing document 输入框 输入 BX...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Billing document 输入框 输入 BX00000028",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Billing document\", { value: \"BX00000028\" });"
+      },
+      {
+        "order": 4,
+        "title": "按左上角menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "按左上角menu",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"按左上角menu\");"
+      },
+      {
+        "order": 5,
+        "title": "点击新出现的 Billing Document",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击新出现的 Billing Document",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击新出现的 Billing Document\");"
+      },
+      {
+        "order": 6,
+        "title": "点击新出现的 Issue Output To",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击新出现的 Issue Output To",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击新出现的 Issue Output To\");"
+      },
+      {
+        "order": 7,
+        "title": "选中 YC30 Inv Output Original 行的 radio",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Output Details 弹窗表格首行左侧的圆形 radio 单选按钮（同一行文本为 YC30 Inv Output Original）",
+        "reason": "点击表格中的 radio 控件。",
+        "exampleCode": "await agent.aiTap(\"Output Details 弹窗表格首行左侧的圆形 radio 单选按钮（同一行文本为 YC30 Inv Output Original）\");"
+      },
+      {
+        "order": 8,
+        "title": "点击打印预览小图标",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Output Details 弹窗底部右下角、Print Options 文字左边的打印预览小图标",
+        "reason": "点击弹窗中的图标按钮。",
+        "exampleCode": "await agent.aiTap(\"Output Details 弹窗底部右下角、Print Options 文字左边的打印预览小图标（打印机形状）\");"
+      },
+      {
+        "order": 9,
+        "title": "等10s",
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等10s",
+        "reason": "打印预览页 PDF 渲染需要额外等待。",
+        "exampleCode": "await sleep(10000);"
+      },
+      {
+        "order": 10,
+        "title": "点击 SAP 返回主页",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 SAP 返回主页",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 SAP 返回主页\");"
+      },
+      {
+        "order": 11,
+        "title": "等10s",
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等10s",
+        "reason": "返回主页转场需要额外等待。",
+        "exampleCode": "await sleep(10000);"
+      },
+      {
+        "order": 12,
+        "title": "在 左上角矩形输入框 输入 VF03",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 左上角矩形输入框 输入 VF03",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"左上角矩形\", { value: \"VF03\" });"
+      },
+      {
+        "order": 13,
+        "title": "按 Enter 回车键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 14,
+        "title": "在 Billing document 输入框 输入 BX...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Billing document 输入框 输入 BX00000063",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Billing document\", { value: \"BX00000063\" });"
+      },
+      {
+        "order": 15,
+        "title": "按 Enter 回车键",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 回车键",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 16,
+        "title": "选择 Display Document Flow",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "选择 Display Document Flow",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"选择 Display Document Flow\");"
+      },
+      {
+        "order": 17,
+        "title": "选择 Central Finance document",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "选择 Central Finance document",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"选择 Central Finance document\");"
+      },
+      {
+        "order": 18,
+        "title": "点击 Display Document",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Display Document",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Display Document\");"
+      },
+      {
+        "order": 19,
+        "title": "等10s",
+        "midsceneApi": "sleep",
+        "naturalLanguageInstruction": "等10s",
+        "reason": "Display Document 页加载 GL 账目需要额外等待。",
+        "exampleCode": "await sleep(10000);"
+      },
+      {
+        "order": 20,
+        "title": "验证 Display document 页面显示的 GL...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "验证 Display document 页面显示的 GL accounts 列表 中同时包含2410110000、5010100003、4610360000 GL 账号",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"验证 Display document 页面显示的 GL accounts 列表 中同时包含2410110000、5010100003、4610360000 GL 账号\");"
+      }
+    ]
+  },
+  "tags": [
+    "SAP",
+    "FI",
+    "VF03",
+    "Document Flow",
+    "Check Invoice"
+  ],
+  "conversionMeta": {
+    "measured": false,
+    "measurementNote": "⚠ 这些数字是估算 · 不是真实测量。转换由 Claude Code (Max 订阅) 手工完成 · 没有 token 计数、没有 pipeline 级计时。要真评效率需要接 /v1/messages API 走一次带 usage header 的对照。",
+    "wallClockElapsedSec": 3285,
+    "wallClockNote": "从 uploadedAt (2026-07-03T11:29:10Z) 到 case.json mtime (2026-07-03T12:23:55Z) 的 wall clock (54 min 45 s) · 期间大量时间在讨论 pipeline 设计 / 抽帧策略 / KB 规则 · 不是纯转换耗时。",
+    "estimatedInputTokens": 62480,
+    "estimatedOutputTokens": 11920,
+    "estimatedTotalTokens": 74400,
+    "estimatedCost": 0.366,
+    "model": "claude-sonnet-4-6 (via Claude Code · Max subscription · not billed per-token)",
+    "stepsGenerated": 20,
+    "framesUsed": 30
+  }
+}

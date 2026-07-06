@@ -52,16 +52,127 @@ const ALLOWED_TOOLS = new Set([
   'queryStats',
   'highlightProjects',
 ]);
-const ALLOWED_QUERY_ENTITIES = new Set(['case', 'project', 'business']);
+const ALLOWED_QUERY_ENTITIES = new Set(['case', 'project', 'business', 'run']);
 const ALLOWED_QUERY_SORTS = new Set(['recent', 'name', 'count_desc']);
 const ALLOWED_STATS_GROUP = new Set(['category', 'business']);
 const ALLOWED_STATS_COUNT = new Set(['case', 'project']);
+const ALLOWED_PROJECT_STATUSES = new Set(['passed', 'failed', 'running', 'pending']);
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const ALLOWED_SECTIONS = new Set([
   'run-center', 'my-projects', 'live-channels',
   'case-library', 'reports', 'failures',
 ]);
 const ALLOWED_ACTIONS = new Set(['save', 'run']);
 const ALLOWED_PROJECT_KINDS = new Set(['latest', 'latestByBusiness', 'byName']);
+
+// ── Phonetic (pinyin) matching for business/department did-you-mean.
+// Covers the 6 default Chinese departments (财务/物流/仓储/销售/人力/研发) +
+// their most common near-sound siblings. No dictionary lookups, no
+// third-party deps — just a hand-picked map of ~90 chars we've seen
+// users voice-type or mistype.
+const PINYIN_MAP = {
+  // 部门核心字
+  '财': 'cai', '务': 'wu',  '物': 'wu',  '流': 'liu', '仓': 'cang', '储': 'chu',
+  '销': 'xiao','售': 'shou','人': 'ren', '力': 'li',  '研': 'yan',  '发': 'fa',
+  '部': 'bu',  '门': 'men', '业': 'ye',  '生': 'sheng','产': 'chan','采': 'cai',
+  '购': 'gou', '市': 'shi', '场': 'chang','法': 'fa', '律': 'lv',  '行': 'xing',
+  '政': 'zheng','运': 'yun','营': 'ying','质': 'zhi', '量': 'liang','技': 'ji',
+  '术': 'shu', '后': 'hou', '客': 'ke',  '户': 'hu',  '服': 'fu',
+  // 数字（1-10）
+  '一': 'yi',  '二': 'er',  '三': 'san', '四': 'si',  '五': 'wu',  '六': 'liu',
+  '七': 'qi',  '八': 'ba',  '九': 'jiu', '十': 'shi',
+  // 常见近音字（未在上面出现过的）
+  '才': 'cai', '猜': 'cai', '菜': 'cai',
+  '屋': 'wu',  '午': 'wu',  '舞': 'wu',  '无': 'wu',  '悟': 'wu',  '雾': 'wu',
+  '吴': 'wu',  '武': 'wu',  '五': 'wu',
+  '留': 'liu', '溜': 'liu', '柳': 'liu', '刘': 'liu',
+  '藏': 'cang','苍': 'cang','沧': 'cang',
+  '处': 'chu', '出': 'chu', '楚': 'chu', '除': 'chu', '触': 'chu', '初': 'chu',
+  '消': 'xiao','小': 'xiao','笑': 'xiao','晓': 'xiao',
+  '首': 'shou','手': 'shou','收': 'shou','受': 'shou','守': 'shou',
+  '仁': 'ren', '认': 'ren', '任': 'ren',
+  '利': 'li',  '立': 'li',  '例': 'li',  '丽': 'li',  '理': 'li',  '里': 'li',
+  '演': 'yan', '眼': 'yan', '严': 'yan', '言': 'yan', '盐': 'yan',
+  '罚': 'fa',  '乏': 'fa',  '伐': 'fa',  '阀': 'fa',
+};
+
+function toPinyin(s) {
+  let out = '';
+  for (const ch of String(s || '')) {
+    if (/[a-z0-9]/i.test(ch)) { out += ch.toLowerCase(); continue; }
+    const py = PINYIN_MAP[ch];
+    if (py) out += py;
+    // Unknown non-ascii char is skipped — we're doing a fuzzy pass,
+    // not a strict transliteration.
+  }
+  return out;
+}
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  const dp = new Array(n + 1);
+  for (let j = 0; j <= n; j++) dp[j] = j;
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const tmp = dp[j];
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + cost);
+      prev = tmp;
+    }
+  }
+  return dp[n];
+}
+
+// Rank businesses by phonetic similarity to `word`. Returns candidates
+// that clear a length-scaled distance threshold, best (lowest distance)
+// first. Used to prepend did-you-mean suggestions to the clarification
+// modal so "五六" (wǔ liù) → "物流" (wù liú) surfaces on top.
+function phoneticBusinessSuggestions(word, availableBusinesses) {
+  const wp = toPinyin(word);
+  if (!wp || wp.length < 2) return [];
+  const scored = [];
+  for (const b of availableBusinesses || []) {
+    const bp = toPinyin(b);
+    if (!bp || bp.length < 2) continue;
+    const dist = levenshtein(wp, bp);
+    const targetLen = Math.max(wp.length, bp.length);
+    const maxDist = targetLen <= 4 ? 0 : (targetLen <= 8 ? 1 : 2);
+    if (dist <= maxDist) scored.push({ business: b, dist });
+  }
+  scored.sort((a, b) => a.dist - b.dist);
+  return scored.map((s) => s.business);
+}
+
+// Pull the words the user actually wrote near a "部门 / business" marker
+// so we can run them through the phonetic matcher. Handles both
+//   "帮我找 五六 部门"  (word before marker)
+//   "business 是 五六"  (word after marker)
+//   "用户补充: 五六"    (clarification retry supplement)
+function extractLikelyBusinessWords(message) {
+  const raw = String(message || '');
+  const words = new Set();
+  const push = (w) => {
+    const clean = String(w || '').trim().replace(/[，,。；;、·。]+$/g, '');
+    if (clean && clean.length <= 12) words.add(clean);
+  };
+  // marker suffix (word BEFORE 部门/business)
+  for (const m of raw.matchAll(/([一-鿿]{1,8}|[a-zA-Z]{2,20})\s*(?:部门|部門|业务|業務|business|department|dept)/gi)) {
+    push(m[1]);
+  }
+  // marker prefix (word AFTER 部门/business)
+  for (const m of raw.matchAll(/(?:部门|部門|业务|業務|business|department|dept)\s*(?:是|为|為|=|:|叫)?\s*([一-鿿]{1,8}|[a-zA-Z]{2,20})/gi)) {
+    push(m[1]);
+  }
+  // 用户补充 lines — split on common separators
+  for (const m of raw.matchAll(/用户补充\s*[:：]\s*([^\n]+)/g)) {
+    for (const w of (m[1] || '').split(/[，,、；;\s]+/)) push(w);
+  }
+  return [...words];
+}
 
 function normalizeCaseRefText(text) {
   return String(text || '')
@@ -449,10 +560,59 @@ function sanitizeToolCalls(raw, ctx, message = '') {
         // surface tight.
         const cleanFilter = {};
         if (filter.category)  cleanFilter.category  = String(filter.category).trim();
-        if (filter.business)  cleanFilter.business  = String(filter.business).trim();
+        // `business` accepts either a single value ("Finance") or an array
+        // (["Finance","Logistics"]) so a multi-select clarification maps
+        // to an OR filter. Arrays are capped at 8 entries; blanks dropped.
+        if (Array.isArray(filter.business)) {
+          const list = filter.business.map(String).map((s) => s.trim()).filter(Boolean).slice(0, 8);
+          if (list.length === 1) cleanFilter.business = list[0];
+          else if (list.length > 1) cleanFilter.business = list;
+        } else if (filter.business) {
+          cleanFilter.business = String(filter.business).trim();
+        }
         if (filter.caseId)    cleanFilter.caseId    = String(filter.caseId).trim();
         if (filter.projectId) cleanFilter.projectId = String(filter.projectId).trim();
         if (filter.search)    cleanFilter.search    = String(filter.search).trim();
+        // status / runDate / createdDate only make sense when listing
+        // projects. Silently drop otherwise so the frontend doesn't have
+        // to re-validate.
+        if (entity === 'project') {
+          if (filter.status && ALLOWED_PROJECT_STATUSES.has(String(filter.status))) {
+            cleanFilter.status = String(filter.status);
+          }
+          if (filter.runDateStart && ISO_DATE_RE.test(String(filter.runDateStart))) {
+            cleanFilter.runDateStart = String(filter.runDateStart);
+          }
+          if (filter.runDateEnd && ISO_DATE_RE.test(String(filter.runDateEnd))) {
+            cleanFilter.runDateEnd = String(filter.runDateEnd);
+          }
+          if (filter.createdDateStart && ISO_DATE_RE.test(String(filter.createdDateStart))) {
+            cleanFilter.createdDateStart = String(filter.createdDateStart);
+          }
+          if (filter.createdDateEnd && ISO_DATE_RE.test(String(filter.createdDateEnd))) {
+            cleanFilter.createdDateEnd = String(filter.createdDateEnd);
+          }
+        }
+        // entity=run — a project's run history. Requires either a
+        // projectId or projectName to scope down (otherwise the answer
+        // is "every run of every project ever", not useful). status
+        // and runDate bounds filter the runs themselves.
+        if (entity === 'run') {
+          if (filter.projectName) {
+            cleanFilter.projectName = String(filter.projectName).trim().slice(0, 120);
+          }
+          // Runs have three real terminal states + a live "running" bucket.
+          const allowedRunStatuses = new Set(['passed', 'failed', 'running']);
+          if (filter.status && allowedRunStatuses.has(String(filter.status))) {
+            cleanFilter.status = String(filter.status);
+          }
+          if (filter.runDateStart && ISO_DATE_RE.test(String(filter.runDateStart))) {
+            cleanFilter.runDateStart = String(filter.runDateStart);
+          }
+          if (filter.runDateEnd && ISO_DATE_RE.test(String(filter.runDateEnd))) {
+            cleanFilter.runDateEnd = String(filter.runDateEnd);
+          }
+        }
         // Reject category not in the enum we sent (mirrors createProjects rule).
         if (cleanFilter.category && validCategoryKeys.size && !validCategoryKeys.has(cleanFilter.category)) {
           delete cleanFilter.category;
@@ -478,7 +638,33 @@ function sanitizeToolCalls(raw, ctx, message = '') {
         if (!ALLOWED_STATS_GROUP.has(groupBy)) continue;
         if (!ALLOWED_STATS_COUNT.has(countOf)) continue;
         const title = args.title ? String(args.title).trim().slice(0, 120) : null;
-        out.push({ tool, args: { groupBy, countOf, title } });
+        // Same filter surface as queryEntities (project subset) so the LLM
+        // can answer "6 月 29 号跑成功的 project 各部门有多少个".
+        const rawFilter = (args.filter && typeof args.filter === 'object') ? args.filter : {};
+        const statFilter = {};
+        if (Array.isArray(rawFilter.business)) {
+          const list = rawFilter.business.map(String).map((s) => s.trim()).filter(Boolean).slice(0, 8);
+          if (list.length === 1) statFilter.business = list[0];
+          else if (list.length > 1) statFilter.business = list;
+        } else if (rawFilter.business) {
+          statFilter.business = String(rawFilter.business).trim();
+        }
+        if (rawFilter.status && ALLOWED_PROJECT_STATUSES.has(String(rawFilter.status))) {
+          statFilter.status = String(rawFilter.status);
+        }
+        if (rawFilter.runDateStart && ISO_DATE_RE.test(String(rawFilter.runDateStart))) {
+          statFilter.runDateStart = String(rawFilter.runDateStart);
+        }
+        if (rawFilter.runDateEnd && ISO_DATE_RE.test(String(rawFilter.runDateEnd))) {
+          statFilter.runDateEnd = String(rawFilter.runDateEnd);
+        }
+        if (rawFilter.createdDateStart && ISO_DATE_RE.test(String(rawFilter.createdDateStart))) {
+          statFilter.createdDateStart = String(rawFilter.createdDateStart);
+        }
+        if (rawFilter.createdDateEnd && ISO_DATE_RE.test(String(rawFilter.createdDateEnd))) {
+          statFilter.createdDateEnd = String(rawFilter.createdDateEnd);
+        }
+        out.push({ tool, args: { groupBy, countOf, title, filter: statFilter } });
         break;
       }
       default:
@@ -543,6 +729,8 @@ router.post('/plan', async (req, res) => {
         })).filter((c) => c.id)
       : [],
     currentSection: String(context?.currentSection || ''),
+    currentDate:    String(context?.currentDate    || '').trim().slice(0, 10),
+    timezone:       String(context?.timezone       || '').trim().slice(0, 60),
   };
 
   await audit(req, 'agent.plan', {
@@ -568,7 +756,9 @@ ${slimCtx.recentProjects.map((p) => `  - ${p.name}  · business=${p.business}  �
 cases (库里所有 case · id / title / category — "test case 2"、"saptest2"、"case 2" 都应该匹配到 id=saptest2 这条):
 ${slimCtx.cases.map((c) => `  - id=${c.id}  · category=${c.category}  · ${c.title}`).join('\n') || '  (空)'}
 
-currentSection: ${slimCtx.currentSection || '(unknown)'}`;
+currentSection: ${slimCtx.currentSection || '(unknown)'}
+currentDate:    ${slimCtx.currentDate    || '(unknown)'}   ← 今天是这个日期（YYYY-MM-DD），用来解释 "今天/昨天/上周" 等相对表达
+timezone:       ${slimCtx.timezone       || '(unknown)'}   ← 用户浏览器时区（IANA）`;
 
   let resp;
   try {
@@ -636,6 +826,37 @@ currentSection: ${slimCtx.currentSection || '(unknown)'}`;
       : [];
     if (question) clarification = { question, kind, field, suggestions };
   }
+
+  // Post-process: when clarification is asking about business/department
+  // and the user's message contains a word that doesn't match anything
+  // in availableBusinesses at face value, run phonetic (pinyin) match
+  // against availableBusinesses and prepend the winners. This catches
+  // cases the LLM missed — e.g. "五六" (wǔ liù) ↔ "物流" (wù liú),
+  // "财物" ↔ "财务", "wu liu" typed in Latin ↔ 物流. Any real match
+  // still goes to the top; existing suggestions keep their order below.
+  if (clarification && String(clarification.field || '').toLowerCase().includes('business')) {
+    const candidates = extractLikelyBusinessWords(message);
+    const phoneticHits = new Set();
+    for (const w of candidates) {
+      for (const b of phoneticBusinessSuggestions(w, slimCtx.availableBusinesses)) {
+        phoneticHits.add(b);
+      }
+    }
+    if (phoneticHits.size) {
+      const seen = new Set();
+      const merged = [];
+      const push = (label) => {
+        const key = String(label).toLowerCase();
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        merged.push(label);
+      };
+      for (const b of phoneticHits) push(b);          // did-you-mean first
+      for (const s of (clarification.suggestions || [])) push(s);
+      clarification.suggestions = merged.slice(0, 6);
+    }
+  }
+
   return res.json({ explain, toolCalls, clarification });
 });
 

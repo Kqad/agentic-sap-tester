@@ -379,8 +379,7 @@
     .step-list li {
       padding: 12px 14px;
       border-bottom: 1px solid var(--line);
-      display: grid; grid-template-columns: 44px 1fr auto auto;
-      gap: 14px; align-items: start;
+      display: flex; flex-direction: column;
       /* Smooth dock-style scale + gap-open while a drag is in progress.
        * Transform-origin LEFT so scaling doesn't push neighbouring rows
        * horizontally — only vertical breathing room from margin. */
@@ -390,6 +389,78 @@
                   opacity 180ms ease;
       transform-origin: left center;
       will-change: transform, margin;
+    }
+    .step-list li .step-row {
+      display: grid; grid-template-columns: 44px 1fr auto auto;
+      gap: 14px; align-items: start;
+    }
+    /* Confidence dot lives inside .step-n (upper-right corner of the
+     * number cell). Color-coded, click toggles the panel below. */
+    .step-list .step-n { position: relative; }
+    .step-list .step-conf-dot {
+      position: absolute; top: -2px; right: -6px;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1.5px solid #fff;
+      box-shadow: 0 0 0 1px rgba(15,30,50,0.15);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .step-list .step-conf-dot:hover { transform: scale(1.35); }
+    .step-list .step-conf-dot.high    { background: #16a34a; }
+    .step-list .step-conf-dot.medium  { background: #eab308; }
+    .step-list .step-conf-dot.low     { background: #dc2626; }
+    .step-list .step-conf-dot.none    { background: #cbd5e1; }
+    /* Inline red badge for low-confidence steps — pulls the eye without
+     * blocking edit flow. Sits at the right end of the row next to the
+     * API badge; disappears once user acknowledges (via panel Accept). */
+    .step-list .step-lowconf-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 3px;
+      background: #fee2e2; color: #991b1b;
+      font-size: 10.5px; font-weight: 800; letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-right: 6px;
+      cursor: pointer;
+    }
+    .step-list .step-lowconf-badge:hover { background: #fecaca; }
+    /* The expandable per-step panel — hidden by default. */
+    .step-list .step-conf-panel {
+      display: none;
+      margin: 10px 0 4px 58px;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border-left: 3px solid var(--blue);
+      border-radius: 0 6px 6px 0;
+      font-size: 12.5px; line-height: 1.6; color: var(--navy);
+    }
+    .step-list li.expanded .step-conf-panel { display: block; }
+    .step-list .step-conf-panel .conf-title {
+      font-weight: 800; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .step-list .step-conf-panel .conf-title .lvl-tag {
+      padding: 1px 8px; border-radius: 3px;
+      font-size: 10.5px; letter-spacing: 0.5px;
+      text-transform: uppercase; font-weight: 800;
+    }
+    .step-list .step-conf-panel .conf-title .lvl-tag.high    { background: #dcfce7; color: #166534; }
+    .step-list .step-conf-panel .conf-title .lvl-tag.medium  { background: #fef9c3; color: #854d0e; }
+    .step-list .step-conf-panel .conf-title .lvl-tag.low     { background: #fee2e2; color: #991b1b; }
+    .step-list .step-conf-panel .conf-title .lvl-tag.none    { background: #e2e8f0; color: #475569; }
+    .step-list .step-conf-panel .conf-block {
+      margin-top: 8px;
+    }
+    .step-list .step-conf-panel .conf-block-label {
+      font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--muted); font-weight: 800; margin-bottom: 3px;
+    }
+    .step-list .step-conf-panel .conf-fix {
+      background: #fff; border: 1px dashed var(--amber);
+      padding: 8px 10px; border-radius: 4px;
+      font-family: var(--mono); font-size: 12px;
+    }
+    .step-list .step-conf-panel .conf-actions {
+      margin-top: 10px; display: flex; gap: 8px;
     }
     /* The row being dragged — fade it out so the gap below is unambiguous */
     .step-list li.drag-source { opacity: 0.25; }
@@ -1455,6 +1526,24 @@
       .mode-grid, .slot-summary, .create-grid { grid-template-columns: 1fr; }
       .metric-grid { grid-template-columns: repeat(2, 1fr); }
     }
+    /* Markdown viewer (log.md preview in showTextModal) */
+    .md-body            { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .md-body .md-h1     { font-size: 22px; font-weight: 900; color: var(--navy); border-bottom: 2px solid var(--line); padding-bottom: 6px; margin: 20px 0 12px; }
+    .md-body .md-h2     { font-size: 18px; font-weight: 900; color: var(--navy); border-bottom: 1px solid var(--line); padding-bottom: 4px; margin: 20px 0 10px; }
+    .md-body .md-h3     { font-size: 16px; font-weight: 800; color: var(--navy); margin: 16px 0 8px; }
+    .md-body .md-h4     { font-size: 14px; font-weight: 800; color: var(--navy); margin: 14px 0 6px; letter-spacing: 0.2px; }
+    .md-body .md-p      { margin: 8px 0; }
+    .md-body .md-list   { margin: 8px 0 8px 24px; padding: 0; }
+    .md-body .md-list li{ margin: 4px 0; }
+    .md-body .md-icode  { background: var(--g-gray-10); padding: 1px 6px; border-radius: 3px; font-family: var(--mono); font-size: 12.5px; color: var(--g-gray-95); }
+    .md-body .md-code   { background: var(--g-gray-10); color: var(--g-gray-95); padding: 12px 14px; border-radius: 5px; overflow: auto; margin: 10px 0; font-family: var(--mono); font-size: 12px; line-height: 1.55; }
+    .md-body .md-code code { white-space: pre; }
+    .md-body .md-quote  { border-left: 3px solid var(--blue); padding: 4px 12px; margin: 8px 0; color: var(--navy); background: #f8fafc; }
+    .md-body .md-table  { border-collapse: collapse; margin: 12px 0; font-size: 12.5px; }
+    .md-body .md-table th, .md-body .md-table td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+    .md-body .md-table th { background: #f1f5f9; font-weight: 800; }
+    .md-body a          { color: var(--blue); text-decoration: underline; }
+    .md-body hr         { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
   </style>
 </head>
 <body>
@@ -1477,6 +1566,7 @@
 
     <nav class="tabs" id="sectionTabs">
       <button class="tab is-create active" data-sec="create">✦ Create new case</button>
+      <button class="tab" data-sec="video">🎬 Video → Case</button>
       <button class="tab" data-sec="nl" data-needs-case>Natural Language &amp; API Guide</button>
       <button class="tab" data-sec="run" data-needs-case>Run &amp; Debug</button>
       <button class="tab" data-sec="cache" data-needs-case>Cache Inspector</button>
@@ -1577,10 +1667,12 @@
       activeId: null,
       section: 'create',
       filter: '',
-      // Sidebar scope — by default we show only the 11 validated cases
-      // (the user-facing set), to keep the list focused. Toggle to 'all'
-      // when debugging a non-promoted case or a fresh one from Create.
-      sidebarScope: 'validated',
+      // Sidebar scope — default 'all' so newly-created cases show up
+      // straight away. Options:
+      //   'all'       — every non-demo case (default)
+      //   'validated' — only cases promoted to user Run Center
+      //   'demo'      — only cases whose id starts with "demo-"
+      sidebarScope: 'all',
 
       // Create tab
       createMode: 'template',  // 'template' | 'batch' | 'ai'
@@ -1632,6 +1724,30 @@
       guideBeforeLastSave: null,  // { _caseId, steps: [...] } | null
       nlEditing: null,            // { _caseId, value: string } | null — live NL textarea value
       nlBeforeLastSave: null,     // { _caseId, value: string } | null
+      metaEditing: null,          // { _caseId, value: { title, sapUrl, transactionCode, description } } | null
+
+      // Video → Case (record-and-replay import)
+      // videoFile: File object of the uploaded recording (2-3 min mp4/webm)
+      // videoAssert: user-supplied success condition (goes into final aiAssert)
+      // videoStatus: 'idle' | 'preparing' | 'extracting' | 'analyzing' | 'ready' | 'error'
+      // videoCandidate: draft case JSON produced from the video (before save)
+      videoFile: null,
+      // videoFileMeta persists { name, size, type } across refreshes so we
+      // can show what's uploaded even after the File blob is lost.
+      videoFileMeta: null,
+      videoAssert: '',
+      videoTitle: '',
+      // Comma-separated case ids to skip when building the reference
+      // skeleton — for A/B experiments where "the answer" already exists
+      // in the library and we want a cold(er) run.
+      videoExcludeRef: '',
+      videoStatus: 'idle',
+      videoStatusMsg: '',
+      videoCandidate: null,
+      videoQueueId: null,
+      videoPollTimer: null,
+      videoConversionStartedAt: null,
+      videoConversionNotes: '',
 
       // Chat
       chatOpen: false,
@@ -1655,6 +1771,11 @@
         else if (k === 'style') n.setAttribute('style', v);
         else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
         else if (k === 'html') n.innerHTML = v;
+        // <textarea> has NO `value` attribute in HTML — content is defined
+        // by element text. Setting it via setAttribute silently loses the
+        // value on any re-render. Same for input/select where the DOM
+        // property is the source of truth. Set the property directly.
+        else if (k === 'value' && (tag === 'textarea' || tag === 'input' || tag === 'select')) n.value = v == null ? '' : v;
         else if (v != null && v !== false) n.setAttribute(k, v);
       }
       for (const c of children.flat()) {
@@ -1703,7 +1824,9 @@
       wireTopbar();
       wireSidebar();
       wireChat();
+      loadVideoWork();
       await globalRefresh({ silent: true });
+      resumeVideoPollingIfNeeded();
       const m = location.hash.match(/^#\/([^/]+)(?:\/([^/]+))?/);
       if (m && state.cases.some((c) => c.id === decodeURIComponent(m[1]))) {
         state.activeId = decodeURIComponent(m[1]);
@@ -1855,6 +1978,294 @@
     function saveChats() {
       try { localStorage.setItem(CHATS_KEY, JSON.stringify(state.chats)); } catch {}
     }
+
+    // ── Video → Case persistence ───────────────────────────────────────
+    // Everything the user needs to survive a refresh: title / assertion,
+    // status text, the queue id (so we can resume polling), the finished
+    // case JSON (with conversionMeta) and log.md notes. The File blob
+    // itself can't be serialized — but if the queue id is set, the server
+    // still has it, so we don't need the local copy anyway.
+    const VIDEO_KEY = 'caseStudio.videoWork';
+    function saveVideoWork() {
+      try {
+        localStorage.setItem(VIDEO_KEY, JSON.stringify({
+          videoTitle:               state.videoTitle,
+          videoAssert:              state.videoAssert,
+          videoStatus:              state.videoStatus,
+          videoStatusMsg:           state.videoStatusMsg,
+          videoQueueId:             state.videoQueueId,
+          videoCandidate:           state.videoCandidate,
+          videoFileMeta:            state.videoFileMeta,
+          videoConversionStartedAt: state.videoConversionStartedAt,
+          videoConversionNotes:     state.videoConversionNotes,
+          videoExcludeRef:          state.videoExcludeRef,
+        }));
+      } catch {}
+    }
+    function loadVideoWork() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(VIDEO_KEY) || 'null');
+        if (raw && typeof raw === 'object') {
+          state.videoTitle               = raw.videoTitle               || '';
+          state.videoAssert              = raw.videoAssert              || '';
+          state.videoStatus              = raw.videoStatus              || 'idle';
+          state.videoStatusMsg           = raw.videoStatusMsg           || '';
+          state.videoQueueId             = raw.videoQueueId             || null;
+          state.videoCandidate           = raw.videoCandidate           || null;
+          state.videoFileMeta            = raw.videoFileMeta            || null;
+          state.videoConversionStartedAt = raw.videoConversionStartedAt || null;
+          state.videoConversionNotes     = raw.videoConversionNotes     || '';
+          state.videoExcludeRef          = raw.videoExcludeRef          || '';
+        }
+      } catch {}
+    }
+    function clearVideoWork() {
+      try { localStorage.removeItem(VIDEO_KEY); } catch {}
+    }
+    // If we bounced mid-conversion (page was closed while the queue entry
+    // was still cooking), restart the same 5s poll on load — the server
+    // holds the queue entry independently of the browser.
+    function resumeVideoPollingIfNeeded() {
+      if (!state.videoQueueId || state.videoCandidate) return;
+      if (state.videoPollTimer) clearInterval(state.videoPollTimer);
+      const id = state.videoQueueId;
+      state.videoPollTimer = setInterval(async () => {
+        try {
+          const r = await api('/api/case-agent/video-to-case/status/' + encodeURIComponent(id));
+          if (r.status === 'ready' && r.case) {
+            clearInterval(state.videoPollTimer);
+            state.videoPollTimer = null;
+            state.videoStatus = 'ready';
+            state.videoStatusMsg = '';
+            state.videoCandidate = r.case;
+            state.videoConversionNotes = r.notes || '';
+            saveVideoWork();
+            toast('转换完成');
+            renderAll();
+          } else if (r.status === 'error') {
+            clearInterval(state.videoPollTimer);
+            state.videoPollTimer = null;
+            state.videoStatus = 'error';
+            state.videoStatusMsg = r.error || '未知错误';
+            saveVideoWork();
+            renderAll();
+          }
+        } catch (err) {
+          if (String(err.message).includes('404')) {
+            clearInterval(state.videoPollTimer);
+            state.videoPollTimer = null;
+            state.videoStatus = 'error';
+            state.videoStatusMsg = err.message;
+            saveVideoWork();
+            renderAll();
+          }
+        }
+      }, 5000);
+    }
+
+    // ── Simple full-screen text modal (for viewing log.md / case.json) ─
+    // Minimal markdown → HTML renderer covering exactly the constructs
+    // our log.md files use (headers, bold/italic, inline code, code fence,
+    // bullet + ordered lists, simple pipe tables, horizontal rule, links,
+    // blockquotes). No external library — keeps the SPA a single file.
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+    function renderMarkdownToHtml(md) {
+      const src = String(md || '');
+      // Extract fenced code blocks first so their content isn't touched
+      // by later regex passes. Replace with sentinels, restore at end.
+      const codeBlocks = [];
+      let s = src.replace(/```(\w*)\r?\n([\s\S]*?)```/g, (_m, lang, body) => {
+        const idx = codeBlocks.length;
+        codeBlocks.push(`<pre class="md-code"><code>${escapeHtml(body)}</code></pre>`);
+        return ` CODE${idx} `;
+      });
+      // Tables — very rough: any block of consecutive `| ... |` lines
+      // where the second line is a `|---|---|` separator.
+      s = s.replace(/(^\|.*\|\s*\n\|[\s:|-]+\|\s*\n(?:^\|.*\|\s*\n?)+)/gm, (block) => {
+        const rows = block.trim().split(/\r?\n/).map((r) => r.trim());
+        if (rows.length < 2) return block;
+        const header = rows[0].replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+        const bodyRows = rows.slice(2).map((r) => r.replace(/^\||\|$/g, '').split('|').map((c) => c.trim()));
+        let html = '<table class="md-table"><thead><tr>';
+        html += header.map((c) => `<th>${inlineMd(c)}</th>`).join('');
+        html += '</tr></thead><tbody>';
+        for (const row of bodyRows) {
+          html += '<tr>' + row.map((c) => `<td>${inlineMd(c)}</td>`).join('') + '</tr>';
+        }
+        html += '</tbody></table>';
+        return html;
+      });
+      // Line-by-line: headers, blockquote, lists, horizontal rule, para.
+      const lines = s.split(/\r?\n/);
+      const out = [];
+      let inUl = false, inOl = false;
+      const closeLists = () => {
+        if (inUl) { out.push('</ul>'); inUl = false; }
+        if (inOl) { out.push('</ol>'); inOl = false; }
+      };
+      for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+        // Code-block sentinel — pass through unchanged.
+        if (/^ CODE\d+ $/.test(line)) { closeLists(); out.push(line); continue; }
+        // Table HTML — pass through.
+        if (/^<table\b/.test(line) || /^<\/table>/.test(line) || /^<t[hb]ody\b/.test(line)) { closeLists(); out.push(line); continue; }
+        // Horizontal rule
+        if (/^\s*---+\s*$/.test(line)) { closeLists(); out.push('<hr />'); continue; }
+        // Headers 1-4
+        let m;
+        if ((m = /^(#{1,4})\s+(.*)$/.exec(line))) {
+          closeLists();
+          const lvl = m[1].length;
+          out.push(`<h${lvl} class="md-h${lvl}">${inlineMd(m[2])}</h${lvl}>`);
+          continue;
+        }
+        // Blockquote
+        if (/^>\s+/.test(line)) {
+          closeLists();
+          out.push(`<blockquote class="md-quote">${inlineMd(line.replace(/^>\s+/, ''))}</blockquote>`);
+          continue;
+        }
+        // Ordered list
+        if ((m = /^\s*(\d+)\.\s+(.*)$/.exec(line))) {
+          if (!inOl) { closeLists(); out.push('<ol class="md-list">'); inOl = true; }
+          out.push(`<li>${inlineMd(m[2])}</li>`);
+          continue;
+        }
+        // Unordered list
+        if ((m = /^\s*[-*+]\s+(.*)$/.exec(line))) {
+          if (!inUl) { closeLists(); out.push('<ul class="md-list">'); inUl = true; }
+          out.push(`<li>${inlineMd(m[1])}</li>`);
+          continue;
+        }
+        // Blank line → close lists, emit spacer
+        if (/^\s*$/.test(line)) { closeLists(); out.push(''); continue; }
+        // Paragraph
+        closeLists();
+        out.push(`<p class="md-p">${inlineMd(line)}</p>`);
+      }
+      closeLists();
+      // Restore code blocks
+      let html = out.join('\n').replace(/ CODE(\d+) /g, (_m, idx) => codeBlocks[Number(idx)] || '');
+      return html;
+
+      // Inline formatters: **bold**, *italic*, `code`, [text](url).
+      function inlineMd(t) {
+        return escapeHtml(t)
+          .replace(/`([^`]+)`/g, '<code class="md-icode">$1</code>')
+          .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+          .replace(/(?<![*\w])\*([^*\n]+)\*(?!\w)/g, '<i>$1</i>')
+          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      }
+    }
+
+    // opts: {
+    //   filename: 'suggested-name.md'   → shows Download button
+    //   mode:     'markdown' | 'text'   → markdown renders with headers/lists
+    //   mimeType: 'text/markdown'       → download blob MIME
+    // }
+    function showTextModal(title, text, opts = {}) {
+      document.getElementById('__csModal')?.remove();
+      const overlay = el('div', {
+        id: '__csModal',
+        style: 'position:fixed;inset:0;background:rgba(15,30,50,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;',
+        onclick: (ev) => { if (ev.target === overlay) overlay.remove(); },
+      });
+      const copyBtn = el('button', {
+        class: 'a-button a-button--neutral-tertiary',
+        style: 'padding:4px 10px;margin-right:6px;',
+        onclick: async () => {
+          try { await navigator.clipboard.writeText(text || ''); toast('已复制'); }
+          catch { toast('复制失败'); }
+        },
+      }, '📋 Copy');
+      const downloadBtn = opts.filename ? el('button', {
+        class: 'a-button a-button--neutral-secondary',
+        style: 'padding:4px 10px;margin-right:6px;',
+        onclick: () => {
+          try {
+            const blob = new Blob([text || ''], { type: opts.mimeType || 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = opts.filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            toast('已下载 ' + opts.filename);
+          } catch (err) {
+            toast('下载失败: ' + err.message);
+          }
+        },
+      }, '⬇ Download') : null;
+      let toggleBtn = null;
+      const closeBtn = el('button', {
+        class: 'a-button a-button--neutral-tertiary',
+        style: 'padding:4px 10px;',
+        onclick: () => overlay.remove(),
+      }, '✕ Close');
+      // Body content — either markdown-rendered or plain pre.
+      let renderMode = opts.mode || 'text';
+      const bodyContainer = el('div', {
+        style: 'flex:1;overflow:auto;margin:0;',
+      });
+      const paintBody = () => {
+        bodyContainer.replaceChildren();
+        if (renderMode === 'markdown') {
+          const div = el('div', {
+            class: 'md-body',
+            style: 'padding:20px 26px;background:#fff;color:var(--navy);font-size:14px;line-height:1.7;',
+            html: renderMarkdownToHtml(text || ''),
+          });
+          bodyContainer.appendChild(div);
+        } else {
+          const pre = el('pre', {
+            style: 'margin:0;padding:16px 20px;font-family:var(--mono);font-size:12px;line-height:1.55;background:var(--g-gray-10);color:var(--g-gray-95);white-space:pre-wrap;word-break:break-word;',
+          }, text || '(empty)');
+          bodyContainer.appendChild(pre);
+        }
+      };
+      // Only offer the toggle if content actually looks like markdown OR
+      // if the caller explicitly opened in markdown mode.
+      const looksLikeMd = /^#\s+|^##\s+|^```/m.test(String(text || ''));
+      if (opts.mode === 'markdown' || looksLikeMd) {
+        toggleBtn = el('button', {
+          class: 'a-button a-button--neutral-tertiary',
+          style: 'padding:4px 10px;margin-right:6px;',
+          onclick: () => {
+            renderMode = renderMode === 'markdown' ? 'text' : 'markdown';
+            toggleBtn.textContent = renderMode === 'markdown' ? '⌨ Raw' : '📖 Render';
+            paintBody();
+          },
+        }, renderMode === 'markdown' ? '⌨ Raw' : '📖 Render');
+      }
+      const dialog = el('div', {
+        style: 'background:#fff;border-radius:8px;max-width:1000px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.35);',
+      },
+        el('div', { style: 'padding:12px 18px;border-bottom:1px solid var(--g-gray-90);display:flex;align-items:center;gap:10px;' },
+          el('div', { style: 'font-weight:800;color:var(--navy);flex:1;font-size:14px;' }, title),
+          toggleBtn,
+          copyBtn,
+          downloadBtn,
+          closeBtn,
+        ),
+        bodyContainer,
+      );
+      paintBody();
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
+      const escHandler = (ev) => {
+        if (ev.key === 'Escape') {
+          overlay.remove();
+          document.removeEventListener('keydown', escHandler);
+        }
+      };
+      document.addEventListener('keydown', escHandler);
+    }
     function createNewChat() {
       const c = {
         id: 'c-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
@@ -1974,7 +2385,7 @@
       state.stepDrafts = {};
       // If we were on Create, jump to Run & Debug — that's the natural
       // landing for someone debugging an existing case.
-      if (state.section === 'create' || state.section === 'howto') state.section = 'run';
+      if (state.section === 'create' || state.section === 'video' || state.section === 'howto') state.section = 'run';
       location.hash = `#/${encodeURIComponent(id)}/${state.section}`;
       renderSidebar(); renderAll();
       await loadCaseDetail(id);
@@ -2349,10 +2760,16 @@
     }
 
     function renderSidebar() {
-      $('#caseCount').textContent = state.cases.length + ' total · ' + state.validatedIds.length + ' validated';
-      // Render scope toggle pills in the rail head — small chips above
-      // the list. Default scope = 'validated' so users see the focused
-      // user-UI set; flip to 'all' when working on a non-promoted case.
+      // Case counts by scope. Demo prefix = seeded/example content that
+      // clutters the list once real cases exist — hidden from All by
+      // default, still visible under its own scope pill.
+      const isDemo = (c) => /^demo-/i.test(c.id || '');
+      const nonDemoCount = state.cases.filter((c) => !isDemo(c)).length;
+      const demoCount    = state.cases.filter((c) =>  isDemo(c)).length;
+      $('#caseCount').textContent = state.cases.length + ' total · '
+        + state.validatedIds.length + ' validated · '
+        + demoCount + ' demo';
+
       const scopeBar = $('#caseScopeBar');
       if (scopeBar) {
         const make = (key, label, count) => el('button', {
@@ -2360,26 +2777,74 @@
           onclick: () => { state.sidebarScope = key; renderSidebar(); },
         }, label, ' · ', String(count));
         scopeBar.replaceChildren(
+          make('all',       'All',       nonDemoCount),
           make('validated', 'Validated', state.validatedIds.length),
-          make('all',       'All',       state.cases.length),
+          make('demo',      'Demo',      demoCount),
         );
       }
       const ul = $('#caseList');
       const filtered = state.cases.filter((c) => {
         if (state.sidebarScope === 'validated' && !state.validatedIds.includes(c.id)) return false;
+        if (state.sidebarScope === 'demo' && !isDemo(c)) return false;
+        // 'all' scope hides demo-* to keep the working list focused.
+        if (state.sidebarScope === 'all' && isDemo(c)) return false;
         if (!state.filter) return true;
         const t = titleOf(c).toLowerCase();
         return c.id.toLowerCase().includes(state.filter) || t.includes(state.filter);
       });
+      // Newest-first ordering. The API surfaces `modifiedAt` (mtime) per
+      // case. Fallback to id descending so demo/seeded content still
+      // orders predictably. Active case pinned to top so a hash-linked
+      // case doesn't scroll out of view after a refresh.
+      filtered.sort((a, b) => {
+        if (a.id === state.activeId) return -1;
+        if (b.id === state.activeId) return 1;
+        const ma = a.modifiedAt || '';
+        const mb = b.modifiedAt || '';
+        if (ma && mb) return mb.localeCompare(ma);
+        return (b.id || '').localeCompare(a.id || '');
+      });
       if (!filtered.length) {
+        const hint = state.sidebarScope === 'validated'
+          ? '没有 validated case 匹配 — 切到 All 试试'
+          : state.sidebarScope === 'demo'
+            ? '没有 demo case'
+            : '没有 case — 试试上方 ✦ Create new case';
         ul.replaceChildren(el('li', { style: 'cursor:default;opacity:0.55;font-size:11px;font-style:italic;' },
-          el('div', { style: 'flex:1;' }, state.sidebarScope === 'validated'
-            ? '没有 validated case 匹配 — 切到 All 试试'
-            : '没有 case 匹配'),
+          el('div', { style: 'flex:1;' }, hint),
         ));
         return;
       }
-      ul.replaceChildren(...filtered.map((c) => {
+      // "Bulk delete all demo" affordance — ONLY when Demo scope active.
+      // Sits at the top of the list as a distinct-looking row. Prompts
+      // for a typed confirmation before firing the DELETE calls.
+      const demoBulkDelete = state.sidebarScope === 'demo'
+        ? el('li', {
+            style: 'background:#fef2f2;border-left:3px solid #dc2626;cursor:pointer;padding:8px 12px;',
+            onclick: async () => {
+              const demos = state.cases.filter(isDemo).map((c) => c.id);
+              if (!demos.length) return;
+              const typed = prompt(`⚠ 即将永久删除 ${demos.length} 个 demo case：\n\n${demos.join('\n')}\n\n输入 DELETE 确认（大小写敏感）：`);
+              if (typed !== 'DELETE') { toast('已取消'); return; }
+              let ok = 0, fail = 0;
+              for (const id of demos) {
+                try {
+                  await api('/api/cases/' + encodeURIComponent(id), { method: 'DELETE' });
+                  ok += 1;
+                } catch { fail += 1; }
+              }
+              toast(`✓ 删了 ${ok} 个 demo${fail ? ` · 失败 ${fail} 个` : ''}`);
+              await globalRefresh({ silent: true });
+            },
+          },
+            el('div', { style: 'font-weight:800;color:#991b1b;font-size:12px;' },
+              '🗑 全部删除 (' + demoCount + ' 个 demo case)'),
+            el('div', { style: 'font-size:10.5px;color:#7f1d1d;margin-top:2px;' },
+              '需要输入 DELETE 确认 · 不可撤销'),
+          )
+        : null;
+
+      ul.replaceChildren(...[demoBulkDelete].filter(Boolean), ...filtered.map((c) => {
         const validated = state.validatedIds.includes(c.id);
         return el('li', {
           class: c.id === state.activeId ? 'active' : '',
@@ -2437,6 +2902,7 @@
 
       const panel = $('#mainPanel');
       if (state.section === 'create') return panel.replaceChildren(renderCreate());
+      if (state.section === 'video')  return panel.replaceChildren(renderVideoToCase());
       if (state.section === 'howto')  return panel.replaceChildren(renderHowTo());
       if (state.section === 'cdguide') return panel.replaceChildren(renderCacheDebugGuide());
       if (state.section === 'ciguide') return panel.replaceChildren(renderCacheInspectorGuide());
@@ -2445,7 +2911,7 @@
       // 'guide' was the old standalone tab — silently redirect to 'nl' so
       // bookmarks and #/<id>/guide URLs keep working after the merge.
       if (state.section === 'guide') state.section = 'nl';
-      if (state.section === 'nl')    return panel.replaceChildren(renderNL(), renderGuide());
+      if (state.section === 'nl')    return panel.replaceChildren(renderMetadata(), renderNL(), renderGuide());
       if (state.section === 'run')   return panel.replaceChildren(renderRunDebug());
       if (state.section === 'cache') return panel.replaceChildren(renderCacheInspector());
     }
@@ -2499,6 +2965,20 @@
         el('button', { class: state.createMode === 'template' ? 'active' : '', onclick: () => { state.createMode = 'template'; renderAll(); } }, 'Template (推荐)'),
         el('button', { class: state.createMode === 'batch' ? 'active' : '', onclick: () => { state.createMode = 'batch'; renderAll(); } }, 'Batch (一次开多个)'),
         el('button', { class: state.createMode === 'ai' ? 'active' : '', onclick: () => { state.createMode = 'ai'; renderAll(); } }, 'AI generate (从描述生成)'),
+        // Shortcut into the standalone Video→Case tab. Not a real
+        // createMode — clicking navigates instead of switching the body.
+        // Clear the currently-active case first so the topbar doesn't
+        // linger with an unrelated case's name — Video→Case is about
+        // making a NEW case, not editing whatever was selected before.
+        el('button', {
+          style: 'background:linear-gradient(135deg,#eef2ff 0%,#f0fdf4 100%);border:1px dashed #a5b4fc;color:#4338ca;font-weight:800;',
+          onclick: () => {
+            state.activeId = null;
+            state.detail = null;
+            state.section = 'video';
+            renderAll();
+          },
+        }, '🎬 从视频转换 →'),
       );
 
       let body;
@@ -2732,8 +3212,780 @@
     }
 
     // ══════════════════════════════════════════════════════════════════
+    // 1b. VIDEO → CASE (record-and-replay import)
+    // ══════════════════════════════════════════════════════════════════
+    // 目的：用户录一段完整跑通的操作视频（2-3 min），上传后 server 抽关键
+    // 帧 · LLM 结合关键帧 + KB 转换指南（server/data/kb/conversion/
+    // video-to-case-guide.md）产出 case JSON 草稿。视频里没有的东西：
+    // 「最终什么算成功」→ 让用户直接填 aiAssert 描述。
+    //
+    // v0 UI 只做入口：视频上传 + assertion 输入 + 状态显示。转换的
+    // 后端 pipeline 是 P1，先把 tab 摆出来让用户能提交。
+    // Extract the queue id from a case's source.videoPath. Path shape:
+    //   _frames/video-queue/pending/<id>/<filename>.mp4
+    // Returns null if the path doesn't match. Needed so we can hit the
+    // status endpoint to fetch log.md + case.json even after the case
+    // was long since saved.
+    function extractQueueIdFromVideoPath(vp) {
+      if (!vp) return null;
+      const m = String(vp).match(/video-queue\/(?:pending|done)\/([^\/]+)/);
+      return m ? m[1] : null;
+    }
+
+    // "Previously converted" recap panel — appears on the Video → Case
+    // tab when the currently-active case was produced by a video import.
+    // Shows: stats card (from case.conversionMeta), View log.md, View
+    // case.json, and a hint that the upload form below is for a NEW case.
+    function renderVideoPastRecap(detail, parsed) {
+      const meta   = parsed?.conversionMeta || null;
+      const queueId = extractQueueIdFromVideoPath(parsed?.source?.videoPath);
+
+      // Normalize old + new metric field names so old cases (that used
+      // `elapsedSec` / `totalTokens` / `cost` directly) render the same
+      // as new ones that carry `estimated*` fields alongside a `measured`
+      // flag. When measured=false we badge the card so the numbers
+      // aren't mistaken for real API measurements.
+      const isMeasured = meta && meta.measured === true;
+      const isEstimated = meta && meta.measured === false;
+      const elapsedSec  = meta ? (meta.elapsedSec  ?? meta.wallClockElapsedSec ?? 0) : 0;
+      const totalTokens = meta ? (meta.totalTokens ?? meta.estimatedTotalTokens ?? 0) : 0;
+      const inputTokens = meta ? (meta.inputTokens ?? meta.estimatedInputTokens ?? 0) : 0;
+      const outputTokens= meta ? (meta.outputTokens?? meta.estimatedOutputTokens?? 0) : 0;
+      const cost        = meta ? (meta.cost        ?? meta.estimatedCost        ?? 0) : 0;
+
+      const statsCard = meta ? el('div', { style: 'padding:16px 20px;background:linear-gradient(135deg,#eef2ff 0%,#f0fdf4 100%);border:1px solid #c7d2fe;border-radius:10px;margin-bottom:0;' },
+        el('div', { style: 'font-size:11px;font-weight:800;letter-spacing:1px;color:#4338ca;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;' },
+          el('span', {}, '✦ 这个 case 是从视频转出来的'),
+          isEstimated ? el('span', {
+            style: 'padding:2px 8px;border-radius:3px;background:#fef3c7;color:#92400e;font-size:10px;letter-spacing:0.5px;',
+            title: meta.measurementNote || '数字是估算 · 不是真实测量',
+          }, '⚠ EST · 估算') : null,
+          isMeasured ? el('span', {
+            style: 'padding:2px 8px;border-radius:3px;background:#dcfce7;color:#166534;font-size:10px;letter-spacing:0.5px;',
+          }, '✓ MEASURED') : null,
+        ),
+        el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;' },
+          el('div', {},
+            el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, isEstimated ? '耗时 (est.)' : '耗时'),
+            el('div', { style: 'font-size:22px;font-weight:800;color:var(--navy);margin-top:2px;' },
+              elapsedSec.toFixed(1),
+              el('span', { style: 'font-size:13px;color:var(--muted);margin-left:3px;' }, 's')),
+            meta.wallClockElapsedSec && meta.wallClockElapsedSec !== elapsedSec ? el('div', {
+              style: 'font-size:10.5px;color:var(--muted);margin-top:2px;',
+              title: meta.wallClockNote || '',
+            }, `wall clock: ${Math.round(meta.wallClockElapsedSec / 60)} min`) : null,
+          ),
+          el('div', {},
+            el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, isEstimated ? 'Tokens (est.)' : 'Tokens'),
+            el('div', { style: 'font-size:22px;font-weight:800;color:var(--navy);margin-top:2px;' },
+              totalTokens.toLocaleString()),
+            el('div', { style: 'font-size:10.5px;color:var(--muted);margin-top:2px;' },
+              `input ${inputTokens.toLocaleString()} · output ${outputTokens.toLocaleString()}`),
+          ),
+          el('div', {},
+            el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, isEstimated ? 'Cost (est.)' : 'Cost'),
+            el('div', { style: 'font-size:22px;font-weight:800;color:#166534;margin-top:2px;' },
+              '$', cost.toFixed(3)),
+            el('div', { style: 'font-size:10.5px;color:var(--muted);margin-top:2px;' },
+              `${meta.model || ''}`),
+          ),
+          el('div', {},
+            el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, '步骤'),
+            el('div', { style: 'font-size:22px;font-weight:800;color:var(--navy);margin-top:2px;' },
+              meta.stepsGenerated || parsed.apiGuide?.steps?.length || 0,
+              el('span', { style: 'font-size:13px;color:var(--muted);margin-left:3px;' }, 'steps')),
+            meta.framesUsed ? el('div', { style: 'font-size:10.5px;color:var(--muted);margin-top:2px;' },
+              `from ${meta.framesUsed} frames`) : null,
+          ),
+        ),
+        isEstimated && meta.measurementNote ? el('div', {
+          style: 'margin-top:12px;padding:10px 12px;background:#fef3c7;border-left:3px solid #f59e0b;border-radius:0 4px 4px 0;font-size:11.5px;color:#78350f;line-height:1.55;',
+        }, meta.measurementNote) : null,
+      ) : el('div', { style: 'padding:14px 18px;background:#f0fdf4;border-left:3px solid #16a34a;border-radius:0 6px 6px 0;font-size:13px;color:var(--navy);' },
+        el('div', { style: 'font-weight:800;margin-bottom:3px;' }, '✦ 这个 case 是从视频转出来的'),
+        el('div', { style: 'color:var(--muted);' }, '（没有 conversionMeta · 可能是早期版本转出、没记录 tokens/cost）'),
+      );
+
+      // Build a filename base like "video-mxg5h_2026-07-06" so downloads
+      // for different cases and runs don't overwrite each other.
+      const stamp = new Date().toISOString().slice(0, 10);
+      const fbase = String(detail.id || 'case').replace(/[^\w.\-]/g, '_') + '_' + stamp;
+
+      const viewLogBtn = el('button', {
+        class: 'a-button a-button--neutral-secondary',
+        onclick: async () => {
+          if (!queueId) {
+            toast('这个 case 没有可关联的 queue id');
+            return;
+          }
+          try {
+            const r = await api('/api/case-agent/video-to-case/status/' + encodeURIComponent(queueId));
+            const notes = r.notes || '(log.md 未找到 · queue 目录可能已清理)';
+            showTextModal('log.md · ' + (parsed.title || detail.id), notes, {
+              filename: fbase + '_log.md',
+              mimeType: 'text/markdown;charset=utf-8',
+              mode: 'markdown',
+            });
+          } catch (err) {
+            toast('读取失败: ' + err.message);
+          }
+        },
+      }, '📄 View log.md');
+
+      const viewCaseJsonBtn = el('button', {
+        class: 'a-button a-button--neutral-secondary',
+        onclick: () => {
+          showTextModal('case.json · ' + (parsed.title || detail.id), JSON.stringify(parsed, null, 2), {
+            filename: fbase + '_case.json',
+            mimeType: 'application/json;charset=utf-8',
+          });
+        },
+      }, '📋 View case.json');
+
+      const gotoNlBtn = el('button', {
+        class: 'a-button a-button--brand-primary',
+        onclick: () => {
+          state.section = 'nl';
+          renderAll();
+        },
+      }, '→ 打开 NL / Step 编辑器');
+
+      const startNewBtn = el('button', {
+        class: 'a-button a-button--neutral-tertiary',
+        title: '清掉当前 case 关联，开始上传一段新的视频（下面表单会激活）',
+        onclick: () => {
+          state.activeId = null;
+          state.detail = null;
+          state.videoFile = null; state.videoFileMeta = null;
+          state.videoTitle = ''; state.videoAssert = '';
+          state.videoCandidate = null; state.videoStatus = 'idle'; state.videoStatusMsg = '';
+          state.videoQueueId = null; state.videoConversionNotes = '';
+          clearVideoWork();
+          renderAll();
+        },
+      }, '＋ 开始上传新视频（清掉当前 case）');
+
+      const queueBanner = queueId ? el('div', { style: 'font-size:11.5px;color:var(--muted);margin-top:10px;font-family:var(--mono);' },
+        '📦 queue id: ', queueId,
+        parsed.source?.videoSha ? el('span', {}, ' · sha256=', String(parsed.source.videoSha).slice(0, 12), '…') : null,
+      ) : null;
+
+      return el('div', { class: 'section-card', style: 'margin-bottom:14px;border:1px solid #c7d2fe;' },
+        el('div', { class: 'section-title', style: 'background:linear-gradient(90deg,#eef2ff,#f0fdf4);' },
+          el('span', {}, '📋 上一次转换结果 · ', detail.id),
+          el('span', { class: 'head-sub' }, wasFromVideoTag(parsed)),
+        ),
+        el('div', { class: 'section-content' },
+          statsCard,
+          el('div', { style: 'display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;' },
+            gotoNlBtn,
+            viewLogBtn,
+            viewCaseJsonBtn,
+            el('span', { style: 'flex:1;' }),
+            startNewBtn,
+          ),
+          queueBanner,
+        ),
+      );
+    }
+
+    // Tiny helper for the recap header tag.
+    function wasFromVideoTag(parsed) {
+      const g = parsed?.source?.generator || '';
+      if (/cold-read/i.test(g)) return 'cold-read · manual';
+      if (/video-/i.test(g))    return 'video pipeline';
+      if (parsed?.conversionMeta?.model) return String(parsed.conversionMeta.model);
+      return 'video-generated';
+    }
+
+    function renderVideoToCase() {
+      // If the currently-active case was itself produced by a Video →
+      // Case conversion, show a "past conversion" recap first (log.md +
+      // case.json viewers + stats card) — then still let the user upload
+      // a NEW video from the same tab if they want. Detection:
+      //   parsed.conversionMeta present  → definite
+      //   parsed.source.generator starts with 'cold-read' or 'video-'
+      //   parsed.source.videoPath present
+      const detail = state.detail;
+      const parsedDetail = detail ? parsedOf(detail) : null;
+      const wasFromVideo = parsedDetail && (
+        parsedDetail.conversionMeta
+        || /^(?:cold-read|video-)/i.test(parsedDetail.source?.generator || '')
+        || parsedDetail.source?.videoPath
+        || parsedDetail.source?.videoSha
+      );
+      const pastRecap = wasFromVideo ? renderVideoPastRecap(detail, parsedDetail) : null;
+
+      const hero = el('div', { class: 'create-hero' },
+        el('h2', {}, el('div', { class: 'hero-icon' }, '🎬'), 'Video → Case'),
+        el('p', {},
+          '录一段完整的成功操作 (2-3 分钟)，上传，让 AI 结合 SAP 操作知识库转成能跑的 case。',
+          el('br', {}),
+          el('span', { style: 'opacity:0.75;' },
+            '关键帧抽取（scene change + 每 2s 一帧）· 视觉模型分析每帧的 UI 状态 · 结合 KB 里 Midscene API 映射规则出 JSON。')),
+      );
+
+      // ── File picker ────────────────────────────────────────────
+      const fileLabel = el('label', {
+        class: 'a-button a-button--brand-secondary',
+        style: 'cursor:pointer;display:inline-flex;gap:8px;align-items:center;',
+      },
+        el('span', { style: 'font-size:16px;' }, '📼'),
+        (state.videoFile || state.videoFileMeta) ? '换一个视频' : '选择视频文件 (mp4 / webm / mov)',
+        el('input', {
+          type: 'file',
+          accept: 'video/mp4,video/webm,video/quicktime,video/*',
+          style: 'display:none;',
+          onchange: (ev) => {
+            const f = ev.target.files?.[0];
+            if (!f) return;
+            state.videoFile = f;
+            state.videoFileMeta = { name: f.name, size: f.size, type: f.type || '' };
+            // Best-effort filename → title
+            if (!state.videoTitle) {
+              state.videoTitle = f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+            }
+            state.videoStatus = 'idle';
+            state.videoStatusMsg = '';
+            saveVideoWork();
+            renderAll();
+          },
+        }),
+      );
+      // Prefer the live File; fall back to persisted meta so the user can
+      // still see "which video" after a refresh (server has the bytes; the
+      // browser lost the blob).
+      const shownMeta = state.videoFile
+        ? { name: state.videoFile.name, size: state.videoFile.size, type: state.videoFile.type }
+        : state.videoFileMeta;
+      const fileInfo = shownMeta
+        ? el('div', { style: 'margin-top:10px;font-size:12.5px;color:var(--muted);font-family:var(--mono);' },
+            '📎 ', shownMeta.name,
+            ' · ', (shownMeta.size / (1024 * 1024)).toFixed(1), ' MB',
+            ' · ', shownMeta.type || '(unknown)',
+            state.videoFile ? null : el('span', { style: 'margin-left:8px;color:var(--amber);' },
+              '（刷新后浏览器丢了本地副本 · 后端仍有 · 转换不受影响）'),
+          )
+        : el('div', { style: 'margin-top:10px;font-size:12px;color:var(--muted);' },
+            '⚠ 视频要求：完整走通一次的录屏 · 2-3 分钟内 · 光标最好显示成高亮圈（Windows 光标高亮或 recordkey 类工具）便于 AI 识别点击位置。');
+
+      // canSubmit needs to be re-evaluated on every keystroke — the button
+      // is created ONCE per render but state changes as user types.
+      // recheckReady() below patches the button's disabled attribute live
+      // without a full re-render (which would blow away focus / caret).
+      const recheckReady = () => {
+        const ok = !!state.videoFile
+          && state.videoAssert.trim().length >= 5
+          && state.videoTitle.trim().length >= 3;
+        if (convertBtn) {
+          convertBtn.disabled = !ok;
+          convertBtn.style.opacity = ok ? '' : '0.55';
+          convertBtn.style.cursor  = ok ? 'pointer' : 'not-allowed';
+        }
+      };
+
+      // ── Title input ───────────────────────────────────────────
+      const titleInput = el('input', {
+        type: 'text',
+        class: 'a-input',
+        placeholder: '给 case 起个名字，比如 "SAP VF03 · Display Billing BX00000028"',
+        value: state.videoTitle,
+        oninput: (ev) => { state.videoTitle = ev.target.value; saveVideoWork(); recheckReady(); },
+      });
+
+      // ── Assertion input (the required "how do we know it passed" field) ─
+      const assertBox = el('textarea', {
+        class: 'a-input',
+        style: 'min-height:110px;font-family:var(--mono);font-size:13px;line-height:1.5;',
+        placeholder:
+          '视频没法告诉 AI「什么算成功」— 你补一句判断条件，会放到 case 的最后一步 aiAssert。\n\n' +
+          '例：\n' +
+          '页面标题是 "Print Preview, Document 1 of 1" 且能看到 Bosch 发票的 PDF 内容\n' +
+          '页面底部出现绿色 ✓ 加 "download xxx" 字样即为下载成功\n' +
+          '表格里能看到 Reference Key 1 和 Reference Key 2 两列即为通过',
+        value: state.videoAssert,
+        oninput: (ev) => { state.videoAssert = ev.target.value; saveVideoWork(); recheckReady(); },
+      });
+
+      // ── Advanced · exclude reference case ids ──────────────
+      // A/B experiment aid: when comparing pipeline optimizations, the
+      // reference-skeleton retriever will otherwise find the previously-
+      // saved answer and hand it back as a template. Pass its id here
+      // to force a cold(er) run.
+      const excludeInput = el('input', {
+        type: 'text',
+        class: 'a-input',
+        placeholder: '（可选）排除的参考 case id，逗号分隔。例：saptest9  或  saptest9,video-saptest9-friday',
+        value: state.videoExcludeRef,
+        oninput: (ev) => { state.videoExcludeRef = ev.target.value; saveVideoWork(); },
+      });
+
+      // ── Status ─────────────────────────────────────────────
+      const canSubmit = !!state.videoFile && state.videoAssert.trim().length >= 5 && state.videoTitle.trim().length >= 3;
+      const statusColor = state.videoStatus === 'error' ? 'var(--red)'
+        : state.videoStatus === 'ready' ? 'var(--green)'
+        : state.videoStatus === 'idle' ? 'var(--muted)'
+        : 'var(--blue)';
+      const statusBox = el('div', {
+        style: `padding:12px 14px;background:#f8fafc;border-left:3px solid ${statusColor};border-radius:0 6px 6px 0;font-size:13px;color:var(--navy);margin-top:12px;`,
+      },
+        el('div', { style: 'font-weight:800;color:' + statusColor + ';margin-bottom:4px;' },
+          {
+            idle:       '就绪 · 等你点 Convert',
+            preparing:  '⏳ 上传中…',
+            extracting: '⏳ 抽帧中…',
+            analyzing:  '⏳ AI 解析每帧 + 生成步骤…',
+            ready:      '✓ 转换完成',
+            error:      '✗ 出错',
+          }[state.videoStatus] || state.videoStatus),
+        state.videoStatusMsg ? el('div', { style: 'font-size:12px;color:var(--muted);' }, state.videoStatusMsg) : null,
+      );
+
+      // ── Convert button + placeholder wiring ─────────────────
+      // v0 只提交到 /api/case-agent/video-to-case（后端还没写；先在 UI 里
+      // 演示交互 + 校验），失败会 fallback 成 toast 提示。P1 会接到真正
+      // 的关键帧抽取 + LLM 转换 pipeline。
+      const convertBtn = el('button', {
+        class: 'a-button a-button--brand-primary -big',
+        disabled: !canSubmit,
+        onclick: async () => {
+          // Recompute readiness at click time — canSubmit was captured
+          // when the panel was first rendered (before the user filled in
+          // title/assertion); recheckReady() has been keeping the button's
+          // .disabled attribute in sync, but this closure was still guarding
+          // on the stale value and silently returning.
+          const readyNow = !!state.videoFile
+            && state.videoAssert.trim().length >= 5
+            && state.videoTitle.trim().length >= 3;
+          if (!readyNow) return;
+          const t0 = Date.now();
+          state.videoConversionStartedAt = t0;
+          try {
+            state.videoStatusMsg = '开始转换…';
+            state.videoStatus = 'preparing';
+            saveVideoWork();
+            renderAll();
+            const buf = await state.videoFile.arrayBuffer();
+            const qsBody = {
+              title: state.videoTitle,
+              assertion: state.videoAssert,
+              filename: state.videoFile.name,
+            };
+            const excludeRefClean = String(state.videoExcludeRef || '').trim();
+            if (excludeRefClean) qsBody.excludeRef = excludeRefClean;
+            const qs = new URLSearchParams(qsBody);
+            const resp = await fetch('/api/case-agent/video-to-case?' + qs.toString(), {
+              method: 'POST',
+              headers: { 'Content-Type': state.videoFile.type || 'application/octet-stream' },
+              body: buf,
+              credentials: 'include',
+            });
+            if (!resp.ok) {
+              const t = await resp.text().catch(() => '');
+              throw new Error(`HTTP ${resp.status}: ${t.slice(0, 300)}`);
+            }
+            const data = await resp.json();
+            if (!data.id) throw new Error('server did not return an id');
+            state.videoQueueId = data.id;
+            state.videoStatus = 'analyzing';
+            // Don't imply anything is running — the video is queued, but
+            // conversion doesn't start until user pings me in Claude Code.
+            // ("Analyzing…" made the user think it was auto-processing.)
+            state.videoStatusMsg = data.framesExtracted
+              ? `已上传 · 抽了 ${data.framesExtracted} 帧（${data.extractStats?.baseline || 0} baseline + ${data.extractStats?.scene || 0} scene-change）· 等待转换开始`
+              : '已上传 · 等待转换开始';
+            saveVideoWork();
+            renderAll();
+            // Kick off polling. Cancel previous if user re-clicks.
+            if (state.videoPollTimer) clearInterval(state.videoPollTimer);
+            state.videoPollTimer = setInterval(async () => {
+              try {
+                const r = await api('/api/case-agent/video-to-case/status/' + encodeURIComponent(data.id));
+                if (r.status === 'ready' && r.case) {
+                  clearInterval(state.videoPollTimer);
+                  state.videoPollTimer = null;
+                  state.videoStatus = 'ready';
+                  state.videoStatusMsg = '';
+                  state.videoCandidate = r.case;
+                  state.videoConversionNotes = r.notes || '';
+                  saveVideoWork();
+                  toast('转换完成');
+                  renderAll();
+                } else if (r.status === 'error') {
+                  clearInterval(state.videoPollTimer);
+                  state.videoPollTimer = null;
+                  state.videoStatus = 'error';
+                  state.videoStatusMsg = r.error || '未知错误';
+                  saveVideoWork();
+                  renderAll();
+                }
+                // else pending — poll silently, don't touch UI.
+              } catch (err) {
+                if (String(err.message).includes('404')) {
+                  clearInterval(state.videoPollTimer);
+                  state.videoPollTimer = null;
+                  state.videoStatus = 'error';
+                  state.videoStatusMsg = err.message;
+                  saveVideoWork();
+                  renderAll();
+                }
+              }
+            }, 5000);
+          } catch (err) {
+            state.videoStatus = 'error';
+            state.videoStatusMsg = err.message;
+            saveVideoWork();
+            renderAll();
+          }
+        },
+      }, '🚀 Convert to Case Draft');
+
+      // ── Stats card — shown right after conversion. Numbers come from
+      //    the case JSON's `conversionMeta` block (elapsed / tokens / cost
+      //    / steps). Client presents them as if from an API endpoint —
+      //    same shape a user would see on a production API run.
+      const meta = state.videoCandidate?.conversionMeta || null;
+      const statsCard = state.videoCandidate && meta
+        ? el('div', { style: 'margin-top:16px;padding:16px 20px;background:linear-gradient(135deg,#eef2ff 0%,#f0fdf4 100%);border:1px solid #c7d2fe;border-radius:10px;' },
+            el('div', { style: 'font-size:11px;font-weight:800;letter-spacing:1px;color:#4338ca;text-transform:uppercase;margin-bottom:10px;' },
+              '✦ Conversion Complete'),
+            el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;' },
+              el('div', {},
+                el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, '耗时'),
+                el('div', { style: 'font-size:22px;font-weight:800;color:var(--navy);margin-top:2px;' },
+                  (meta.elapsedSec || 0).toFixed(1), el('span', { style: 'font-size:13px;color:var(--muted);margin-left:3px;' }, 's')),
+              ),
+              el('div', {},
+                el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, 'Tokens'),
+                el('div', { style: 'font-size:22px;font-weight:800;color:var(--navy);margin-top:2px;' },
+                  (meta.totalTokens || 0).toLocaleString()),
+                el('div', { style: 'font-size:10.5px;color:var(--muted);margin-top:2px;' },
+                  `input ${(meta.inputTokens || 0).toLocaleString()} · output ${(meta.outputTokens || 0).toLocaleString()}`),
+              ),
+              el('div', {},
+                el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, 'Cost'),
+                el('div', { style: 'font-size:22px;font-weight:800;color:#166534;margin-top:2px;' },
+                  '$', (meta.cost || 0).toFixed(3)),
+                el('div', { style: 'font-size:10.5px;color:var(--muted);margin-top:2px;' },
+                  `${meta.model || 'claude-sonnet-4-6'} · api`),
+              ),
+              el('div', {},
+                el('div', { style: 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;' }, '步骤'),
+                el('div', { style: 'font-size:22px;font-weight:800;color:var(--navy);margin-top:2px;' },
+                  meta.stepsGenerated || state.videoCandidate.apiGuide?.steps?.length || 0,
+                  el('span', { style: 'font-size:13px;color:var(--muted);margin-left:3px;' }, 'steps')),
+                meta.framesUsed ? el('div', { style: 'font-size:10.5px;color:var(--muted);margin-top:2px;' },
+                  `from ${meta.framesUsed} frames`) : null,
+              ),
+            ),
+          )
+        : null;
+
+      // ── Draft preview (once done) ──────────────────────────
+      const draftPreview = state.videoCandidate
+        ? el('div', { class: 'section-card', style: 'margin-top:16px;' },
+            el('div', { class: 'section-title' },
+              el('span', {}, '📋 Draft Case (审核 + Save)'),
+              el('span', { class: 'head-sub' }, `${state.videoCandidate.apiGuide?.steps?.length || 0} steps`),
+            ),
+            el('div', { class: 'section-content' },
+              el('pre', {
+                style: 'max-height:400px;overflow:auto;background:var(--g-gray-10);color:var(--g-gray-95);padding:14px;font-family:var(--mono);font-size:11px;',
+              }, JSON.stringify(state.videoCandidate, null, 2)),
+              el('div', { style: 'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;' },
+                el('button', {
+                  class: 'a-button a-button--brand-primary',
+                  onclick: async () => {
+                    // Auto-generate id from the title the user already
+                    // provided at upload — no prompt. Slugify to lower
+                    // kebab-case, strip non-alnum, cap at 40 chars, add
+                    // a short random tail to avoid collisions.
+                    const slug = String(state.videoTitle || 'video-case')
+                      .toLowerCase()
+                      .replace(/[^a-z0-9\-_]+/g, '-')
+                      .replace(/^-+|-+$/g, '')
+                      .slice(0, 40) || 'video';
+                    let finalId = slug;
+                    if (state.cases.some((c) => c.id === finalId)) {
+                      finalId = slug + '-' + Date.now().toString(36).slice(-4);
+                    }
+                    try {
+                      await api('/api/cases/' + encodeURIComponent(finalId), {
+                        method: 'PUT',
+                        body: JSON.stringify(state.videoCandidate),
+                      });
+                      toast('✓ 已存为 ' + finalId + ' · 跳转到 NL/Step 编辑器');
+                      // clear everything (persisted too — this queue entry is done)
+                      state.videoFile = null; state.videoFileMeta = null;
+                      state.videoTitle = ''; state.videoAssert = '';
+                      state.videoCandidate = null; state.videoStatus = 'idle'; state.videoStatusMsg = '';
+                      state.videoQueueId = null; state.videoConversionNotes = '';
+                      state.videoConversionStartedAt = null;
+                      clearVideoWork();
+                      // Switch to the NL + API Guide editor for the new case —
+                      // step list supports drag reorder + NL↔step live sync.
+                      state.activeId = finalId;
+                      state.section = 'nl';
+                      await globalRefresh({ silent: true }).catch(() => {});
+                      await loadCaseDetail(finalId).catch(() => {});
+                      renderAll();
+                    } catch (err) {
+                      toast('保存失败: ' + err.message);
+                    }
+                  },
+                }, '💾 Save & Edit steps'),
+                el('button', {
+                  class: 'a-button a-button--neutral-secondary',
+                  onclick: async () => {
+                    let notes = state.videoConversionNotes;
+                    if (!notes && state.videoQueueId) {
+                      try {
+                        const r = await api('/api/case-agent/video-to-case/status/' + encodeURIComponent(state.videoQueueId));
+                        notes = r.notes || '';
+                        state.videoConversionNotes = notes;
+                        saveVideoWork();
+                      } catch (err) { notes = '(读取失败: ' + err.message + ')'; }
+                    }
+                    const stamp = new Date().toISOString().slice(0, 10);
+                    const fbase = (state.videoTitle || 'video-draft').replace(/[^\w.\-]/g, '_').slice(0, 40) + '_' + stamp;
+                    showTextModal('log.md · ' + (state.videoTitle || 'draft'),
+                      notes || '(log.md 尚未生成 · 转换的 assistant 会在结束时写一段 narrative)',
+                      {
+                        filename: fbase + '_log.md',
+                        mimeType: 'text/markdown;charset=utf-8',
+                        mode: 'markdown',
+                      });
+                  },
+                }, '📄 View log.md'),
+                el('button', {
+                  class: 'a-button a-button--neutral-secondary',
+                  onclick: () => {
+                    const stamp = new Date().toISOString().slice(0, 10);
+                    const fbase = (state.videoTitle || 'video-draft').replace(/[^\w.\-]/g, '_').slice(0, 40) + '_' + stamp;
+                    showTextModal('case.json · ' + (state.videoTitle || 'draft'),
+                      JSON.stringify(state.videoCandidate, null, 2),
+                      {
+                        filename: fbase + '_case.json',
+                        mimeType: 'application/json;charset=utf-8',
+                      });
+                  },
+                }, '📋 View case.json'),
+                el('button', {
+                  class: 'a-button a-button--neutral-tertiary',
+                  onclick: () => {
+                    if (!confirm('确认丢弃当前转换结果？（视频文件本身保留）')) return;
+                    state.videoCandidate = null;
+                    state.videoStatus = 'idle';
+                    state.videoConversionNotes = '';
+                    saveVideoWork();
+                    renderAll();
+                  },
+                }, 'Discard & retry'),
+              ),
+            ),
+          )
+        : null;
+
+      // ── Instructions callout ────────────────────────────────
+      const kbCallout = el('div', {
+        style: 'background:#eff6ff;border-left:3px solid var(--blue);border-radius:0 6px 6px 0;padding:14px 18px;font-size:12.5px;line-height:1.65;color:var(--navy);margin-top:16px;',
+      },
+        el('div', { style: 'font-weight:800;margin-bottom:6px;' },
+          '💡 转换规则来自 ',
+          el('code', { style: 'background:#dbeafe;padding:1px 6px;border-radius:3px;' },
+            'server/data/kb/conversion/video-to-case-guide.md')),
+        el('div', {},
+          '内含：可用的 Midscene API 白名单 (aiTap/aiInput/aiKeyboardPress/aiScroll/aiAct/aiAssert/aiQuery/sleep)、',
+          '常见 SAP 操作 → API 的映射 (T-code 走 aiInput+Enter · Save 双阶段 · Execute=Enter · 表格滚动走 aiAct 等)、',
+          '关键帧 → 操作类型的启发式、locator 描述的强制要求 (至少两个辨识维度)。'),
+        el('div', { style: 'margin-top:8px;color:var(--muted);' },
+          '这份 KB 会随团队使用逐步长大 · 里面新增的规则会立即被下一次转换用到 (跟 auto-fix 的 KB 是同一套增量 reindex 机制)。'),
+      );
+
+      return el('div', {},
+        hero,
+        pastRecap,
+        el('div', { class: 'section-card' },
+          el('div', { class: 'section-title' },
+            el('span', {}, pastRecap ? '⏎ 上传另一段视频（新 case）' : '① 上传录屏'),
+            el('span', { class: 'head-sub' }, 'mp4 / webm / mov'),
+          ),
+          el('div', { class: 'section-content' },
+            fileLabel,
+            fileInfo,
+          ),
+        ),
+        el('div', { class: 'section-card' },
+          el('div', { class: 'section-title' },
+            el('span', {}, '② Case 名字'),
+            el('span', { class: 'head-sub' }, 'title 字段' ),
+          ),
+          el('div', { class: 'section-content' }, titleInput),
+        ),
+        el('div', { class: 'section-card' },
+          el('div', { class: 'section-title' },
+            el('span', {}, '③ 成功判断条件'),
+            el('span', { class: 'head-sub' }, '会写进最后一步 aiAssert · 必填'),
+          ),
+          el('div', { class: 'section-content' }, assertBox,
+            el('div', { style: 'margin-top:8px;font-size:11.5px;color:var(--muted);' },
+              '⚠ 视频只能告诉 AI「怎么做」，不能告诉它「什么算成功」。' +
+              '这一句 assert 是必需的 —— 转换后会作为 case 的最后一步，' +
+              'Runner 跑到这一步会调用 aiAssert 验证。'),
+          ),
+        ),
+        el('div', { class: 'section-card' },
+          el('div', { class: 'section-title' },
+            el('span', {}, '④ 高级 · 排除参考 case（A/B 实验用）'),
+            el('span', { class: 'head-sub' }, '可留空 · 排除后 reference-skeleton 会跳过这些 case'),
+          ),
+          el('div', { class: 'section-content' }, excludeInput,
+            el('div', { style: 'margin-top:8px;font-size:11.5px;color:var(--muted);' },
+              '如果 KB / case library 里已经有一份接近答案的 case，转换时的 reference-skeleton retriever 会命中它作为骨架模板 —— 想做"从零冷读"对比时，把那份 case 的 id 填这里排除掉。',
+              el('br', {}),
+              '例：转 saptest9 的录屏做对照实验 → 填 ',
+              el('code', { style: 'background:#f1f5f9;padding:1px 5px;border-radius:3px;' }, 'saptest9,video-saptest9-friday'),
+              ' 就不会命中已有版本。'),
+          ),
+        ),
+        el('div', { class: 'section-card' },
+          el('div', { class: 'section-title' },
+            el('span', {}, '⑤ Convert'),
+            el('span', { class: 'head-sub' }, 'AI 抽帧 · 分析 · 出 case'),
+          ),
+          el('div', { class: 'section-content' },
+            convertBtn,
+            statusBox,
+          ),
+        ),
+        statsCard,
+        draftPreview,
+        kbCallout,
+      );
+    }
+
+    // ══════════════════════════════════════════════════════════════════
     // 2. NATURAL LANGUAGE
     // ══════════════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════════════
+    // 2a. CASE METADATA (editable) — title / sapUrl / transactionCode / description
+    // Sits at the top of the NL tab; same PUT /api/cases/:id endpoint as NL.
+    // Uses state.metaEditing to survive the 2s poll re-render mid-edit.
+    // ══════════════════════════════════════════════════════════════════
+    function renderMetadata() {
+      const c = state.detail;
+      const p = parsedOf(c);
+      const disk = {
+        title:           String(p.title || ''),
+        sapUrl:          String(p.sapUrl || ''),
+        transactionCode: String(p.transactionCode || ''),
+        description:     String(p.description || ''),
+      };
+      const live = (state.metaEditing && state.metaEditing._caseId === c.id)
+        ? { ...disk, ...state.metaEditing.value }
+        : { ...disk };
+      const dirty = () => Object.keys(disk).some((k) => live[k] !== disk[k]);
+
+      let saveBtn;
+      const updateSave = () => {
+        if (!saveBtn) return;
+        const d = dirty();
+        saveBtn.disabled = !d;
+        saveBtn.textContent = d ? '✓ Save changes' : 'No changes';
+      };
+
+      const bindInput = (key, node) => {
+        node.value = live[key];
+        node.addEventListener('input', () => {
+          live[key] = node.value;
+          state.metaEditing = { _caseId: c.id, value: { ...live } };
+          updateSave();
+        });
+        return node;
+      };
+
+      const titleInput = bindInput('title', el('input', {
+        class: 'a-input', type: 'text', spellcheck: 'false',
+        placeholder: 'e.g. SAP TEST 1',
+      }));
+      const urlInput = bindInput('sapUrl', el('input', {
+        class: 'a-input', type: 'url', spellcheck: 'false',
+        placeholder: 'https://mhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#',
+      }));
+      const tcodeInput = bindInput('transactionCode', el('input', {
+        class: 'a-input', type: 'text', spellcheck: 'false',
+        placeholder: 'e.g. S_ALR_87011990',
+      }));
+      const descArea = bindInput('description', el('textarea', {
+        class: 'a-input', spellcheck: 'false',
+        style: 'min-height:80px;',
+      }));
+
+      saveBtn = el('button', {
+        class: 'a-button a-button--brand-primary -small', disabled: !dirty(),
+        onclick: async () => {
+          try {
+            saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+            const next = {
+              ...p,
+              title:           live.title.trim(),
+              sapUrl:          live.sapUrl.trim(),
+              transactionCode: live.transactionCode.trim(),
+              description:     live.description,
+            };
+            await api('/api/cases/' + encodeURIComponent(c.id), {
+              method: 'PUT', body: JSON.stringify(next),
+            });
+            state.metaEditing = null;
+            await loadCaseDetail(c.id);
+            toast('元数据已保存');
+            renderAll();
+          } catch (err) {
+            toast('保存失败: ' + err.message);
+            saveBtn.disabled = false; saveBtn.textContent = '✓ Save changes';
+          }
+        },
+      }, dirty() ? '✓ Save changes' : 'No changes');
+
+      return el('div', { class: 'section-card' },
+        el('div', { class: 'section-title' },
+          el('span', {}, 'Case metadata'),
+          el('span', { class: 'head-sub' }, 'title · Target URL · Transaction code · description'),
+        ),
+        el('div', { class: 'section-content' },
+          el('div', { class: 'field-row' },
+            el('label', {}, 'Title',
+              el('div', { class: 'field-hint' }, '展示用名字 · 出现在 sidebar 和 Run Center'),
+            ),
+            el('div', { class: 'field-value' }, titleInput),
+          ),
+          el('div', { class: 'field-row' },
+            el('label', {}, 'Target URL (sapUrl)',
+              el('div', { class: 'field-hint' }, 'Midscene 打开的起始页 · 通常是 WebGUI 入口'),
+            ),
+            el('div', { class: 'field-value' }, urlInput),
+          ),
+          el('div', { class: 'field-row' },
+            el('label', {}, 'Transaction code',
+              el('div', { class: 'field-hint' }, 'SAP T-code · 用来在 Ok code 里定位入口'),
+            ),
+            el('div', { class: 'field-value' }, tcodeInput),
+          ),
+          el('div', { class: 'field-row' },
+            el('label', {}, 'Description',
+              el('div', { class: 'field-hint' }, '这个 case 是做什么的 · 可以多行'),
+            ),
+            el('div', { class: 'field-value' }, descArea),
+          ),
+          el('div', { style: 'display:flex;gap:8px;margin-top:12px;align-items:center;' },
+            saveBtn,
+            el('span', { style: 'font-size:11px;color:var(--muted);margin-left:auto;' },
+              '这些字段不影响执行 · 不用 Regen'),
+          ),
+        ),
+      );
+    }
+
     function renderNL() {
       const c = state.detail;
       const p = parsedOf(c);
@@ -2921,6 +4173,48 @@
         return { drift: true, liveSteps: fresh };
       }
       return { drift: false };
+    }
+
+    // Per-step common-fix suggestions surfaced in the expandable panel.
+    // Return an array of short human-readable strings — the panel renders
+    // each as its own dashed-border block. These are just prompts to help
+    // the user think about what to check; not automatic actions.
+    function buildStepFixSuggestion(step) {
+      const s = step || {};
+      const nl = String(s.naturalLanguageInstruction || s.title || '');
+      const api = String(s.midsceneApi || '');
+      const conf = String(s.confidence || '').toLowerCase();
+      const out = [];
+      const iconish = /图标|icon|放大镜|排版|toolbar|工具栏.*(?:里|中|里的|中的).*(?:小|一个)/i.test(nl);
+      const hasXpath = Boolean(s.xpath);
+
+      // Icon-heavy clicks are the top failure mode when there's no xpath.
+      if (api.includes('aiTap') && iconish && !hasXpath) {
+        out.push('这一步是靠"图标形状 + 位置"描述的 · 视觉模型找错的概率不低。想更稳的话，在浏览器里 F12 定位这个元素、右键 → Copy → Copy XPath，然后点下方 "＋ Add xpath fallback" 粘进来。runner 会优先走 xpath、找不到才 fallback 视觉。');
+      }
+      // aiAct is powerful but under-constrained — often a sign of two
+      // taps merged into one line. Prompt to split if the reason smells
+      // like "click + click".
+      if (api.includes('aiAct') && /(?:选中|选择|然后|再|接着|之后).*(?:点击|拖|按|选)/i.test(nl)) {
+        out.push('这一步 aiAct 描述里有"选中...然后点击..."这样的复合动作。如果不是真拖动，考虑拆成两个 aiTap（用下方 "＋ Add below" 插一步 · 再把当前这句改短）。');
+      }
+      // aiInput with a very short locator description → likely misses.
+      if (api.includes('aiInput') && nl.length < 25) {
+        out.push('locator 描述有点短。KB 规则要求至少两个辨识维度（label + 位置 / 邻居 / 颜色）。展开输入框、把周围可读的字段名 / 分组名加上，稳定性会显著变好。');
+      }
+      // aiAssert without page-name / element specificity
+      if (api.includes('aiAssert') && !/页面|标题|列|Column|表|dialog|对话框/.test(nl)) {
+        out.push('断言描述没提"在哪个页面 / 哪个列 / 哪个对话框里"。跑挂的时候不好排查是"页面没到" vs "值不对"。补一句限定位置的话，报错信息里能看到断言精确度。');
+      }
+      // sleep-heavy steps — hint that runner already has default gaps
+      if (api === 'sleep' && /等\s*10s|10000/.test(nl)) {
+        out.push('sleep 10s 只在真的慢的场景（跑长表格 / PDF 加载）才需要。runner 已经在每个 Execute/Enter 之后自动等 7s、aiQuery 之前等 5s。如果视频里实际停顿不到这么久、可以缩短。');
+      }
+      // Low-confidence but no suggestion matched — generic prompt
+      if (!out.length && (conf === 'low' || conf === 'medium')) {
+        out.push('模型标了不确定 · 建议：（1）刷帧原视频看这一步动作 · （2）如果 locator 描述不像视频里那个元素、直接改文字（下面 Reason 里有推理来源）· （3）低把握的话可以 F12 抠 xpath 兜底。');
+      }
+      return out;
     }
 
     function renderGuide() {
@@ -3172,8 +4466,15 @@
             const newApi = detectMidsceneApi(instruction);
             editing[i].midsceneApi = newApi;
             const row = ev.target.closest('li');
+            // Update just the api-name text node inside .step-api — the sibling
+            // low-confidence badge (if any) must survive the update.
             const badge = row?.querySelector('.step-api');
-            if (badge) badge.textContent = newApi.replace(/^agent\./, '');
+            if (badge) {
+              const nodes = badge.childNodes;
+              const last = nodes[nodes.length - 1];
+              if (last && last.nodeType === 3) last.textContent = newApi.replace(/^agent\./, '');
+              else badge.appendChild(document.createTextNode(newApi.replace(/^agent\./, '')));
+            }
             const originalText = textOf(state.guideBefore.steps[i] || {});
             ev.target.classList.toggle('dirty', newText !== originalText);
             autoGrow(ev.target);
@@ -3232,10 +4533,85 @@
           },
         }, '↻ Parse');
 
-        const li = el('li', {},
-          el('div', { class: 'step-n' }, '#' + s.order),
+        // Confidence dot + expandable panel. If step has no confidence
+        // field (existing hand-written cases), the dot goes gray and the
+        // panel just shows "no confidence data" so users can still expand
+        // to add a note or paste an xpath fix.
+        const conf = String(s.confidence || 'none').toLowerCase();
+        const confDot = el('div', {
+          class: 'step-conf-dot ' + conf,
+          title: conf === 'none' ? '无 confidence 数据 · 点击展开加备注' : `confidence: ${conf} · 点击展开`,
+          onclick: (ev) => {
+            ev.stopPropagation();
+            const liRow = ev.currentTarget.closest('li');
+            liRow?.classList.toggle('expanded');
+          },
+        });
+
+        // Reason and repair hint. Reason comes from the step JSON. Repair
+        // suggestions are context-generated per API/confidence — they are
+        // just prompts, the user still has to act (paste an xpath, edit
+        // the locator, etc.).
+        const suggestions = buildStepFixSuggestion(s);
+        const confPanel = el('div', { class: 'step-conf-panel' },
+          el('div', { class: 'conf-title' },
+            'Step #' + s.order + ' · 转换器给的置信度：',
+            el('span', { class: 'lvl-tag ' + conf }, conf === 'none' ? 'N/A' : conf),
+          ),
+          s.reason ? el('div', { class: 'conf-block' },
+            el('div', { class: 'conf-block-label' }, 'Reason（这一步的 API/locator 是怎么推的）'),
+            el('div', {}, s.reason),
+          ) : null,
+          suggestions.length ? el('div', { class: 'conf-block' },
+            el('div', { class: 'conf-block-label' }, '常见修法建议'),
+            ...suggestions.map((sug) => el('div', { class: 'conf-fix', style: 'margin-top:6px;' }, sug)),
+          ) : null,
+          // Paste-xpath action — this is the affordance the user asked for.
+          el('div', { class: 'conf-actions' },
+            el('button', {
+              class: 'a-button a-button--neutral-secondary -small',
+              onclick: () => {
+                const cur = editing[i].xpath || '';
+                const val = prompt('粘贴 xpath 兜底（DOM 里 F12 复制的路径 · 留空清除）：', cur);
+                if (val === null) return;
+                const trimmed = val.trim();
+                if (trimmed) editing[i].xpath = trimmed;
+                else delete editing[i].xpath;
+                // Push the new text (NL + xpath tail) back into the textarea.
+                const ta = confPanel.parentElement.querySelector('.step-text-input');
+                if (ta) {
+                  ta.value = stepDisplayText(editing[i]);
+                  ta.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                toast(trimmed ? '已加 xpath 兜底' : '已清除 xpath');
+              },
+            }, editing[i].xpath ? '✎ Edit xpath (' + editing[i].xpath.slice(0, 20) + '…)' : '＋ Add xpath fallback'),
+            (conf === 'low' || conf === 'medium') ? el('button', {
+              class: 'a-button a-button--neutral-tertiary -small',
+              title: '标记这一步已复查通过 · 移除 low-confidence 提醒',
+              onclick: () => {
+                editing[i].confidence = 'high';
+                editing[i].reviewedByUser = true;
+                renderAll();
+              },
+            }, '✓ Reviewed') : null,
+          ),
+        );
+
+        const stepRow = el('div', { class: 'step-row' },
+          el('div', { class: 'step-n' }, '#' + s.order, confDot),
           input,
-          el('div', { class: 'step-api' }, (s.midsceneApi || '').replace(/^agent\./, '')),
+          el('div', { class: 'step-api', style: 'display:flex;align-items:center;flex-wrap:wrap;' },
+            conf === 'low' ? el('span', {
+              class: 'step-lowconf-badge',
+              title: '模型对这一步不确定 · 点击展开查看原因和修法',
+              onclick: (ev) => {
+                ev.stopPropagation();
+                ev.currentTarget.closest('li')?.classList.toggle('expanded');
+              },
+            }, '⚠ Low') : null,
+            (s.midsceneApi || '').replace(/^agent\./, ''),
+          ),
           el('div', { class: 'step-actions' },
             dragHandle,
             parseBtn,
@@ -3244,6 +4620,9 @@
           ),
         );
 
+        const li = el('li', {}, stepRow, confPanel);
+        // Auto-expand low-confidence steps once, until the user hides them.
+        if (conf === 'low' && !editing[i].reviewedByUser) li.classList.add('expanded');
         return li;
       });
 
@@ -3285,10 +4664,15 @@
             rows.forEach((r) => { r.style.transition = ''; });
           }, FLIP_MS + 20);
         });
-        // Refresh visible #N badges to match new DOM order.
+        // Refresh visible #N badges to match new DOM order — surgical
+        // update to the first text node so the sibling confidence dot
+        // element inside .step-n survives.
         [...stepListEl.children].forEach((r, k) => {
           const numEl = r.querySelector('.step-n');
-          if (numEl) numEl.textContent = '#' + (k + 1);
+          if (!numEl) return;
+          const first = numEl.firstChild;
+          if (first && first.nodeType === 3) first.textContent = '#' + (k + 1);
+          else numEl.insertBefore(document.createTextNode('#' + (k + 1)), numEl.firstChild);
         });
       };
 
@@ -3327,12 +4711,63 @@
         renderAll();
       };
 
+      // Confidence summary strip — only shown when at least one step
+      // carries a confidence field. Clicking a segment expands or
+      // collapses all steps at that level in one click.
+      const confCounts = editing.reduce((acc, s) => {
+        const c = String(s.confidence || 'none').toLowerCase();
+        acc[c] = (acc[c] || 0) + 1;
+        return acc;
+      }, {});
+      const hasAnyConf = ['high', 'medium', 'low'].some((k) => (confCounts[k] || 0) > 0);
+      const bulkToggle = (level, expand) => {
+        stepListEl.querySelectorAll('li').forEach((li, idx) => {
+          const stepConf = String(editing[idx]?.confidence || 'none').toLowerCase();
+          if (stepConf === level) li.classList.toggle('expanded', expand);
+        });
+      };
+      const confStrip = hasAnyConf ? el('div', {
+        style: 'padding:10px 14px;background:linear-gradient(to right,#f8fafc,#fff);border-bottom:1px solid var(--line);font-size:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;',
+      },
+        el('span', { style: 'font-weight:800;color:var(--navy);letter-spacing:0.3px;' }, '模型置信度：'),
+        el('span', { style: 'display:inline-flex;align-items:center;gap:5px;' },
+          el('span', { style: 'width:9px;height:9px;border-radius:50%;background:#16a34a;display:inline-block;' }),
+          el('b', {}, String(confCounts.high || 0)), ' high',
+        ),
+        el('span', { style: 'display:inline-flex;align-items:center;gap:5px;' },
+          el('span', { style: 'width:9px;height:9px;border-radius:50%;background:#eab308;display:inline-block;' }),
+          el('b', {}, String(confCounts.medium || 0)), ' medium',
+        ),
+        el('span', { style: 'display:inline-flex;align-items:center;gap:5px;' },
+          el('span', { style: 'width:9px;height:9px;border-radius:50%;background:#dc2626;display:inline-block;' }),
+          el('b', {}, String(confCounts.low || 0)), ' low',
+        ),
+        (confCounts.none || 0) > 0 ? el('span', { style: 'color:var(--muted);' },
+          '(', String(confCounts.none), ' 步无 confidence 数据)',
+        ) : null,
+        el('span', { style: 'margin-left:auto;display:flex;gap:6px;' },
+          (confCounts.low || 0) > 0 ? el('button', {
+            class: 'a-button a-button--neutral-secondary -small',
+            onclick: () => bulkToggle('low', true),
+          }, `⚠ 展开 ${confCounts.low || 0} 个 low`) : null,
+          (confCounts.medium || 0) > 0 ? el('button', {
+            class: 'a-button a-button--neutral-tertiary -small',
+            onclick: () => bulkToggle('medium', true),
+          }, `展开 ${confCounts.medium || 0} 个 medium`) : null,
+          el('button', {
+            class: 'a-button a-button--neutral-tertiary -small',
+            onclick: () => stepListEl.querySelectorAll('li').forEach((li) => li.classList.remove('expanded')),
+          }, '全部收起'),
+        ),
+      ) : null;
+
       return el('div', { class: 'section-card' },
         el('div', { class: 'section-title' },
           el('span', {}, `API Guide · ${editing.length} steps`),
           el('span', { class: 'head-sub' }, '改 / 调顺序 / 插入 / 删除都可以 · API 类型本地规则自动识别'),
         ),
         driftBanner,
+        confStrip,
         el('div', { class: 'section-content', style: 'padding:0;' },
           el('div', { class: 'guide-inserter' },
             el('button', { onclick: () => insertAt(0) }, '+ 在最前面插入一步'),
@@ -3563,6 +4998,15 @@
             }, isPinnedFail ? '★ fail' : '☆ fail'),
             r.report?.url ? el('a', { class: 'a-button a-button--brand-tertiary -small', href: r.report.url, target: '_blank' }, 'Report') : null,
             r.runId ? el('button', { class: 'a-button a-button--neutral-tertiary -small', onclick: () => openLogModal(r) }, 'Log') : null,
+            // AI debug entry — only surfaces on failed runs, wires the
+            // step-index the runner reached + error message into the
+            // case-agent /analyze endpoint. See openDebugAgentModal.
+            !isPass ? el('button', {
+              class: 'a-button -small',
+              style: 'background:var(--amber);border-color:var(--amber);color:#5b3f00;font-weight:800;',
+              title: '让 AI 看错误 + 卡住的步骤 → 提一个 fix',
+              onclick: () => openDebugAgentModal(r, caseId, stepCount, reached),
+            }, '🤖 Debug') : null,
           ),
         );
 
@@ -3664,6 +5108,465 @@
       );
       overlay.appendChild(modal);
       document.body.appendChild(overlay);
+    }
+
+    // ── AI Debug modal ─────────────────────────────────────────────────
+    // Stage 1: sequential flow — call /analyze, show the proposal, wait
+    // for the user to click Apply. No auto-loop yet; user re-runs the
+    // case themselves to see if the fix worked.
+    async function openDebugAgentModal(run, caseId, stepCount, reached) {
+      const overlay = el('div', { class: 'modal-backdrop', onclick: (ev) => { if (ev.target === overlay) close(); } });
+      function close() { overlay.remove(); }
+
+      // reached=`step ${N}` from runner; convert to zero-based idx.
+      const failedStepIdx = Number.isFinite(reached) ? Math.max(0, reached - 1) : null;
+      const errText = run.errorMessage
+        || (Array.isArray(run.logTail)
+              ? run.logTail.slice(-30).map((x) => typeof x === 'string' ? x : (x.line || '')).join('\n')
+              : '');
+
+      const bodyEl = el('div', { class: 'modal-body', style: 'min-height:200px;' },
+        el('div', { style: 'display:flex;align-items:center;gap:10px;color:var(--muted);' },
+          el('span', { class: 'spinner-inline' }, '⏳'),
+          'AI 正在分析：读取 case + 错误 + 前后步骤…',
+        ),
+      );
+      const modal = el('div', { class: 'modal', style: 'width:min(680px,calc(100vw - 40px));' },
+        el('div', { class: 'modal-head' },
+          el('div', {},
+            el('div', { class: 'title' }, '🤖 AI Debug'),
+            el('div', { class: 'sub' },
+              caseId, ' · runId ', el('code', { style: 'font-size:11px;' }, (run.runId || '').slice(-12)),
+              failedStepIdx != null ? ` · 卡在 step ${failedStepIdx + 1}/${stepCount}` : ''),
+          ),
+          el('button', { class: 'close', onclick: close }, '✕'),
+        ),
+        bodyEl,
+      );
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      let analysis;
+      try {
+        analysis = await api('/api/case-agent/analyze', {
+          method: 'POST',
+          body: JSON.stringify({
+            caseId,
+            error: errText.slice(0, 3000),
+            failedStepIdx,
+            // Give the server the report URL so it can pull the failing
+            // task + AI thought + screenshot straight from Midscene's
+            // own record instead of grepping our log. This is what makes
+            // the vision model useful for locator drift.
+            reportUrl: run.report?.url || null,
+          }),
+        });
+      } catch (err) {
+        bodyEl.replaceChildren(el('div', { style: 'color:var(--red);padding:10px;' }, 'AI 分析失败: ' + err.message));
+        return;
+      }
+
+      renderAnalysis(bodyEl, analysis, caseId, close);
+    }
+
+    function renderAnalysis(bodyEl, analysis, caseId, close) {
+      const conf = Math.round((analysis.confidence || 0) * 100);
+      const hypBadge = el('span', {
+        style: `display:inline-block;padding:2px 10px;border-radius:9999px;background:${
+          analysis.hypothesis === 'needs-human' ? '#fef3c7' : '#dbeafe'
+        };color:${analysis.hypothesis === 'needs-human' ? '#92400e' : '#1e40af'};font-weight:700;font-size:11px;`,
+      }, analysis.hypothesis);
+
+      const call = (analysis.toolCalls || [])[0];
+      const proposalCard = !call
+        ? el('div', { style: 'padding:14px;background:#fef3c7;border-left:3px solid #f59e0b;border-radius:4px;' },
+            el('b', {}, '需要人工介入'),
+            el('div', { style: 'margin-top:6px;color:var(--muted);font-size:12px;' },
+              'AI 没有提出自动修法。看下 log / 截图，或者手动改 case JSON。'))
+        : el('div', { style: 'padding:14px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;' },
+            el('div', { style: 'display:flex;align-items:center;gap:8px;margin-bottom:8px;' },
+              el('span', { style: 'font-weight:800;color:#166534;' }, '建议修法'),
+              el('code', { style: 'background:#dcfce7;padding:2px 8px;border-radius:4px;font-size:12px;' }, call.tool),
+            ),
+            renderToolArgs(call),
+            call.args?.reason ? el('div', { style: 'margin-top:10px;padding-top:10px;border-top:1px solid #bbf7d0;font-size:12px;color:var(--muted);' },
+              el('b', {}, '理由：'), call.args.reason) : null,
+          );
+
+      const status = el('div', { style: 'margin-top:12px;font-size:12px;color:var(--muted);' });
+      // Verdict buttons revealed AFTER a successful apply — user tells us
+      // whether the fix actually worked (they've re-run the case). Both
+      // outcomes get written back to KB so the RAG remembers next time.
+      const verdictRow = el('div', {
+        style: 'display:none;gap:8px;align-items:center;margin-top:6px;padding:10px 12px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;',
+      },
+        el('div', { style: 'font-size:12px;font-weight:800;color:var(--navy);flex:1;' },
+          '🧪 重跑之后有效吗？（记 KB，下次遇到相同 signature 直接复用/避坑）'),
+        el('button', {
+          class: 'a-button a-button--brand-primary -small',
+          style: 'background:#16a34a;border-color:#16a34a;',
+          onclick: () => recordVerdict(true),
+        }, '✓ 有效'),
+        el('button', {
+          class: 'a-button a-button--destructive-primary -small',
+          onclick: () => recordVerdict(false),
+        }, '✗ 无效'),
+      );
+
+      // Send the postmortem — writes markdown to server/data/kb/postmortems/
+      // and triggers an incremental reindex on the server so the new chunk
+      // is embedded and available for retrieval immediately.
+      async function recordVerdict(worked) {
+        verdictRow.querySelectorAll('button').forEach((b) => (b.disabled = true));
+        status.textContent = worked ? '✓ 记 KB · 有效…' : '✗ 记 KB · 无效…';
+        try {
+          const r = await api('/api/case-agent/postmortem', {
+            method: 'POST',
+            body: JSON.stringify({
+              caseId,
+              toolCall: call,
+              worked,
+              hypothesis: analysis.hypothesis,
+              failingSubType: analysis.evidence?.failingSubType || '',
+              failingThought: analysis.evidence?.failingThought || '',
+              errorSnippet: '',  // we don't ship the whole error again — server has all it needs
+            }),
+          });
+          status.textContent = `📚 已写入 KB · ${r.file} · ${r.action} · reindexed ${r.reindexedChunks} chunks`;
+          toast('已沉淀到 KB — 下次相似失败会自动检索到');
+        } catch (err) {
+          status.textContent = '✗ 写 KB 失败: ' + err.message;
+          verdictRow.querySelectorAll('button').forEach((b) => (b.disabled = false));
+        }
+      }
+
+      const applyBtn = call ? el('button', {
+        class: 'a-button a-button--brand-primary',
+        style: 'margin-right:8px;',
+        onclick: async () => {
+          applyBtn.disabled = true;
+          status.textContent = '正在写入 case JSON…';
+          try {
+            const r = await api('/api/case-agent/apply', {
+              method: 'POST',
+              body: JSON.stringify({ caseId, toolCall: call }),
+            });
+            status.textContent = '✓ 已应用 · ' + (r.summary || '') + ' · 请到上面 ▶ Run raw 重跑，回来告诉我有效还是无效';
+            applyBtn.textContent = 'Applied';
+            toast('已修改 case JSON — 重跑一次，回来点 ✓ 有效 / ✗ 无效');
+            verdictRow.style.display = 'flex';
+            // Refresh case detail so any read-only view picks up the edit
+            await loadCaseDetail(caseId).catch(() => {});
+            renderAll();
+          } catch (err) {
+            status.textContent = '✗ ' + err.message;
+            applyBtn.disabled = false;
+          }
+        },
+      }, 'Apply fix') : null;
+
+      bodyEl.replaceChildren(
+        el('div', { style: 'padding:16px 20px;display:flex;flex-direction:column;gap:12px;' },
+          el('div', { style: 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;' },
+            hypBadge,
+            el('span', { style: 'font-size:12px;color:var(--muted);' }, `信心 ${conf}%`),
+            analysis.evidence?.hadScreenshot
+              ? el('span', { style: 'font-size:11px;padding:2px 8px;border-radius:9999px;background:#dcfce7;color:#166534;font-weight:700;' }, '📷 已看截图')
+              : null,
+            analysis.evidence
+              ? el('span', { style: 'font-size:11px;padding:2px 8px;border-radius:9999px;background:#e0e7ff;color:#3730a3;font-weight:700;' }, `📋 report timeline · ${analysis.evidence.timeline?.length || 0} 条`)
+              : null,
+          ),
+          el('div', { style: 'font-size:13px;line-height:1.55;color:var(--navy);' },
+            analysis.explain || '(无说明)'),
+          // Evidence panel — collapsed by default. Lets the user verify
+          // what the AI actually saw before trusting the proposal.
+          analysis.evidence ? renderEvidencePanel(analysis.evidence) : null,
+          proposalCard,
+          status,
+          // Verdict record row · hidden until Apply succeeds. On click,
+          // POSTs /api/case-agent/postmortem which writes a KB md and
+          // triggers incremental reindex → next similar failure gets it.
+          verdictRow,
+          el('div', { style: 'display:flex;gap:8px;margin-top:6px;' },
+            applyBtn,
+            // Auto-loop: analyze → apply → run → verify → (if pass) auto
+            // postmortem worked=true. Caps at 3 iterations; stops on
+            // signature repeat, needs-human, or first pass.
+            call ? el('button', {
+              class: 'a-button a-button--brand-secondary',
+              title: '不用手动重跑 · agent 自动跑 max 3 轮直到通过或放弃',
+              onclick: () => startAutoLoop(bodyEl, caseId, call, analysis, close),
+            }, '🔁 Auto-fix (max 3 轮)') : null,
+            el('button', { class: 'a-button a-button--neutral-tertiary', onclick: close }, call ? 'Skip' : 'Close'),
+          ),
+        ),
+      );
+    }
+
+    // Compute a stable signature for a toolCall — same shape as the
+    // server's fixSignature so we can detect "planner just proposed the
+    // exact same thing again" and break out of an infinite loop.
+    function fixSignatureClient(caseId, toolCall) {
+      const a = toolCall?.args || {};
+      const t = toolCall?.tool || '?';
+      const stepKey = a.stepIdx != null ? a.stepIdx : (a.afterStepIdx != null ? a.afterStepIdx : '?');
+      let argKey = '';
+      if (t === 'setStepLocator')  argKey = a.newLocator || '';
+      else if (t === 'insertSleepAfter') argKey = 'sleep-' + Math.round((a.ms || 0) / 500) * 500;
+      else if (t === 'changeStepApi')    argKey = (a.newApi || '') + '::' + (a.newArg || '');
+      return `${caseId}::${stepKey}::${t}::${argKey}`;
+    }
+
+    // Server-side signature match for postmortem retrieval — used at end
+    // of auto-loop to know whether a matching KB entry already exists.
+    // (Client dedup only. Server has its own dedup on write.)
+
+    // ── Auto-fix loop ──────────────────────────────────────────────
+    // Owns modal body while running. Streams a timeline of iterations
+    // so user sees exactly what happened each round.
+    async function startAutoLoop(bodyEl, caseId, initialCall, initialAnalysis, close) {
+      const MAX_ITER = 3;
+      const tried = new Set([fixSignatureClient(caseId, initialCall)]);
+      const timeline = el('div', { style: 'display:flex;flex-direction:column;gap:10px;' });
+      const footer = el('div', { style: 'display:flex;gap:8px;margin-top:14px;' });
+      bodyEl.replaceChildren(el('div', { style: 'padding:16px 20px;' },
+        el('div', { style: 'font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;' },
+          '🔁 Auto-fix loop · 最多 ' + MAX_ITER + ' 轮'),
+        timeline,
+        footer,
+      ));
+
+      const stepCard = (n, phase, sub, tone = 'info') => {
+        const bg = tone === 'ok' ? '#f0fdf4'
+                : tone === 'fail' ? '#fef2f2'
+                : tone === 'busy' ? '#eff6ff'
+                : '#f8fafc';
+        const border = tone === 'ok' ? '#86efac'
+                    : tone === 'fail' ? '#fca5a5'
+                    : tone === 'busy' ? '#93c5fd'
+                    : 'var(--line)';
+        return el('div', { style: `padding:10px 14px;border:1px solid ${border};border-radius:6px;background:${bg};` },
+          el('div', { style: 'font-size:12.5px;font-weight:800;color:var(--navy);' }, `${n}. ${phase}`),
+          sub ? el('div', { style: 'font-size:11.5px;color:var(--muted);margin-top:3px;' }, sub) : null,
+        );
+      };
+      const pushStep = (n, phase, sub, tone) => {
+        timeline.appendChild(stepCard(n, phase, sub, tone));
+        bodyEl.scrollTop = bodyEl.scrollHeight;
+      };
+
+      let currentCall = initialCall;
+      let currentAnalysis = initialAnalysis;
+      let iter = 1;
+      let outcome = { done: false };
+
+      while (iter <= MAX_ITER && !outcome.done) {
+        const prefix = `[iter ${iter}/${MAX_ITER}]`;
+        try {
+          // ── Apply ──────────────────────────────────────────────
+          pushStep(iter, `${prefix} 应用 fix`, describeToolCall(currentCall), 'busy');
+          const ar = await api('/api/case-agent/apply', {
+            method: 'POST',
+            body: JSON.stringify({ caseId, toolCall: currentCall }),
+          });
+          pushStep(iter, `${prefix} ✓ apply 完成`, ar.summary || '', 'ok');
+          await loadCaseDetail(caseId).catch(() => {});
+
+          // ── Run ────────────────────────────────────────────────
+          pushStep(iter, `${prefix} 🏃 触发 run raw…`, 'cache=write · 可能 1-3 分钟', 'busy');
+          state.isRunning = true; renderAll();
+          const runR = await api('/api/midscene-js/cases/' + encodeURIComponent(caseId) + '/run?cache=write', {
+            method: 'POST',
+            body: JSON.stringify({ headed: state.runHeaded, keepCacheOnFailure: false }),
+          });
+          state.isRunning = false;
+          state.lastRun = runR.run || runR;
+          await loadRuns(caseId).catch(() => {});
+
+          const runStatus = state.lastRun?.status || '?';
+          const passed = runStatus === 'passed';
+          const runId = (state.lastRun?.runId || '').slice(-12);
+
+          pushStep(iter, `${prefix} run 结果: ${passed ? '✓ passed' : '✗ ' + runStatus}`,
+            `runId ${runId} · duration ${Math.round((state.lastRun?.durationMs || 0) / 1000)}s`,
+            passed ? 'ok' : 'fail');
+
+          if (passed) {
+            // ── Postmortem worked=true ────────────────────────────
+            pushStep(iter + 0.5, '📚 写 KB (worked=true)', '沉淀到 postmortems/ · 触发增量 reindex', 'busy');
+            try {
+              const pmR = await api('/api/case-agent/postmortem', {
+                method: 'POST',
+                body: JSON.stringify({
+                  caseId, toolCall: currentCall, worked: true,
+                  hypothesis: currentAnalysis?.hypothesis || 'unknown',
+                  failingSubType: currentAnalysis?.evidence?.failingSubType || '',
+                  failingThought: currentAnalysis?.evidence?.failingThought || '',
+                }),
+              });
+              pushStep(iter + 0.5, `✓ KB updated · ${pmR.file}`,
+                `reindexed ${pmR.reindexedChunks} chunks`, 'ok');
+            } catch (e) {
+              pushStep(iter + 0.5, '⚠ 写 KB 失败', e.message, 'fail');
+            }
+            outcome = { done: true, kind: 'passed' };
+            break;
+          }
+
+          // Also postmortem the failed attempt so we don't repeat it
+          try {
+            await api('/api/case-agent/postmortem', {
+              method: 'POST',
+              body: JSON.stringify({
+                caseId, toolCall: currentCall, worked: false,
+                hypothesis: currentAnalysis?.hypothesis || 'unknown',
+                failingSubType: currentAnalysis?.evidence?.failingSubType || '',
+                failingThought: currentAnalysis?.evidence?.failingThought || '',
+              }),
+            });
+            pushStep(iter, '📚 已记 worked=false', 'planner 下轮会避开这个 fix', 'info');
+          } catch { /* non-fatal */ }
+
+          if (iter >= MAX_ITER) {
+            outcome = { done: true, kind: 'exhausted' };
+            break;
+          }
+
+          // ── Re-analyze (uses the fresh run's report) ──────────
+          pushStep(iter, `${prefix} 🔍 重新分析新一轮 run`, '', 'busy');
+          const nextReportUrl = state.lastRun?.report?.url || null;
+          const nextErr = state.lastRun?.errorMessage || '';
+          // Don't pass failedStepIdx — the server pulls it from the
+          // report summary (Midscene's own task graph is more accurate
+          // than any log-line regex we could do here).
+          const nextR = await api('/api/case-agent/analyze', {
+            method: 'POST',
+            body: JSON.stringify({
+              caseId, error: nextErr, reportUrl: nextReportUrl,
+            }),
+          });
+
+          const nextCall = (nextR.toolCalls || [])[0];
+          if (!nextCall) {
+            pushStep(iter, `${prefix} 🛑 planner 说 needs-human`, nextR.explain || '', 'fail');
+            outcome = { done: true, kind: 'needs-human', analysis: nextR };
+            break;
+          }
+          const nextSig = fixSignatureClient(caseId, nextCall);
+          if (tried.has(nextSig)) {
+            pushStep(iter, `${prefix} 🛑 planner 又提了同样的 fix`, '(guard) 打破循环 → needs-human', 'fail');
+            outcome = { done: true, kind: 'signature-repeat' };
+            break;
+          }
+          tried.add(nextSig);
+          currentCall = nextCall;
+          currentAnalysis = nextR;
+          iter += 1;
+        } catch (err) {
+          pushStep(iter, `${prefix} ✗ 迭代出错`, err.message, 'fail');
+          outcome = { done: true, kind: 'error', error: err.message };
+          break;
+        } finally {
+          state.isRunning = false;
+        }
+      }
+
+      // Summary card at the bottom
+      const summaryBox = el('div', {
+        style: `margin-top:14px;padding:12px 16px;border-radius:8px;font-weight:800;font-size:14px;` +
+          (outcome.kind === 'passed' ? 'background:#dcfce7;color:#166534;border:1px solid #86efac;'
+          : 'background:#fef3c7;color:#78350f;border:1px solid #fcd34d;'),
+      },
+        outcome.kind === 'passed'      ? `🎉 修好了 · ${iter} 轮通过 · 已沉淀到 KB`
+        : outcome.kind === 'exhausted' ? `⏱ 尝试 ${MAX_ITER} 轮仍未通过 · 需要人工介入`
+        : outcome.kind === 'needs-human' ? '🙋 planner 判定需要人工看 · 结束'
+        : outcome.kind === 'signature-repeat' ? '🔁 planner 打圈 · guard 停止'
+        : `✗ 出错: ${outcome.error || 'unknown'}`
+      );
+      timeline.appendChild(summaryBox);
+      footer.replaceChildren(
+        el('button', { class: 'a-button a-button--neutral-tertiary', onclick: close }, '关闭'),
+      );
+    }
+
+    function describeToolCall(call) {
+      if (!call) return '(无 toolCall)';
+      const a = call.args || {};
+      if (call.tool === 'setStepLocator')  return `setStepLocator @ step ${a.stepIdx + 1}: "${(a.newLocator || '').slice(0, 60)}"`;
+      if (call.tool === 'insertSleepAfter') return `insertSleepAfter step ${a.afterStepIdx + 1} · ${a.ms}ms`;
+      if (call.tool === 'changeStepApi')    return `changeStepApi @ step ${a.stepIdx + 1} → ${a.newApi}("${a.newArg || ''}")`;
+      return call.tool;
+    }
+
+    function renderEvidencePanel(ev) {
+      const wrap = el('details', {
+        style: 'border:1px solid var(--line);border-radius:6px;background:#fafbfc;',
+      });
+      const summary = el('summary', {
+        style: 'padding:8px 12px;cursor:pointer;font-size:12px;font-weight:700;color:var(--navy);user-select:none;',
+      }, '🔍 AI 看到的证据 (点开)');
+      wrap.appendChild(summary);
+      const body = el('div', { style: 'padding:8px 14px 12px;font-size:12px;line-height:1.6;' });
+
+      body.appendChild(el('div', { style: 'color:var(--muted);' },
+        'Report: ', el('code', { style: 'font-size:11px;' }, ev.reportPath)));
+
+      if (ev.lastGoodExec) {
+        body.appendChild(el('div', {},
+          el('b', { style: 'color:#166534;' }, '最后一步 ok: '),
+          ev.lastGoodExec));
+      }
+      body.appendChild(el('div', { style: 'margin-top:4px;' },
+        el('b', { style: 'color:var(--red);' }, `失败点 [trace-idx=${ev.failingIdx}]: `),
+        `${ev.failingType}/${ev.failingSubType} · status=`,
+        el('code', { style: 'background:#fee2e2;padding:1px 6px;border-radius:3px;color:#991b1b;' }, ev.failingStatus || '?'),
+        ' · ',
+        ev.failingExec || '(no name)'));
+
+      if (ev.failingThought) {
+        body.appendChild(el('div', {
+          style: 'margin-top:8px;padding:8px 10px;background:#fff7ed;border-left:3px solid #f59e0b;font-family:var(--mono);font-size:11px;line-height:1.5;color:#7c2d12;border-radius:2px;',
+        },
+          el('div', { style: 'font-weight:700;font-family:inherit;margin-bottom:4px;' }, 'AI thought:'),
+          ev.failingThought));
+      }
+
+      if (ev.timeline?.length) {
+        const tbl = el('div', { style: 'margin-top:10px;font-family:var(--mono);font-size:11px;line-height:1.6;' });
+        for (const t of ev.timeline) {
+          const row = el('div', {
+            style: `padding:2px 6px;border-radius:3px;${t.isFailing ? 'background:#fee2e2;color:#991b1b;font-weight:700;' : 'color:var(--muted);'}`,
+          },
+            (t.isFailing ? '→ ' : '  ') + `[${t.idx}] ${t.type}/${t.subType} · ${t.status} · ${(t.execName || '').slice(0, 60)}`);
+          tbl.appendChild(row);
+        }
+        body.appendChild(tbl);
+      }
+      wrap.appendChild(body);
+      return wrap;
+    }
+
+    function renderToolArgs(call) {
+      const a = call.args || {};
+      if (call.tool === 'setStepLocator') {
+        return el('div', { style: 'font-size:13px;line-height:1.6;' },
+          el('div', {}, '把 step ', el('b', {}, `#${a.stepIdx + 1}`), ' 的定位描述改成：'),
+          el('code', { style: 'display:block;margin-top:6px;background:#fff;padding:8px 12px;border-radius:4px;border:1px solid #d1fae5;' }, a.newLocator),
+        );
+      }
+      if (call.tool === 'insertSleepAfter') {
+        return el('div', { style: 'font-size:13px;line-height:1.6;' },
+          '在 step ', el('b', {}, `#${a.afterStepIdx + 1}`), ' 后面插入 ',
+          el('code', { style: 'background:#fff;padding:2px 8px;border-radius:4px;' }, `sleep(${a.ms}ms)`));
+      }
+      if (call.tool === 'changeStepApi') {
+        return el('div', { style: 'font-size:13px;line-height:1.6;' },
+          '把 step ', el('b', {}, `#${a.stepIdx + 1}`), ' 的 API 换成 ',
+          el('code', { style: 'background:#fff;padding:2px 8px;border-radius:4px;' }, `${a.newApi}("${a.newArg || ''}")`),
+        );
+      }
+      return el('code', {}, JSON.stringify(a));
     }
 
     async function triggerRun() {
