@@ -1,0 +1,424 @@
+{
+  "$schema": "SAPTEST16 - converted from Fixed Assets Word SOP on 2026-07-07",
+  "title": "SAP TEST 16 - IFRS16 Lease Liability Reclassification",
+  "description": "Run IFRS16 lease liability reclassification in ZHL. Reads workbook parameters, executes Info System Reclassification, then uses OBJREG / valuation object list to perform test run and posting checks.",
+  "sapUrl": "https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "OBJREG / Reclassification",
+  "naturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 读取工作簿 RBJP_BP_IT_B2P_RE-FX_YEC_LeaseLiab_Reclassification 中的测试参数。\n7. 从 SAP Easy Access 用户菜单打开 Info System Reclassification。\n8. 打开 Sort Method 搜索帮助。\n9. 在 Sort Method 搜索结果中选择 sort method 1。\n10. 在 Info System Reclassification 页面输入 Key date。\n11. 从 listbox shell 中选择匹配的 key date/参数条目。\n12. 执行 Info System Reclassification。\n13. 确认出现 Reclassification (<Date>) 结果页。\n14. 返回 SAP Easy Access。\n15. 在 OK Code / 左上角命令输入框输入 OBJREG。\n16. 按 Enter 打开 Sorted List for Valuation Objects。\n17. 打开 Sort Method 搜索帮助并选择 sort method 2。\n18. 打开 Valuation Area for FI Year End Closing 搜索帮助并选择 valuation area 2。\n19. 在 Valuation key date 输入 31.03.2026。\n20. 切换到 Valuation objects 页签。\n21. 在 Aggregation ledger 字段选择 Bosch valuation ledger IFRS16。\n22. 在 G/L account 字段输入 lease liabilities 对应科目。\n23. 在 Identif. val. obj 字段选择或输入估值对象。\n24. 切换到 Parameters 页签。\n25. 切换到 Postings 页签。\n26. 点击执行图标 sap_180 进行测试运行/生成日志。\n27. 点击 Messages 查看 Display logs。\n28. 确认 Display logs 中没有阻断性错误。\n29. 返回 Sorted Valuation Objects 页面，并确认 Post documents immediately 选项。\n30. 在 Valuation objects 页签输入 Debit flow type。\n31. 确认 Credit flow type 为 L40。\n32. 切换到 Postings 页签，并确认 Perform test run。\n33. 点击执行图标 sap_180 并打开 Messages。\n34. 返回后取消/关闭 test run 标记，准备正式 posting。\n35. 再次点击执行图标 sap_180 进行正式过账。\n36. 打开 Postings 结果并返回。\n37. 确认 IFRS16 lease liability reclassification 运行完成，日志/过账结果无错误。",
+  "jsSource": "async function run(agent) {\n  await agent.aiTap(\"进入 Menu\");\n  await agent.aiTap(\"点击 Settings\");\n  await agent.aiTap(\"点击 Visualization\");\n  await agent.aiTap(\"启用 Show OK Code Field\");\n  await agent.aiTap(\"保存 Visualization 设置\");\n  const workbookParams = await agent.aiQuery(\"string, 读取工作簿 RBJP_BP_IT_B2P_RE-FX_YEC_LeaseLiab_Reclassification 中的测试参数。\");\n  await agent.aiTap(\"从 SAP Easy Access 用户菜单打开 Info System Reclassification。\");\n  await agent.aiTap(\"打开 Sort Method 搜索帮助。\");\n  await agent.aiTap(\"在 Sort Method 搜索结果中选择 sort method 1。\");\n  await agent.aiInput(\"Key date\", { value: \"<key date from workbook>\" });\n  await agent.aiTap(\"从 listbox shell 中选择匹配的 key date/参数条目。\");\n  await agent.aiTap(\"执行 Info System Reclassification。\");\n  await agent.aiAssert(\"确认出现 Reclassification (<Date>) 结果页。\");\n  await agent.aiTap(\"返回 SAP Easy Access。\");\n  await agent.aiInput(\"OK Code / command field\", { value: \"OBJREG\" });\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiTap(\"打开 Sort Method 搜索帮助并选择 sort method 2。\");\n  await agent.aiTap(\"打开 Valuation Area for FI Year End Closing 搜索帮助并选择 valuation area 2。\");\n  await agent.aiInput(\"Valuation key date\", { value: \"31.03.2026\" });\n  await agent.aiTap(\"切换到 Valuation objects 页签。\");\n  await agent.aiInput(\"Aggregation ledger\", { value: \"Bosch valuation ledger IFRS16\" });\n  await agent.aiInput(\"G/L account\", { value: \"<lease liabilities G/L account>\" });\n  await agent.aiInput(\"Identif. val. obj\", { value: \"<valuation object id>\" });\n  await agent.aiTap(\"切换到 Parameters 页签。\");\n  await agent.aiTap(\"切换到 Postings 页签。\");\n  await agent.aiTap(\"点击执行图标 sap_180 进行测试运行/生成日志。\");\n  await agent.aiTap(\"点击 Messages 查看 Display logs。\");\n  await agent.aiAssert(\"确认 Display logs 中没有阻断性错误。\");\n  await agent.aiTap(\"返回 Sorted Valuation Objects 页面，并确认 Post documents immediately 选项。\");\n  await agent.aiInput(\"Debit flow type\", { value: \"<debit flow type>\" });\n  await agent.aiInput(\"Credit flow type\", { value: \"L40\" });\n  await agent.aiTap(\"切换到 Postings 页签，并确认 Perform test run。\");\n  await agent.aiTap(\"点击执行图标 sap_180 并打开 Messages。\");\n  await agent.aiTap(\"返回后取消/关闭 test run 标记，准备正式 posting。\");\n  await agent.aiTap(\"再次点击执行图标 sap_180 进行正式过账。\");\n  await agent.aiTap(\"打开 Postings 结果并返回。\");\n  await agent.aiAssert(\"确认 IFRS16 lease liability reclassification 运行完成，日志/过账结果无错误。\");\n}",
+  "apiGuide": {
+    "summary": "SAP TEST 16 - IFRS16 Lease Liability Reclassification",
+    "assumptions": [
+      "从 https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。",
+      "Word SOP 是流程挖掘导出文档，部分字段值被脱敏为 <Number>/<name>；这类字段在步骤中保留为运行时占位说明。",
+      "如 SAP 页面没有显示 OK Code，请先按既有 saptest1 的方式开启 Show OK Code Field。"
+    ],
+    "steps": [
+      {
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "打开 SAP WebGUI 菜单，用于进入 Settings / Visualization。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 1
+      },
+      {
+        "title": "点击 Settings",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Settings",
+        "reason": "进入 SAP WebGUI 设置菜单。",
+        "exampleCode": "await agent.aiTap(\"点击 Settings\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 2
+      },
+      {
+        "title": "点击 Visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Visualization",
+        "reason": "打开可视化设置，准备启用 OK Code 输入框。",
+        "exampleCode": "await agent.aiTap(\"点击 Visualization\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 3
+      },
+      {
+        "title": "启用 Show OK Code Field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用 Show OK Code Field",
+        "reason": "确保 SAP 左上角 OK Code / 命令输入框可见，后续才能输入 T-code。",
+        "exampleCode": "await agent.aiTap(\"启用 Show OK Code Field\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 4
+      },
+      {
+        "title": "保存 Visualization 设置",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存 Visualization 设置",
+        "reason": "保存设置并回到 SAP Easy Access。",
+        "exampleCode": "await agent.aiTap(\"保存 Visualization 设置\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 5
+      },
+      {
+        "order": 6,
+        "title": "读取工作簿 RBJP_BP_IT_B2P_RE-FX_YEC_LeaseLiab_Reclassifi...",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "读取工作簿 RBJP_BP_IT_B2P_RE-FX_YEC_LeaseLiab_Reclassification 中的测试参数。",
+        "reason": "从 SAP 页面或表格读取结果值，用于后续校验。",
+        "exampleCode": "const workbookParams = await agent.aiQuery(\"string, 读取工作簿 RBJP_BP_IT_B2P_RE-FX_YEC_LeaseLiab_Reclassification 中的测试参数。\");",
+        "executionConfidence": 0.55,
+        "sourceEvidence": "Reading a Workbook; Reading from worksheet"
+      },
+      {
+        "order": 7,
+        "title": "从 SAP Easy Access 用户菜单打开 Info System Reclassification。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "从 SAP Easy Access 用户菜单打开 Info System Reclassification。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"从 SAP Easy Access 用户菜单打开 Info System Reclassification。\");",
+        "executionConfidence": 0.58,
+        "sourceEvidence": "ZHL SAP Easy Access -> Info System Reclassification; menu path not exported"
+      },
+      {
+        "order": 8,
+        "title": "打开 Sort Method 搜索帮助。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Sort Method 搜索帮助。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Sort Method 搜索帮助。\");",
+        "executionConfidence": 0.78,
+        "sourceEvidence": "Reading from field - sort method; Sort Method entries found"
+      },
+      {
+        "order": 9,
+        "title": "在 Sort Method 搜索结果中选择 sort method 1。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Sort Method 搜索结果中选择 sort method 1。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在 Sort Method 搜索结果中选择 sort method 1。\");",
+        "executionConfidence": 0.8,
+        "sourceEvidence": "Reading a label - sort method 1; Focusing on Table - description"
+      },
+      {
+        "order": 10,
+        "title": "在 Info System Reclassification 页面输入 Key date。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Info System Reclassification 页面输入 Key date。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Key date\", { value: \"<key date from workbook>\" });",
+        "executionConfidence": 0.62,
+        "sourceEvidence": "Reading from field - key date; value from workbook"
+      },
+      {
+        "order": 11,
+        "title": "从 listbox shell 中选择匹配的 key date/参数条目。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "从 listbox shell 中选择匹配的 key date/参数条目。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"从 listbox shell 中选择匹配的 key date/参数条目。\");",
+        "executionConfidence": 0.58,
+        "sourceEvidence": "Viewing listbox shell; Selecting an application field"
+      },
+      {
+        "order": 12,
+        "title": "执行 Info System Reclassification。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "执行 Info System Reclassification。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"执行 Info System Reclassification。\");",
+        "executionConfidence": 0.72,
+        "sourceEvidence": "Left Click on icon - sap_180; Reclassification (<Date>)"
+      },
+      {
+        "order": 13,
+        "title": "确认出现 Reclassification (<Date>) 结果页。",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认出现 Reclassification (<Date>) 结果页。",
+        "reason": "流程完成后的页面状态/消息校验。",
+        "exampleCode": "await agent.aiAssert(\"确认出现 Reclassification (<Date>) 结果页。\");",
+        "executionConfidence": 0.84,
+        "sourceEvidence": "Viewing ZHL Reclassification (<Date>)"
+      },
+      {
+        "order": 14,
+        "title": "返回 SAP Easy Access。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "返回 SAP Easy Access。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"返回 SAP Easy Access。\");",
+        "executionConfidence": 0.72,
+        "sourceEvidence": "Reclassification -> SAP Easy Access"
+      },
+      {
+        "order": 15,
+        "title": "在 OK Code / 左上角命令输入框输入 OBJREG。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 OK Code / 左上角命令输入框输入 OBJREG。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"OK Code / command field\", { value: \"OBJREG\" });",
+        "executionConfidence": 0.9,
+        "sourceEvidence": "Selecting from dropdown - OBJREG in edit"
+      },
+      {
+        "order": 16,
+        "title": "按 Enter 打开 Sorted List for Valuation Objects。",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 打开 Sorted List for Valuation Objects。",
+        "reason": "SAP 中确认/执行类动作优先用键盘，定位更稳定。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Sorted <name> for Valuation Objects"
+      },
+      {
+        "order": 17,
+        "title": "打开 Sort Method 搜索帮助并选择 sort method 2。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Sort Method 搜索帮助并选择 sort method 2。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Sort Method 搜索帮助并选择 sort method 2。\");",
+        "executionConfidence": 0.78,
+        "sourceEvidence": "Reading a label - sort method 2"
+      },
+      {
+        "order": 18,
+        "title": "打开 Valuation Area for FI Year End Closing 搜索帮助并选择 v...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Valuation Area for FI Year End Closing 搜索帮助并选择 valuation area 2。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Valuation Area for FI Year End Closing 搜索帮助并选择 valuation area 2。\");",
+        "executionConfidence": 0.8,
+        "sourceEvidence": "valuation area for f year-end closing 2"
+      },
+      {
+        "order": 19,
+        "title": "在 Valuation key date 输入 31.03.2026。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Valuation key date 输入 31.03.2026。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Valuation key date\", { value: \"31.03.2026\" });",
+        "executionConfidence": 0.9,
+        "sourceEvidence": "Reading from field - value 31.03.2026o in valuation key date"
+      },
+      {
+        "order": 20,
+        "title": "切换到 Valuation objects 页签。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Valuation objects 页签。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Valuation objects 页签。\");",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Navigating to Tab - valuation objects"
+      },
+      {
+        "order": 21,
+        "title": "在 Aggregation ledger 字段选择 Bosch valuation ledger IF...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Aggregation ledger 字段选择 Bosch valuation ledger IFRS16。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Aggregation ledger\", { value: \"Bosch valuation ledger IFRS16\" });",
+        "executionConfidence": 0.84,
+        "sourceEvidence": "Reading label - bosch valuation ledger ifrs16"
+      },
+      {
+        "order": 22,
+        "title": "在 G/L account 字段输入 lease liabilities 对应科目。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 G/L account 字段输入 lease liabilities 对应科目。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"G/L account\", { value: \"<lease liabilities G/L account>\" });",
+        "executionConfidence": 0.6,
+        "sourceEvidence": "Reading a label - lease liabilities; G/L account value masked"
+      },
+      {
+        "order": 23,
+        "title": "在 Identif. val. obj 字段选择或输入估值对象。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Identif. val. obj 字段选择或输入估值对象。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Identif. val. obj\", { value: \"<valuation object id>\" });",
+        "executionConfidence": 0.55,
+        "sourceEvidence": "Reading from field - identif. val. obj; value masked"
+      },
+      {
+        "order": 24,
+        "title": "切换到 Parameters 页签。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Parameters 页签。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Parameters 页签。\");",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Navigating to Tab - parameters"
+      },
+      {
+        "order": 25,
+        "title": "切换到 Postings 页签。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Postings 页签。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Postings 页签。\");",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Navigating to Tab - postinqs"
+      },
+      {
+        "order": 26,
+        "title": "点击执行图标 sap_180 进行测试运行/生成日志。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击执行图标 sap_180 进行测试运行/生成日志。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击执行图标 sap_180 进行测试运行/生成日志。\");",
+        "executionConfidence": 0.78,
+        "sourceEvidence": "Left Click on icon - sap_180; Messages"
+      },
+      {
+        "order": 27,
+        "title": "点击 Messages 查看 Display logs。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Messages 查看 Display logs。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击 Messages 查看 Display logs。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Left Click on icon - Messages; Display logs"
+      },
+      {
+        "order": 28,
+        "title": "确认 Display logs 中没有阻断性错误。",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认 Display logs 中没有阻断性错误。",
+        "reason": "流程完成后的页面状态/消息校验。",
+        "exampleCode": "await agent.aiAssert(\"确认 Display logs 中没有阻断性错误。\");",
+        "executionConfidence": 0.72,
+        "sourceEvidence": "Display logs"
+      },
+      {
+        "order": 29,
+        "title": "返回 Sorted Valuation Objects 页面，并确认 Post documents i...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "返回 Sorted Valuation Objects 页面，并确认 Post documents immediately 选项。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"返回 Sorted Valuation Objects 页面，并确认 Post documents immediately 选项。\");",
+        "executionConfidence": 0.8,
+        "sourceEvidence": "sap_178; Reading label - post documents immediately"
+      },
+      {
+        "order": 30,
+        "title": "在 Valuation objects 页签输入 Debit flow type。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Valuation objects 页签输入 Debit flow type。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Debit flow type\", { value: \"<debit flow type>\" });",
+        "executionConfidence": 0.58,
+        "sourceEvidence": "Reading from field - debit flow type; value masked"
+      },
+      {
+        "order": 31,
+        "title": "确认 Credit flow type 为 L40。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "确认 Credit flow type 为 L40。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Credit flow type\", { value: \"L40\" });",
+        "executionConfidence": 0.9,
+        "sourceEvidence": "Reading from field - value L40 in credit flow type"
+      },
+      {
+        "order": 32,
+        "title": "切换到 Postings 页签，并确认 Perform test run。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Postings 页签，并确认 Perform test run。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Postings 页签，并确认 Perform test run。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Navigating to Tab - postinqs; Reading a label - perform test run"
+      },
+      {
+        "order": 33,
+        "title": "点击执行图标 sap_180 并打开 Messages。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击执行图标 sap_180 并打开 Messages。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击执行图标 sap_180 并打开 Messages。\");",
+        "executionConfidence": 0.78,
+        "sourceEvidence": "Left Click on icon - sap_180; Messages"
+      },
+      {
+        "order": 34,
+        "title": "返回后取消/关闭 test run 标记，准备正式 posting。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "返回后取消/关闭 test run 标记，准备正式 posting。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"返回后取消/关闭 test run 标记，准备正式 posting。\");",
+        "executionConfidence": 0.62,
+        "sourceEvidence": "sap_178; Post documents immediately"
+      },
+      {
+        "order": 35,
+        "title": "再次点击执行图标 sap_180 进行正式过账。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "再次点击执行图标 sap_180 进行正式过账。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"再次点击执行图标 sap_180 进行正式过账。\");",
+        "executionConfidence": 0.68,
+        "sourceEvidence": "Left Click on icon - sap_180; Postings"
+      },
+      {
+        "order": 36,
+        "title": "打开 Postings 结果并返回。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Postings 结果并返回。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Postings 结果并返回。\");",
+        "executionConfidence": 0.72,
+        "sourceEvidence": "Left Click on icon - Postings; sap_178"
+      },
+      {
+        "order": 37,
+        "title": "确认 IFRS16 lease liability reclassification 运行完成，日志/...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认 IFRS16 lease liability reclassification 运行完成，日志/过账结果无错误。",
+        "reason": "流程完成后的页面状态/消息校验。",
+        "exampleCode": "await agent.aiAssert(\"确认 IFRS16 lease liability reclassification 运行完成，日志/过账结果无错误。\");",
+        "executionConfidence": 0.78,
+        "sourceEvidence": "Display logs / Postings flow completed"
+      }
+    ],
+    "recommendedYamlSnippet": "",
+    "docReferences": [
+      "IFRS16_Leasing_BP_IT_B2P_RE_FX_YEC_LeaseLiab_Recl-SOP-30062026 (1).docx"
+    ],
+    "warnings": [
+      "由 Word SOP 自动转换，建议首次运行时使用 headed + write cache。",
+      "executionConfidence < 0.65 的步骤包含脱敏字段、图标 sap_xxx 或需要人工确认的菜单路径。"
+    ],
+    "markdown": "## SAP TEST 16 - IFRS16 Lease Liability Reclassification\n\n### Source\n- IFRS16_Leasing_BP_IT_B2P_RE_FX_YEC_LeaseLiab_Recl-SOP-30062026 (1).docx\n- URL: https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\n\n### API Steps\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n2. 点击 Settings\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n3. 点击 Visualization\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n4. 启用 Show OK Code Field\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n5. 保存 Visualization 设置\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n6. 读取工作簿 RBJP_BP_IT_B2P_RE-FX_YEC_LeaseLiab_Reclassification 中的测试参数。\n   - API: `agent.aiQuery()`\n   - executionConfidence: 0.55\n   - evidence: Reading a Workbook; Reading from worksheet\n7. 从 SAP Easy Access 用户菜单打开 Info System Reclassification。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.58\n   - evidence: ZHL SAP Easy Access -> Info System Reclassification; menu path not exported\n8. 打开 Sort Method 搜索帮助。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.78\n   - evidence: Reading from field - sort method; Sort Method entries found\n9. 在 Sort Method 搜索结果中选择 sort method 1。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.8\n   - evidence: Reading a label - sort method 1; Focusing on Table - description\n10. 在 Info System Reclassification 页面输入 Key date。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.62\n   - evidence: Reading from field - key date; value from workbook\n11. 从 listbox shell 中选择匹配的 key date/参数条目。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.58\n   - evidence: Viewing listbox shell; Selecting an application field\n12. 执行 Info System Reclassification。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.72\n   - evidence: Left Click on icon - sap_180; Reclassification (<Date>)\n13. 确认出现 Reclassification (<Date>) 结果页。\n   - API: `agent.aiAssert()`\n   - executionConfidence: 0.84\n   - evidence: Viewing ZHL Reclassification (<Date>)\n14. 返回 SAP Easy Access。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.72\n   - evidence: Reclassification -> SAP Easy Access\n15. 在 OK Code / 左上角命令输入框输入 OBJREG。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.9\n   - evidence: Selecting from dropdown - OBJREG in edit\n16. 按 Enter 打开 Sorted List for Valuation Objects。\n   - API: `agent.aiKeyboardPress()`\n   - executionConfidence: 0.82\n   - evidence: Sorted <name> for Valuation Objects\n17. 打开 Sort Method 搜索帮助并选择 sort method 2。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.78\n   - evidence: Reading a label - sort method 2\n18. 打开 Valuation Area for FI Year End Closing 搜索帮助并选择 valuation area 2。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.8\n   - evidence: valuation area for f year-end closing 2\n19. 在 Valuation key date 输入 31.03.2026。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.9\n   - evidence: Reading from field - value 31.03.2026o in valuation key date\n20. 切换到 Valuation objects 页签。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.86\n   - evidence: Navigating to Tab - valuation objects\n21. 在 Aggregation ledger 字段选择 Bosch valuation ledger IFRS16。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.84\n   - evidence: Reading label - bosch valuation ledger ifrs16\n22. 在 G/L account 字段输入 lease liabilities 对应科目。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.6\n   - evidence: Reading a label - lease liabilities; G/L account value masked\n23. 在 Identif. val. obj 字段选择或输入估值对象。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.55\n   - evidence: Reading from field - identif. val. obj; value masked\n24. 切换到 Parameters 页签。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.86\n   - evidence: Navigating to Tab - parameters\n25. 切换到 Postings 页签。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.86\n   - evidence: Navigating to Tab - postinqs\n26. 点击执行图标 sap_180 进行测试运行/生成日志。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.78\n   - evidence: Left Click on icon - sap_180; Messages\n27. 点击 Messages 查看 Display logs。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.82\n   - evidence: Left Click on icon - Messages; Display logs\n28. 确认 Display logs 中没有阻断性错误。\n   - API: `agent.aiAssert()`\n   - executionConfidence: 0.72\n   - evidence: Display logs\n29. 返回 Sorted Valuation Objects 页面，并确认 Post documents immediately 选项。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.8\n   - evidence: sap_178; Reading label - post documents immediately\n30. 在 Valuation objects 页签输入 Debit flow type。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.58\n   - evidence: Reading from field - debit flow type; value masked\n31. 确认 Credit flow type 为 L40。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.9\n   - evidence: Reading from field - value L40 in credit flow type\n32. 切换到 Postings 页签，并确认 Perform test run。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.82\n   - evidence: Navigating to Tab - postinqs; Reading a label - perform test run\n33. 点击执行图标 sap_180 并打开 Messages。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.78\n   - evidence: Left Click on icon - sap_180; Messages\n34. 返回后取消/关闭 test run 标记，准备正式 posting。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.62\n   - evidence: sap_178; Post documents immediately\n35. 再次点击执行图标 sap_180 进行正式过账。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.68\n   - evidence: Left Click on icon - sap_180; Postings\n36. 打开 Postings 结果并返回。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.72\n   - evidence: Left Click on icon - Postings; sap_178\n37. 确认 IFRS16 lease liability reclassification 运行完成，日志/过账结果无错误。\n   - API: `agent.aiAssert()`\n   - executionConfidence: 0.78\n   - evidence: Display logs / Postings flow completed"
+  },
+  "apiGuideNaturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 读取工作簿 RBJP_BP_IT_B2P_RE-FX_YEC_LeaseLiab_Reclassification 中的测试参数。\n7. 从 SAP Easy Access 用户菜单打开 Info System Reclassification。\n8. 打开 Sort Method 搜索帮助。\n9. 在 Sort Method 搜索结果中选择 sort method 1。\n10. 在 Info System Reclassification 页面输入 Key date。\n11. 从 listbox shell 中选择匹配的 key date/参数条目。\n12. 执行 Info System Reclassification。\n13. 确认出现 Reclassification (<Date>) 结果页。\n14. 返回 SAP Easy Access。\n15. 在 OK Code / 左上角命令输入框输入 OBJREG。\n16. 按 Enter 打开 Sorted List for Valuation Objects。\n17. 打开 Sort Method 搜索帮助并选择 sort method 2。\n18. 打开 Valuation Area for FI Year End Closing 搜索帮助并选择 valuation area 2。\n19. 在 Valuation key date 输入 31.03.2026。\n20. 切换到 Valuation objects 页签。\n21. 在 Aggregation ledger 字段选择 Bosch valuation ledger IFRS16。\n22. 在 G/L account 字段输入 lease liabilities 对应科目。\n23. 在 Identif. val. obj 字段选择或输入估值对象。\n24. 切换到 Parameters 页签。\n25. 切换到 Postings 页签。\n26. 点击执行图标 sap_180 进行测试运行/生成日志。\n27. 点击 Messages 查看 Display logs。\n28. 确认 Display logs 中没有阻断性错误。\n29. 返回 Sorted Valuation Objects 页面，并确认 Post documents immediately 选项。\n30. 在 Valuation objects 页签输入 Debit flow type。\n31. 确认 Credit flow type 为 L40。\n32. 切换到 Postings 页签，并确认 Perform test run。\n33. 点击执行图标 sap_180 并打开 Messages。\n34. 返回后取消/关闭 test run 标记，准备正式 posting。\n35. 再次点击执行图标 sap_180 进行正式过账。\n36. 打开 Postings 结果并返回。\n37. 确认 IFRS16 lease liability reclassification 运行完成，日志/过账结果无错误。",
+  "tags": [
+    "SAP",
+    "Fixed Assets",
+    "ZHL",
+    "IFRS16",
+    "Lease Liability",
+    "OBJREG",
+    "Reclassification"
+  ],
+  "source": {
+    "generator": "word-to-step-fixed-assets-v1",
+    "docxSource": "IFRS16_Leasing_BP_IT_B2P_RE_FX_YEC_LeaseLiab_Recl-SOP-30062026 (1).docx",
+    "convertedAt": "2026-07-07T00:00:00.000Z",
+    "system": "ZHL",
+    "conversionMeta": {
+      "stepsGenerated": 37,
+      "confidenceSummary": {
+        "high": 11,
+        "medium": 18,
+        "low": 8
+      },
+      "note": "executionConfidence 是 Word SOP 转步骤置信度，不是真实运行通过率。",
+      "okCodeSetupPrepended": true
+    }
+  }
+}

@@ -1,0 +1,453 @@
+{
+  "$schema": "SAPTEST13 - converted from Fixed Assets Word SOP on 2026-07-07",
+  "title": "SAP TEST 13 - Fixed Asset Capitalization of Current Asset",
+  "description": "Post capitalization/current asset acquisition in BHL using ABSOL, verify posted document, then display the asset and asset values. Includes a second capitalization/currency-difference posting pass from the SOP.",
+  "sapUrl": "https://bhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "ABSOL / AS03",
+  "naturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 在 OK Code / 左上角命令输入框输入 ABSOL，进入 Create General Header Data for Posting。\n7. 按 Enter 打开 ABSOL 资产交易录入页面。\n8. 在 Asset 字段输入 _mobilephone_。\n9. 在 Sub-number 字段粘贴/输入 <mobilephone>。\n10. 在 Trans. type 字段输入 1050。\n11. 打开 Transaction Type 搜索帮助/下拉列表。\n12. 在 Transaction Type 列表中选择匹配的 1050 交易类型。\n13. 点击 OK 图标确认交易类型。\n14. 在 Document date 字段输入 29.05.2026。\n15. 在 Asset value date 字段输入 29.05.2026。\n16. 在 Text 字段输入 mobilephone。\n17. 确认/输入公司代码 JPL1。\n18. 切换到 Additional details 页签。\n19. 补齐 Additional details 中的必填字段（Word 导出未给出字段名/值，按页面默认或测试数据维护）。\n20. 点击检查/模拟或行项目按钮，进入行项目/Performance 窗口。\n21. 在行项目表格中选择/确认 FIOU Center 或成本对象行。\n22. 点击保存图标 sap_190 过账资产交易。\n23. 确认状态栏显示 asset transaction posted with document no.，且文本包含 mobilephone 和 company code JPL1。\n24. 关闭 Performance/提示窗口。\n25. 进入 Display Asset Initial Screen，在 OK Code 输入 AS03。\n26. 按 Enter 打开 Display Asset Initial Screen。\n27. 在 Display Asset Initial Screen 的 Asset 字段输入 _mobilephone_。\n28. 点击 Asset values 图标/按钮。\n29. 读取 Asset Explorer 中 01 IFRS in local currency JPY 和 E10 Local GAAP in local currency 的资产值区域。\n30. 返回 SAP Easy Access，重新输入 ABSOL 开始第二笔 capitalization/currency difference posting。\n31. 在第二笔 ABSOL 中维护 Trans. type（Word 仅显示字段名，需按 SOP 测试数据确认）。\n32. 第二笔交易输入 Document date / Asset value date 为 29.05.2026。\n33. 维护 Offsetting account。\n34. 在 Text 字段输入 Capitalization currency diffr。\n35. 切换到 Additional details 并补齐必填字段。\n36. 保存第二笔资产交易。\n37. 再次打开 AS03 Display Asset。\n38. 在 Display Asset Initial Screen 输入/确认 company code JPL1。\n39. 打开 Asset values。\n40. 确认 Asset Explorer 可看到 01 IFRS/local currency 与 E10 Local GAAP/local currency 的资产值/币种行。",
+  "jsSource": "async function run(agent) {\n  await agent.aiTap(\"进入 Menu\");\n  await agent.aiTap(\"点击 Settings\");\n  await agent.aiTap(\"点击 Visualization\");\n  await agent.aiTap(\"启用 Show OK Code Field\");\n  await agent.aiTap(\"保存 Visualization 设置\");\n  await agent.aiInput(\"OK Code / command field\", { value: \"ABSOL\" });\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiInput(\"Asset\", { value: \"_mobilephone_\" });\n  await agent.aiInput(\"Sub-number\", { value: \"<mobilephone>\" });\n  await agent.aiInput(\"Trans. type\", { value: \"1050\" });\n  await agent.aiTap(\"打开 Transaction Type 搜索帮助/下拉列表。\");\n  await agent.aiTap(\"在 Transaction Type 列表中选择匹配的 1050 交易类型。\");\n  await agent.aiTap(\"点击 OK 图标确认交易类型。\");\n  await agent.aiInput(\"Document date\", { value: \"29.05.2026\" });\n  await agent.aiInput(\"Asset value date\", { value: \"29.05.2026\" });\n  await agent.aiInput(\"Text\", { value: \"mobilephone\" });\n  await agent.aiInput(\"Company code\", { value: \"JPL1\" });\n  await agent.aiTap(\"切换到 Additional details 页签。\");\n  await agent.aiInput(\"Additional details required field\", { value: \"<SOP default>\" });\n  await agent.aiTap(\"点击检查/模拟或行项目按钮，进入行项目/Performance 窗口。\");\n  await agent.aiTap(\"在行项目表格中选择/确认 FIOU Center 或成本对象行。\");\n  await agent.aiTap(\"点击保存图标 sap_190 过账资产交易。\");\n  await agent.aiAssert(\"确认状态栏显示 asset transaction posted with document no.，且文本包含 mobilephone 和 company code JPL1。\");\n  await agent.aiTap(\"关闭 Performance/提示窗口。\");\n  await agent.aiInput(\"OK Code / command field\", { value: \"AS03\" });\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiInput(\"Asset\", { value: \"_mobilephone_\" });\n  await agent.aiTap(\"点击 Asset values 图标/按钮。\");\n  const assetValueAreas = await agent.aiQuery(\"string, 读取 Asset Explorer 中 01 IFRS in local currency JPY 和 E10 Local GAAP in local currency 的资产值区域。\");\n  await agent.aiTap(\"返回 SAP Easy Access，重新输入 ABSOL 开始第二笔 capitalization/currency difference posting。\");\n  await agent.aiInput(\"Trans. type\", { value: \"<transaction type from SOP list>\" });\n  await agent.aiInput(\"Document date / Asset value date\", { value: \"29.05.2026\" });\n  await agent.aiInput(\"Offsetting account\", { value: \"<offsetting account>\" });\n  await agent.aiInput(\"Text\", { value: \"Capitalization currency diffr\" });\n  await agent.aiTap(\"切换到 Additional details 并补齐必填字段。\");\n  await agent.aiTap(\"保存第二笔资产交易。\");\n  await agent.aiInput(\"OK Code / command field\", { value: \"AS03\" });\n  await agent.aiInput(\"Company code\", { value: \"JPL1\" });\n  await agent.aiTap(\"打开 Asset values。\");\n  await agent.aiAssert(\"确认 Asset Explorer 可看到 01 IFRS/local currency 与 E10 Local GAAP/local currency 的资产值/币种行。\");\n}",
+  "apiGuide": {
+    "summary": "SAP TEST 13 - Fixed Asset Capitalization of Current Asset",
+    "assumptions": [
+      "从 https://bhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。",
+      "Word SOP 是流程挖掘导出文档，部分字段值被脱敏为 <Number>/<name>；这类字段在步骤中保留为运行时占位说明。",
+      "如 SAP 页面没有显示 OK Code，请先按既有 saptest1 的方式开启 Show OK Code Field。"
+    ],
+    "steps": [
+      {
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "打开 SAP WebGUI 菜单，用于进入 Settings / Visualization。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 1
+      },
+      {
+        "title": "点击 Settings",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Settings",
+        "reason": "进入 SAP WebGUI 设置菜单。",
+        "exampleCode": "await agent.aiTap(\"点击 Settings\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 2
+      },
+      {
+        "title": "点击 Visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Visualization",
+        "reason": "打开可视化设置，准备启用 OK Code 输入框。",
+        "exampleCode": "await agent.aiTap(\"点击 Visualization\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 3
+      },
+      {
+        "title": "启用 Show OK Code Field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用 Show OK Code Field",
+        "reason": "确保 SAP 左上角 OK Code / 命令输入框可见，后续才能输入 T-code。",
+        "exampleCode": "await agent.aiTap(\"启用 Show OK Code Field\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 4
+      },
+      {
+        "title": "保存 Visualization 设置",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存 Visualization 设置",
+        "reason": "保存设置并回到 SAP Easy Access。",
+        "exampleCode": "await agent.aiTap(\"保存 Visualization 设置\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 5
+      },
+      {
+        "order": 6,
+        "title": "在 OK Code / 左上角命令输入框输入 ABSOL，进入 Create General Head...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 OK Code / 左上角命令输入框输入 ABSOL，进入 Create General Header Data for Posting。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"OK Code / command field\", { value: \"ABSOL\" });",
+        "executionConfidence": 0.9,
+        "sourceEvidence": "Selecting from dropdown - ABSOL in edit"
+      },
+      {
+        "order": 7,
+        "title": "按 Enter 打开 ABSOL 资产交易录入页面。",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 打开 ABSOL 资产交易录入页面。",
+        "reason": "SAP 中确认/执行类动作优先用键盘，定位更稳定。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");",
+        "executionConfidence": 0.84,
+        "sourceEvidence": "Create General Header Data for Posting"
+      },
+      {
+        "order": 8,
+        "title": "在 Asset 字段输入 _mobilephone_。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Asset 字段输入 _mobilephone_。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Asset\", { value: \"_mobilephone_\" });",
+        "executionConfidence": 0.92,
+        "sourceEvidence": "Reading from field - value _mobilephone_ in asset"
+      },
+      {
+        "order": 9,
+        "title": "在 Sub-number 字段粘贴/输入 <mobilephone>。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Sub-number 字段粘贴/输入 <mobilephone>。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Sub-number\", { value: \"<mobilephone>\" });",
+        "executionConfidence": 0.7,
+        "sourceEvidence": "Pasting into field - value <mobilephone> in sub-number"
+      },
+      {
+        "order": 10,
+        "title": "在 Trans. type 字段输入 1050。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Trans. type 字段输入 1050。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Trans. type\", { value: \"1050\" });",
+        "executionConfidence": 0.91,
+        "sourceEvidence": "Reading from field - value 1050 in trans. type"
+      },
+      {
+        "order": 11,
+        "title": "打开 Transaction Type 搜索帮助/下拉列表。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Transaction Type 搜索帮助/下拉列表。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Transaction Type 搜索帮助/下拉列表。\");",
+        "executionConfidence": 0.75,
+        "sourceEvidence": "Viewing Transaction Type entries found"
+      },
+      {
+        "order": 12,
+        "title": "在 Transaction Type 列表中选择匹配的 1050 交易类型。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Transaction Type 列表中选择匹配的 1050 交易类型。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在 Transaction Type 列表中选择匹配的 1050 交易类型。\");",
+        "executionConfidence": 0.76,
+        "sourceEvidence": "Focusing on Table - ttype transaction type name"
+      },
+      {
+        "order": 13,
+        "title": "点击 OK 图标确认交易类型。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 OK 图标确认交易类型。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击 OK 图标确认交易类型。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Left Click on icon - OK"
+      },
+      {
+        "order": 14,
+        "title": "在 Document date 字段输入 29.05.2026。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Document date 字段输入 29.05.2026。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Document date\", { value: \"29.05.2026\" });",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Reading a label - 29.05.2026"
+      },
+      {
+        "order": 15,
+        "title": "在 Asset value date 字段输入 29.05.2026。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Asset value date 字段输入 29.05.2026。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Asset value date\", { value: \"29.05.2026\" });",
+        "executionConfidence": 0.84,
+        "sourceEvidence": "Reading from field - asset value date"
+      },
+      {
+        "order": 16,
+        "title": "在 Text 字段输入 mobilephone。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Text 字段输入 mobilephone。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Text\", { value: \"mobilephone\" });",
+        "executionConfidence": 0.9,
+        "sourceEvidence": "Posted message contains mobilephone"
+      },
+      {
+        "order": 17,
+        "title": "确认/输入公司代码 JPL1。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "确认/输入公司代码 JPL1。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Company code\", { value: \"JPL1\" });",
+        "executionConfidence": 0.88,
+        "sourceEvidence": "Reading a label - jpl1"
+      },
+      {
+        "order": 18,
+        "title": "切换到 Additional details 页签。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Additional details 页签。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Additional details 页签。\");",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Navigating to Tab - additional details"
+      },
+      {
+        "order": 19,
+        "title": "补齐 Additional details 中的必填字段（Word 导出未给出字段名/值，按页面默认或...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "补齐 Additional details 中的必填字段（Word 导出未给出字段名/值，按页面默认或测试数据维护）。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Additional details required field\", { value: \"<SOP default>\" });",
+        "executionConfidence": 0.45,
+        "sourceEvidence": "Editing a field with element name; value masked"
+      },
+      {
+        "order": 20,
+        "title": "点击检查/模拟或行项目按钮，进入行项目/Performance 窗口。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击检查/模拟或行项目按钮，进入行项目/Performance 窗口。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击检查/模拟或行项目按钮，进入行项目/Performance 窗口。\");",
+        "executionConfidence": 0.58,
+        "sourceEvidence": "Left Click on icon - sap_238; Performance <name>"
+      },
+      {
+        "order": 21,
+        "title": "在行项目表格中选择/确认 FIOU Center 或成本对象行。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在行项目表格中选择/确认 FIOU Center 或成本对象行。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在行项目表格中选择/确认 FIOU Center 或成本对象行。\");",
+        "executionConfidence": 0.5,
+        "sourceEvidence": "Focusing on Table - fiou ceniter"
+      },
+      {
+        "order": 22,
+        "title": "点击保存图标 sap_190 过账资产交易。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击保存图标 sap_190 过账资产交易。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击保存图标 sap_190 过账资产交易。\");",
+        "executionConfidence": 0.75,
+        "sourceEvidence": "Left Click on icon - sap_190"
+      },
+      {
+        "order": 23,
+        "title": "确认状态栏显示 asset transaction posted with document no.，...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认状态栏显示 asset transaction posted with document no.，且文本包含 mobilephone 和 company code JPL1。",
+        "reason": "流程完成后的页面状态/消息校验。",
+        "exampleCode": "await agent.aiAssert(\"确认状态栏显示 asset transaction posted with document no.，且文本包含 mobilephone 和 company code JPL1。\");",
+        "executionConfidence": 0.93,
+        "sourceEvidence": "Reading a label - asset transaction posted with document no. 0280 mobilephone in accto princ. jpl1"
+      },
+      {
+        "order": 24,
+        "title": "关闭 Performance/提示窗口。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "关闭 Performance/提示窗口。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"关闭 Performance/提示窗口。\");",
+        "executionConfidence": 0.74,
+        "sourceEvidence": "Left Click on icon - Close"
+      },
+      {
+        "order": 25,
+        "title": "进入 Display Asset Initial Screen，在 OK Code 输入 AS03。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "进入 Display Asset Initial Screen，在 OK Code 输入 AS03。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"OK Code / command field\", { value: \"AS03\" });",
+        "executionConfidence": 0.74,
+        "sourceEvidence": "Enter Asset Transaction -> Display Asset Initial screen"
+      },
+      {
+        "order": 26,
+        "title": "按 Enter 打开 Display Asset Initial Screen。",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 打开 Display Asset Initial Screen。",
+        "reason": "SAP 中确认/执行类动作优先用键盘，定位更稳定。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Display Asset Initial screen"
+      },
+      {
+        "order": 27,
+        "title": "在 Display Asset Initial Screen 的 Asset 字段输入 _mobile...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Display Asset Initial Screen 的 Asset 字段输入 _mobilephone_。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Asset\", { value: \"_mobilephone_\" });",
+        "executionConfidence": 0.9,
+        "sourceEvidence": "Reading from field - value _mobilephone_ in asset"
+      },
+      {
+        "order": 28,
+        "title": "点击 Asset values 图标/按钮。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Asset values 图标/按钮。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击 Asset values 图标/按钮。\");",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Left Click on icon - Asset values"
+      },
+      {
+        "order": 29,
+        "title": "读取 Asset Explorer 中 01 IFRS in local currency JPY 和...",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "读取 Asset Explorer 中 01 IFRS in local currency JPY 和 E10 Local GAAP in local currency 的资产值区域。",
+        "reason": "从 SAP 页面或表格读取结果值，用于后续校验。",
+        "exampleCode": "const assetValueAreas = await agent.aiQuery(\"string, 读取 Asset Explorer 中 01 IFRS in local currency JPY 和 E10 Local GAAP in local currency 的资产值区域。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Reading labels - 01 ifrs in local currency jpy; e10 local gaap"
+      },
+      {
+        "order": 30,
+        "title": "返回 SAP Easy Access，重新输入 ABSOL 开始第二笔 capitalization/...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "返回 SAP Easy Access，重新输入 ABSOL 开始第二笔 capitalization/currency difference posting。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"返回 SAP Easy Access，重新输入 ABSOL 开始第二笔 capitalization/currency difference posting。\");",
+        "executionConfidence": 0.77,
+        "sourceEvidence": "Document second ABSOL flow starts at step 16"
+      },
+      {
+        "order": 31,
+        "title": "在第二笔 ABSOL 中维护 Trans. type（Word 仅显示字段名，需按 SOP 测试数据确认）。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在第二笔 ABSOL 中维护 Trans. type（Word 仅显示字段名，需按 SOP 测试数据确认）。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Trans. type\", { value: \"<transaction type from SOP list>\" });",
+        "executionConfidence": 0.42,
+        "sourceEvidence": "Reading from field - trans. type; no value exported"
+      },
+      {
+        "order": 32,
+        "title": "第二笔交易输入 Document date / Asset value date 为 29.05.2026。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "第二笔交易输入 Document date / Asset value date 为 29.05.2026。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Document date / Asset value date\", { value: \"29.05.2026\" });",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Reading label - 29.05.2026"
+      },
+      {
+        "order": 33,
+        "title": "维护 Offsetting account。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "维护 Offsetting account。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Offsetting account\", { value: \"<offsetting account>\" });",
+        "executionConfidence": 0.48,
+        "sourceEvidence": "Reading from field - offsetting account; value masked"
+      },
+      {
+        "order": 34,
+        "title": "在 Text 字段输入 Capitalization currency diffr。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Text 字段输入 Capitalization currency diffr。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Text\", { value: \"Capitalization currency diffr\" });",
+        "executionConfidence": 0.9,
+        "sourceEvidence": "Reading from field - value Capitalization currency diffr in text"
+      },
+      {
+        "order": 35,
+        "title": "切换到 Additional details 并补齐必填字段。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Additional details 并补齐必填字段。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Additional details 并补齐必填字段。\");",
+        "executionConfidence": 0.58,
+        "sourceEvidence": "Navigating to Tab - additional details"
+      },
+      {
+        "order": 36,
+        "title": "保存第二笔资产交易。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存第二笔资产交易。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"保存第二笔资产交易。\");",
+        "executionConfidence": 0.72,
+        "sourceEvidence": "Left Click on icon - sap_190"
+      },
+      {
+        "order": 37,
+        "title": "再次打开 AS03 Display Asset。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "再次打开 AS03 Display Asset。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"OK Code / command field\", { value: \"AS03\" });",
+        "executionConfidence": 0.75,
+        "sourceEvidence": "Display Asset Initial screen repeated"
+      },
+      {
+        "order": 38,
+        "title": "在 Display Asset Initial Screen 输入/确认 company code J...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Display Asset Initial Screen 输入/确认 company code JPL1。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Company code\", { value: \"JPL1\" });",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Editing text in field - company code; earlier JPL1 label"
+      },
+      {
+        "order": 39,
+        "title": "打开 Asset values。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Asset values。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Asset values。\");",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Left Click on icon - Asset values"
+      },
+      {
+        "order": 40,
+        "title": "确认 Asset Explorer 可看到 01 IFRS/local currency 与 E10 ...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认 Asset Explorer 可看到 01 IFRS/local currency 与 E10 Local GAAP/local currency 的资产值/币种行。",
+        "reason": "流程完成后的页面状态/消息校验。",
+        "exampleCode": "await agent.aiAssert(\"确认 Asset Explorer 可看到 01 IFRS/local currency 与 E10 Local GAAP/local currency 的资产值/币种行。\");",
+        "executionConfidence": 0.84,
+        "sourceEvidence": "Focusing on Table - crcy; IFRS/local GAAP labels"
+      }
+    ],
+    "recommendedYamlSnippet": "",
+    "docReferences": [
+      "Fixed_Assets_BP_IT_B2P_GUI_Capitalization_of_curre-SOP-30062026.docx"
+    ],
+    "warnings": [
+      "由 Word SOP 自动转换，建议首次运行时使用 headed + write cache。",
+      "executionConfidence < 0.65 的步骤包含脱敏字段、图标 sap_xxx 或需要人工确认的菜单路径。"
+    ],
+    "markdown": "## SAP TEST 13 - Fixed Asset Capitalization of Current Asset\n\n### Source\n- Fixed_Assets_BP_IT_B2P_GUI_Capitalization_of_curre-SOP-30062026.docx\n- URL: https://bhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\n\n### API Steps\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n2. 点击 Settings\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n3. 点击 Visualization\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n4. 启用 Show OK Code Field\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n5. 保存 Visualization 设置\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n6. 在 OK Code / 左上角命令输入框输入 ABSOL，进入 Create General Header Data for Posting。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.9\n   - evidence: Selecting from dropdown - ABSOL in edit\n7. 按 Enter 打开 ABSOL 资产交易录入页面。\n   - API: `agent.aiKeyboardPress()`\n   - executionConfidence: 0.84\n   - evidence: Create General Header Data for Posting\n8. 在 Asset 字段输入 _mobilephone_。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.92\n   - evidence: Reading from field - value _mobilephone_ in asset\n9. 在 Sub-number 字段粘贴/输入 <mobilephone>。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.7\n   - evidence: Pasting into field - value <mobilephone> in sub-number\n10. 在 Trans. type 字段输入 1050。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.91\n   - evidence: Reading from field - value 1050 in trans. type\n11. 打开 Transaction Type 搜索帮助/下拉列表。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.75\n   - evidence: Viewing Transaction Type entries found\n12. 在 Transaction Type 列表中选择匹配的 1050 交易类型。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.76\n   - evidence: Focusing on Table - ttype transaction type name\n13. 点击 OK 图标确认交易类型。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.82\n   - evidence: Left Click on icon - OK\n14. 在 Document date 字段输入 29.05.2026。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.86\n   - evidence: Reading a label - 29.05.2026\n15. 在 Asset value date 字段输入 29.05.2026。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.84\n   - evidence: Reading from field - asset value date\n16. 在 Text 字段输入 mobilephone。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.9\n   - evidence: Posted message contains mobilephone\n17. 确认/输入公司代码 JPL1。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.88\n   - evidence: Reading a label - jpl1\n18. 切换到 Additional details 页签。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.86\n   - evidence: Navigating to Tab - additional details\n19. 补齐 Additional details 中的必填字段（Word 导出未给出字段名/值，按页面默认或测试数据维护）。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.45\n   - evidence: Editing a field with element name; value masked\n20. 点击检查/模拟或行项目按钮，进入行项目/Performance 窗口。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.58\n   - evidence: Left Click on icon - sap_238; Performance <name>\n21. 在行项目表格中选择/确认 FIOU Center 或成本对象行。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.5\n   - evidence: Focusing on Table - fiou ceniter\n22. 点击保存图标 sap_190 过账资产交易。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.75\n   - evidence: Left Click on icon - sap_190\n23. 确认状态栏显示 asset transaction posted with document no.，且文本包含 mobilephone 和 company code JPL1。\n   - API: `agent.aiAssert()`\n   - executionConfidence: 0.93\n   - evidence: Reading a label - asset transaction posted with document no. 0280 mobilephone in accto princ. jpl1\n24. 关闭 Performance/提示窗口。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.74\n   - evidence: Left Click on icon - Close\n25. 进入 Display Asset Initial Screen，在 OK Code 输入 AS03。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.74\n   - evidence: Enter Asset Transaction -> Display Asset Initial screen\n26. 按 Enter 打开 Display Asset Initial Screen。\n   - API: `agent.aiKeyboardPress()`\n   - executionConfidence: 0.82\n   - evidence: Display Asset Initial screen\n27. 在 Display Asset Initial Screen 的 Asset 字段输入 _mobilephone_。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.9\n   - evidence: Reading from field - value _mobilephone_ in asset\n28. 点击 Asset values 图标/按钮。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.86\n   - evidence: Left Click on icon - Asset values\n29. 读取 Asset Explorer 中 01 IFRS in local currency JPY 和 E10 Local GAAP in local currency 的资产值区域。\n   - API: `agent.aiQuery()`\n   - executionConfidence: 0.82\n   - evidence: Reading labels - 01 ifrs in local currency jpy; e10 local gaap\n30. 返回 SAP Easy Access，重新输入 ABSOL 开始第二笔 capitalization/currency difference posting。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.77\n   - evidence: Document second ABSOL flow starts at step 16\n31. 在第二笔 ABSOL 中维护 Trans. type（Word 仅显示字段名，需按 SOP 测试数据确认）。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.42\n   - evidence: Reading from field - trans. type; no value exported\n32. 第二笔交易输入 Document date / Asset value date 为 29.05.2026。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.82\n   - evidence: Reading label - 29.05.2026\n33. 维护 Offsetting account。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.48\n   - evidence: Reading from field - offsetting account; value masked\n34. 在 Text 字段输入 Capitalization currency diffr。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.9\n   - evidence: Reading from field - value Capitalization currency diffr in text\n35. 切换到 Additional details 并补齐必填字段。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.58\n   - evidence: Navigating to Tab - additional details\n36. 保存第二笔资产交易。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.72\n   - evidence: Left Click on icon - sap_190\n37. 再次打开 AS03 Display Asset。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.75\n   - evidence: Display Asset Initial screen repeated\n38. 在 Display Asset Initial Screen 输入/确认 company code JPL1。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.82\n   - evidence: Editing text in field - company code; earlier JPL1 label\n39. 打开 Asset values。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.86\n   - evidence: Left Click on icon - Asset values\n40. 确认 Asset Explorer 可看到 01 IFRS/local currency 与 E10 Local GAAP/local currency 的资产值/币种行。\n   - API: `agent.aiAssert()`\n   - executionConfidence: 0.84\n   - evidence: Focusing on Table - crcy; IFRS/local GAAP labels"
+  },
+  "apiGuideNaturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 在 OK Code / 左上角命令输入框输入 ABSOL，进入 Create General Header Data for Posting。\n7. 按 Enter 打开 ABSOL 资产交易录入页面。\n8. 在 Asset 字段输入 _mobilephone_。\n9. 在 Sub-number 字段粘贴/输入 <mobilephone>。\n10. 在 Trans. type 字段输入 1050。\n11. 打开 Transaction Type 搜索帮助/下拉列表。\n12. 在 Transaction Type 列表中选择匹配的 1050 交易类型。\n13. 点击 OK 图标确认交易类型。\n14. 在 Document date 字段输入 29.05.2026。\n15. 在 Asset value date 字段输入 29.05.2026。\n16. 在 Text 字段输入 mobilephone。\n17. 确认/输入公司代码 JPL1。\n18. 切换到 Additional details 页签。\n19. 补齐 Additional details 中的必填字段（Word 导出未给出字段名/值，按页面默认或测试数据维护）。\n20. 点击检查/模拟或行项目按钮，进入行项目/Performance 窗口。\n21. 在行项目表格中选择/确认 FIOU Center 或成本对象行。\n22. 点击保存图标 sap_190 过账资产交易。\n23. 确认状态栏显示 asset transaction posted with document no.，且文本包含 mobilephone 和 company code JPL1。\n24. 关闭 Performance/提示窗口。\n25. 进入 Display Asset Initial Screen，在 OK Code 输入 AS03。\n26. 按 Enter 打开 Display Asset Initial Screen。\n27. 在 Display Asset Initial Screen 的 Asset 字段输入 _mobilephone_。\n28. 点击 Asset values 图标/按钮。\n29. 读取 Asset Explorer 中 01 IFRS in local currency JPY 和 E10 Local GAAP in local currency 的资产值区域。\n30. 返回 SAP Easy Access，重新输入 ABSOL 开始第二笔 capitalization/currency difference posting。\n31. 在第二笔 ABSOL 中维护 Trans. type（Word 仅显示字段名，需按 SOP 测试数据确认）。\n32. 第二笔交易输入 Document date / Asset value date 为 29.05.2026。\n33. 维护 Offsetting account。\n34. 在 Text 字段输入 Capitalization currency diffr。\n35. 切换到 Additional details 并补齐必填字段。\n36. 保存第二笔资产交易。\n37. 再次打开 AS03 Display Asset。\n38. 在 Display Asset Initial Screen 输入/确认 company code JPL1。\n39. 打开 Asset values。\n40. 确认 Asset Explorer 可看到 01 IFRS/local currency 与 E10 Local GAAP/local currency 的资产值/币种行。",
+  "tags": [
+    "SAP",
+    "Fixed Assets",
+    "BHL",
+    "Capitalization",
+    "ABSOL",
+    "Asset Explorer"
+  ],
+  "source": {
+    "generator": "word-to-step-fixed-assets-v1",
+    "docxSource": "Fixed_Assets_BP_IT_B2P_GUI_Capitalization_of_curre-SOP-30062026.docx",
+    "convertedAt": "2026-07-07T00:00:00.000Z",
+    "system": "BHL",
+    "conversionMeta": {
+      "stepsGenerated": 40,
+      "confidenceSummary": {
+        "high": 17,
+        "medium": 17,
+        "low": 6
+      },
+      "note": "executionConfidence 是 Word SOP 转步骤置信度，不是真实运行通过率。",
+      "okCodeSetupPrepended": true
+    }
+  }
+}

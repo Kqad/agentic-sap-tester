@@ -1,0 +1,363 @@
+{
+  "$schema": "SAPTEST14 - converted from Fixed Assets Word SOP on 2026-07-07",
+  "title": "SAP TEST 14 - Fixed Asset Single Asset Sale",
+  "description": "Run asset sale without customer in ZHL, post partial retirement/sale, verify Asset Explorer/Documents for Asset, then reverse the generated accounting document.",
+  "sapUrl": "https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "ABAON / AS03",
+  "naturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 在 OK Code / 左上角命令输入框输入 ABAON，进入 Asset Sale Without Customer。\n7. 按 Enter 打开 Enter Asset Transaction Asset Sale Without Customer 页面。\n8. 在 Document date 字段输入 SOP 测试日期。\n9. 在 Asset value date 字段输入 SOP 测试日期。\n10. 在 Manual revenue 字段输入 sale revenue。\n11. 切换到 Additional details 页签。\n12. 填写 Additional details 中的必填字段。\n13. 从 listbox shell 中选择匹配条目。\n14. 切换到 Partial retirement 页签。\n15. 在 Percentage rate 字段输入部分出售比例。\n16. 在 6A line items / amount currency cost center 表格中确认行项目。\n17. 点击保存图标 sap_190 过账资产出售。\n18. 在 Document lines Display messages 弹窗中点击 OK。\n19. 进入 Display Asset / Asset Explorer，输入刚才出售的资产编号。\n20. 在 Asset Explorer 表格读取 amount / ttype / transaction type name，确认出售交易行存在。\n21. 打开 Documents for Asset。\n22. 在 Documents for Asset 中输入/确认 Depreciation area。\n23. 选择 Overview of Asset Accounting Documents 中的 transaction 行。\n24. 在 Overview of Asset Accounting Documents 中点击 Reverse。\n25. 在 Specifications for Reverse Posting 中输入 Reversal reason。\n26. 打开 Reason for Reversal 搜索帮助并选择匹配原因。\n27. 点击 OK 确认 reversal reason。\n28. 在 Overview 中确认 reversal line items 后点击保存 sap_190。\n29. 在 Document lines Display messages 中点击 OK。\n30. 返回 Display Asset Master data，读取 Plnd retirement on 或资产出售相关状态。\n31. 确认 Documents for Asset / Asset Explorer 中存在出售交易和对应 reversal/冲销记录。",
+  "jsSource": "async function run(agent) {\n  await agent.aiTap(\"进入 Menu\");\n  await agent.aiTap(\"点击 Settings\");\n  await agent.aiTap(\"点击 Visualization\");\n  await agent.aiTap(\"启用 Show OK Code Field\");\n  await agent.aiTap(\"保存 Visualization 设置\");\n  await agent.aiInput(\"OK Code / command field\", { value: \"ABAON\" });\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiInput(\"Document date\", { value: \"<posting document date>\" });\n  await agent.aiInput(\"Asset value date\", { value: \"<asset value date>\" });\n  await agent.aiInput(\"Manual revenue\", { value: \"<manual revenue>\" });\n  await agent.aiTap(\"切换到 Additional details 页签。\");\n  await agent.aiInput(\"Additional details required field\", { value: \"<SOP default>\" });\n  await agent.aiTap(\"从 listbox shell 中选择匹配条目。\");\n  await agent.aiTap(\"切换到 Partial retirement 页签。\");\n  await agent.aiInput(\"Percentage rate\", { value: \"<percentage rate>\" });\n  await agent.aiTap(\"在 6A line items / amount currency cost center 表格中确认行项目。\");\n  await agent.aiTap(\"点击保存图标 sap_190 过账资产出售。\");\n  await agent.aiTap(\"在 Document lines Display messages 弹窗中点击 OK。\");\n  await agent.aiInput(\"Asset\", { value: \"<asset from posted sale>\" });\n  const saleTType = await agent.aiQuery(\"string, 在 Asset Explorer 表格读取 amount / ttype / transaction type name，确认出售交易行存在。\");\n  await agent.aiTap(\"打开 Documents for Asset。\");\n  await agent.aiInput(\"Depreciation area\", { value: \"<depreciation area>\" });\n  await agent.aiTap(\"选择 Overview of Asset Accounting Documents 中的 transaction 行。\");\n  await agent.aiTap(\"在 Overview of Asset Accounting Documents 中点击 Reverse。\");\n  await agent.aiInput(\"Reversal reason\", { value: \"<reversal reason>\" });\n  await agent.aiTap(\"打开 Reason for Reversal 搜索帮助并选择匹配原因。\");\n  await agent.aiTap(\"点击 OK 确认 reversal reason。\");\n  await agent.aiTap(\"在 Overview 中确认 reversal line items 后点击保存 sap_190。\");\n  await agent.aiTap(\"在 Document lines Display messages 中点击 OK。\");\n  const plannedRetirement = await agent.aiQuery(\"string, 返回 Display Asset Master data，读取 Plnd retirement on 或资产出售相关状态。\");\n  await agent.aiAssert(\"确认 Documents for Asset / Asset Explorer 中存在出售交易和对应 reversal/冲销记录。\");\n}",
+  "apiGuide": {
+    "summary": "SAP TEST 14 - Fixed Asset Single Asset Sale",
+    "assumptions": [
+      "从 https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。",
+      "Word SOP 是流程挖掘导出文档，部分字段值被脱敏为 <Number>/<name>；这类字段在步骤中保留为运行时占位说明。",
+      "如 SAP 页面没有显示 OK Code，请先按既有 saptest1 的方式开启 Show OK Code Field。"
+    ],
+    "steps": [
+      {
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "打开 SAP WebGUI 菜单，用于进入 Settings / Visualization。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 1
+      },
+      {
+        "title": "点击 Settings",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Settings",
+        "reason": "进入 SAP WebGUI 设置菜单。",
+        "exampleCode": "await agent.aiTap(\"点击 Settings\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 2
+      },
+      {
+        "title": "点击 Visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Visualization",
+        "reason": "打开可视化设置，准备启用 OK Code 输入框。",
+        "exampleCode": "await agent.aiTap(\"点击 Visualization\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 3
+      },
+      {
+        "title": "启用 Show OK Code Field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用 Show OK Code Field",
+        "reason": "确保 SAP 左上角 OK Code / 命令输入框可见，后续才能输入 T-code。",
+        "exampleCode": "await agent.aiTap(\"启用 Show OK Code Field\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 4
+      },
+      {
+        "title": "保存 Visualization 设置",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存 Visualization 设置",
+        "reason": "保存设置并回到 SAP Easy Access。",
+        "exampleCode": "await agent.aiTap(\"保存 Visualization 设置\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 5
+      },
+      {
+        "order": 6,
+        "title": "在 OK Code / 左上角命令输入框输入 ABAON，进入 Asset Sale Without ...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 OK Code / 左上角命令输入框输入 ABAON，进入 Asset Sale Without Customer。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"OK Code / command field\", { value: \"ABAON\" });",
+        "executionConfidence": 0.78,
+        "sourceEvidence": "Enter Asset Transaction Asset Sale Without Customer"
+      },
+      {
+        "order": 7,
+        "title": "按 Enter 打开 Enter Asset Transaction Asset Sale Witho...",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 打开 Enter Asset Transaction Asset Sale Without Customer 页面。",
+        "reason": "SAP 中确认/执行类动作优先用键盘，定位更稳定。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Next view: Asset Sale Without Customer"
+      },
+      {
+        "order": 8,
+        "title": "在 Document date 字段输入 SOP 测试日期。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Document date 字段输入 SOP 测试日期。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Document date\", { value: \"<posting document date>\" });",
+        "executionConfidence": 0.6,
+        "sourceEvidence": "Reading from field - document date; value not exported"
+      },
+      {
+        "order": 9,
+        "title": "在 Asset value date 字段输入 SOP 测试日期。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Asset value date 字段输入 SOP 测试日期。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Asset value date\", { value: \"<asset value date>\" });",
+        "executionConfidence": 0.6,
+        "sourceEvidence": "Reading from field - asset value date; value not exported"
+      },
+      {
+        "order": 10,
+        "title": "在 Manual revenue 字段输入 sale revenue。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Manual revenue 字段输入 sale revenue。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Manual revenue\", { value: \"<manual revenue>\" });",
+        "executionConfidence": 0.55,
+        "sourceEvidence": "Reading from field - manual revenue; value not exported"
+      },
+      {
+        "order": 11,
+        "title": "切换到 Additional details 页签。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Additional details 页签。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Additional details 页签。\");",
+        "executionConfidence": 0.86,
+        "sourceEvidence": "Navigating to Tab - additional details"
+      },
+      {
+        "order": 12,
+        "title": "填写 Additional details 中的必填字段。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "填写 Additional details 中的必填字段。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Additional details required field\", { value: \"<SOP default>\" });",
+        "executionConfidence": 0.48,
+        "sourceEvidence": "Editing a field with element name; field/value masked"
+      },
+      {
+        "order": 13,
+        "title": "从 listbox shell 中选择匹配条目。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "从 listbox shell 中选择匹配条目。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"从 listbox shell 中选择匹配条目。\");",
+        "executionConfidence": 0.58,
+        "sourceEvidence": "Selecting an application field"
+      },
+      {
+        "order": 14,
+        "title": "切换到 Partial retirement 页签。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Partial retirement 页签。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"切换到 Partial retirement 页签。\");",
+        "executionConfidence": 0.84,
+        "sourceEvidence": "Navigating to Tab - partia retirement"
+      },
+      {
+        "order": 15,
+        "title": "在 Percentage rate 字段输入部分出售比例。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Percentage rate 字段输入部分出售比例。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Percentage rate\", { value: \"<percentage rate>\" });",
+        "executionConfidence": 0.62,
+        "sourceEvidence": "Editing text in field - percentage rate"
+      },
+      {
+        "order": 16,
+        "title": "在 6A line items / amount currency cost center 表格中确认...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 6A line items / amount currency cost center 表格中确认行项目。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在 6A line items / amount currency cost center 表格中确认行项目。\");",
+        "executionConfidence": 0.62,
+        "sourceEvidence": "Reading label - 6a line items; Focusing on Table - amount crcy cost center"
+      },
+      {
+        "order": 17,
+        "title": "点击保存图标 sap_190 过账资产出售。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击保存图标 sap_190 过账资产出售。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击保存图标 sap_190 过账资产出售。\");",
+        "executionConfidence": 0.76,
+        "sourceEvidence": "Left Click on icon - sap_190"
+      },
+      {
+        "order": 18,
+        "title": "在 Document lines Display messages 弹窗中点击 OK。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Document lines Display messages 弹窗中点击 OK。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在 Document lines Display messages 弹窗中点击 OK。\");",
+        "executionConfidence": 0.8,
+        "sourceEvidence": "Document lines Display messages; Left Click on icon - OK"
+      },
+      {
+        "order": 19,
+        "title": "进入 Display Asset / Asset Explorer，输入刚才出售的资产编号。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "进入 Display Asset / Asset Explorer，输入刚才出售的资产编号。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Asset\", { value: \"<asset from posted sale>\" });",
+        "executionConfidence": 0.56,
+        "sourceEvidence": "Enter asset transaction -> Asset Explorer; asset value masked"
+      },
+      {
+        "order": 20,
+        "title": "在 Asset Explorer 表格读取 amount / ttype / transaction ...",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "在 Asset Explorer 表格读取 amount / ttype / transaction type name，确认出售交易行存在。",
+        "reason": "从 SAP 页面或表格读取结果值，用于后续校验。",
+        "exampleCode": "const saleTType = await agent.aiQuery(\"string, 在 Asset Explorer 表格读取 amount / ttype / transaction type name，确认出售交易行存在。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Focusing on Table - amount ttype transaction type name"
+      },
+      {
+        "order": 21,
+        "title": "打开 Documents for Asset。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Documents for Asset。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Documents for Asset。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Display Asset Master data -> Documents for Asset"
+      },
+      {
+        "order": 22,
+        "title": "在 Documents for Asset 中输入/确认 Depreciation area。",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Documents for Asset 中输入/确认 Depreciation area。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Depreciation area\", { value: \"<depreciation area>\" });",
+        "executionConfidence": 0.58,
+        "sourceEvidence": "Reading from field - depreciation area; value not exported"
+      },
+      {
+        "order": 23,
+        "title": "选择 Overview of Asset Accounting Documents 中的 transa...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "选择 Overview of Asset Accounting Documents 中的 transaction 行。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"选择 Overview of Asset Accounting Documents 中的 transaction 行。\");",
+        "executionConfidence": 0.72,
+        "sourceEvidence": "Reading label - transaction; Selecting an application field"
+      },
+      {
+        "order": 24,
+        "title": "在 Overview of Asset Accounting Documents 中点击 Reverse。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Overview of Asset Accounting Documents 中点击 Reverse。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在 Overview of Asset Accounting Documents 中点击 Reverse。\");",
+        "executionConfidence": 0.88,
+        "sourceEvidence": "Left Click on icon - Reverse"
+      },
+      {
+        "order": 25,
+        "title": "在 Specifications for Reverse Posting 中输入 Reversal r...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Specifications for Reverse Posting 中输入 Reversal reason。",
+        "reason": "向 SAP 明确字段输入 Word SOP 中抽取到的值。",
+        "exampleCode": "await agent.aiInput(\"Reversal reason\", { value: \"<reversal reason>\" });",
+        "executionConfidence": 0.62,
+        "sourceEvidence": "Reading from field - reversal reason; value not exported"
+      },
+      {
+        "order": 26,
+        "title": "打开 Reason for Reversal 搜索帮助并选择匹配原因。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 Reason for Reversal 搜索帮助并选择匹配原因。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"打开 Reason for Reversal 搜索帮助并选择匹配原因。\");",
+        "executionConfidence": 0.74,
+        "sourceEvidence": "Viewing Reason for Reversal entries; Focusing on Table - text"
+      },
+      {
+        "order": 27,
+        "title": "点击 OK 确认 reversal reason。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 OK 确认 reversal reason。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"点击 OK 确认 reversal reason。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Left Click on icon - OK"
+      },
+      {
+        "order": 28,
+        "title": "在 Overview 中确认 reversal line items 后点击保存 sap_190。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Overview 中确认 reversal line items 后点击保存 sap_190。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在 Overview 中确认 reversal line items 后点击保存 sap_190。\");",
+        "executionConfidence": 0.75,
+        "sourceEvidence": "Focusing on Table - amount crcy cost center; Left Click on icon - sap_190"
+      },
+      {
+        "order": 29,
+        "title": "在 Document lines Display messages 中点击 OK。",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Document lines Display messages 中点击 OK。",
+        "reason": "点击菜单、按钮、图标、tab 或列表项。",
+        "exampleCode": "await agent.aiTap(\"在 Document lines Display messages 中点击 OK。\");",
+        "executionConfidence": 0.8,
+        "sourceEvidence": "Left Click on icon - OK"
+      },
+      {
+        "order": 30,
+        "title": "返回 Display Asset Master data，读取 Plnd retirement on ...",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "返回 Display Asset Master data，读取 Plnd retirement on 或资产出售相关状态。",
+        "reason": "从 SAP 页面或表格读取结果值，用于后续校验。",
+        "exampleCode": "const plannedRetirement = await agent.aiQuery(\"string, 返回 Display Asset Master data，读取 Plnd retirement on 或资产出售相关状态。\");",
+        "executionConfidence": 0.72,
+        "sourceEvidence": "Reading from field - plnd retirement on; asset values"
+      },
+      {
+        "order": 31,
+        "title": "确认 Documents for Asset / Asset Explorer 中存在出售交易和对应 ...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认 Documents for Asset / Asset Explorer 中存在出售交易和对应 reversal/冲销记录。",
+        "reason": "流程完成后的页面状态/消息校验。",
+        "exampleCode": "await agent.aiAssert(\"确认 Documents for Asset / Asset Explorer 中存在出售交易和对应 reversal/冲销记录。\");",
+        "executionConfidence": 0.82,
+        "sourceEvidence": "Documents for Asset; Overview; Asset Explorer table"
+      }
+    ],
+    "recommendedYamlSnippet": "",
+    "docReferences": [
+      "Fixed_Assets_BP_IT_B2P_GUI_Single_asset_sale-SOP-30062026.docx"
+    ],
+    "warnings": [
+      "由 Word SOP 自动转换，建议首次运行时使用 headed + write cache。",
+      "executionConfidence < 0.65 的步骤包含脱敏字段、图标 sap_xxx 或需要人工确认的菜单路径。"
+    ],
+    "markdown": "## SAP TEST 14 - Fixed Asset Single Asset Sale\n\n### Source\n- Fixed_Assets_BP_IT_B2P_GUI_Single_asset_sale-SOP-30062026.docx\n- URL: https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\n\n### API Steps\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n2. 点击 Settings\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n3. 点击 Visualization\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n4. 启用 Show OK Code Field\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n5. 保存 Visualization 设置\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n6. 在 OK Code / 左上角命令输入框输入 ABAON，进入 Asset Sale Without Customer。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.78\n   - evidence: Enter Asset Transaction Asset Sale Without Customer\n7. 按 Enter 打开 Enter Asset Transaction Asset Sale Without Customer 页面。\n   - API: `agent.aiKeyboardPress()`\n   - executionConfidence: 0.82\n   - evidence: Next view: Asset Sale Without Customer\n8. 在 Document date 字段输入 SOP 测试日期。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.6\n   - evidence: Reading from field - document date; value not exported\n9. 在 Asset value date 字段输入 SOP 测试日期。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.6\n   - evidence: Reading from field - asset value date; value not exported\n10. 在 Manual revenue 字段输入 sale revenue。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.55\n   - evidence: Reading from field - manual revenue; value not exported\n11. 切换到 Additional details 页签。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.86\n   - evidence: Navigating to Tab - additional details\n12. 填写 Additional details 中的必填字段。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.48\n   - evidence: Editing a field with element name; field/value masked\n13. 从 listbox shell 中选择匹配条目。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.58\n   - evidence: Selecting an application field\n14. 切换到 Partial retirement 页签。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.84\n   - evidence: Navigating to Tab - partia retirement\n15. 在 Percentage rate 字段输入部分出售比例。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.62\n   - evidence: Editing text in field - percentage rate\n16. 在 6A line items / amount currency cost center 表格中确认行项目。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.62\n   - evidence: Reading label - 6a line items; Focusing on Table - amount crcy cost center\n17. 点击保存图标 sap_190 过账资产出售。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.76\n   - evidence: Left Click on icon - sap_190\n18. 在 Document lines Display messages 弹窗中点击 OK。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.8\n   - evidence: Document lines Display messages; Left Click on icon - OK\n19. 进入 Display Asset / Asset Explorer，输入刚才出售的资产编号。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.56\n   - evidence: Enter asset transaction -> Asset Explorer; asset value masked\n20. 在 Asset Explorer 表格读取 amount / ttype / transaction type name，确认出售交易行存在。\n   - API: `agent.aiQuery()`\n   - executionConfidence: 0.82\n   - evidence: Focusing on Table - amount ttype transaction type name\n21. 打开 Documents for Asset。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.82\n   - evidence: Display Asset Master data -> Documents for Asset\n22. 在 Documents for Asset 中输入/确认 Depreciation area。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.58\n   - evidence: Reading from field - depreciation area; value not exported\n23. 选择 Overview of Asset Accounting Documents 中的 transaction 行。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.72\n   - evidence: Reading label - transaction; Selecting an application field\n24. 在 Overview of Asset Accounting Documents 中点击 Reverse。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.88\n   - evidence: Left Click on icon - Reverse\n25. 在 Specifications for Reverse Posting 中输入 Reversal reason。\n   - API: `agent.aiInput()`\n   - executionConfidence: 0.62\n   - evidence: Reading from field - reversal reason; value not exported\n26. 打开 Reason for Reversal 搜索帮助并选择匹配原因。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.74\n   - evidence: Viewing Reason for Reversal entries; Focusing on Table - text\n27. 点击 OK 确认 reversal reason。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.82\n   - evidence: Left Click on icon - OK\n28. 在 Overview 中确认 reversal line items 后点击保存 sap_190。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.75\n   - evidence: Focusing on Table - amount crcy cost center; Left Click on icon - sap_190\n29. 在 Document lines Display messages 中点击 OK。\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.8\n   - evidence: Left Click on icon - OK\n30. 返回 Display Asset Master data，读取 Plnd retirement on 或资产出售相关状态。\n   - API: `agent.aiQuery()`\n   - executionConfidence: 0.72\n   - evidence: Reading from field - plnd retirement on; asset values\n31. 确认 Documents for Asset / Asset Explorer 中存在出售交易和对应 reversal/冲销记录。\n   - API: `agent.aiAssert()`\n   - executionConfidence: 0.82\n   - evidence: Documents for Asset; Overview; Asset Explorer table"
+  },
+  "apiGuideNaturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 在 OK Code / 左上角命令输入框输入 ABAON，进入 Asset Sale Without Customer。\n7. 按 Enter 打开 Enter Asset Transaction Asset Sale Without Customer 页面。\n8. 在 Document date 字段输入 SOP 测试日期。\n9. 在 Asset value date 字段输入 SOP 测试日期。\n10. 在 Manual revenue 字段输入 sale revenue。\n11. 切换到 Additional details 页签。\n12. 填写 Additional details 中的必填字段。\n13. 从 listbox shell 中选择匹配条目。\n14. 切换到 Partial retirement 页签。\n15. 在 Percentage rate 字段输入部分出售比例。\n16. 在 6A line items / amount currency cost center 表格中确认行项目。\n17. 点击保存图标 sap_190 过账资产出售。\n18. 在 Document lines Display messages 弹窗中点击 OK。\n19. 进入 Display Asset / Asset Explorer，输入刚才出售的资产编号。\n20. 在 Asset Explorer 表格读取 amount / ttype / transaction type name，确认出售交易行存在。\n21. 打开 Documents for Asset。\n22. 在 Documents for Asset 中输入/确认 Depreciation area。\n23. 选择 Overview of Asset Accounting Documents 中的 transaction 行。\n24. 在 Overview of Asset Accounting Documents 中点击 Reverse。\n25. 在 Specifications for Reverse Posting 中输入 Reversal reason。\n26. 打开 Reason for Reversal 搜索帮助并选择匹配原因。\n27. 点击 OK 确认 reversal reason。\n28. 在 Overview 中确认 reversal line items 后点击保存 sap_190。\n29. 在 Document lines Display messages 中点击 OK。\n30. 返回 Display Asset Master data，读取 Plnd retirement on 或资产出售相关状态。\n31. 确认 Documents for Asset / Asset Explorer 中存在出售交易和对应 reversal/冲销记录。",
+  "tags": [
+    "SAP",
+    "Fixed Assets",
+    "ZHL",
+    "Asset Sale",
+    "ABAON",
+    "Reverse Posting"
+  ],
+  "source": {
+    "generator": "word-to-step-fixed-assets-v1",
+    "docxSource": "Fixed_Assets_BP_IT_B2P_GUI_Single_asset_sale-SOP-30062026.docx",
+    "convertedAt": "2026-07-07T00:00:00.000Z",
+    "system": "ZHL",
+    "conversionMeta": {
+      "stepsGenerated": 31,
+      "confidenceSummary": {
+        "high": 7,
+        "medium": 14,
+        "low": 10
+      },
+      "note": "executionConfidence 是 Word SOP 转步骤置信度，不是真实运行通过率。",
+      "okCodeSetupPrepended": true
+    }
+  }
+}

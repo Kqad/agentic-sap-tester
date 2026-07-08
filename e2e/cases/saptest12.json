@@ -1,0 +1,396 @@
+{
+  "$schema": "SAPTEST12 - converted from Fixed Assets Word SOP on 2026-07-07",
+  "title": "SAP TEST 12 - Fixed Asset Single Asset Master Data",
+  "description": "Create/display fixed asset master data from Project Builder in ZHL. Opens WBS project EH-000000254-01, creates an asset, checks settlement rule, and verifies generated asset master data and WBS assignment.",
+  "sapUrl": "https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#",
+  "transactionCode": "CJ20N / AS03",
+  "naturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 在 OK Code / 左上角命令输入框输入 CJ20N\n7. 进入 Project Builder\n8. 按 Enter 打开 Project Builder\n9. 点击 Project Builder 工具栏上的 Open Project 图标\n10. 在 Open Project 弹窗的 WBS element 字段输入 EH-000000254-01\n11. 从 listbox shell 中选择匹配的 WBS/project 条目\n12. 在 Project Builder Subproject EH-000000254 页面中打开 Edit 菜单\n13. 选择创建资产/Create Asset 的菜单项或应用字段\n14. 在 Create Asset 页面填写必填资产字段（资产类别、描述、公司代码等\n15. 按当前 WBS 默认值补齐）\n16. 在弹出的 listbox shell 中选择正确的资产类别/字段值\n17. 点击 Additional data 图标/页签\n18. 切换到 Time-dependent 页签\n19. 点击返回/确认图标 sap_178 保存当前资产主数据页签\n20. 在 Create Asset 页面点击 OK\n21. 回到 Project Builder Subproject 页面后点击保存图标 sap_190\n22. 确认状态栏出现 project EH-000000254 being changed 或项目已保存/已更改提示\n23. 关闭 Performance/提示窗口\n24. 重新点击 Open Project 图标 sap_244\n25. 再次在 WBS element 字段输入 EH-000000254-01\n26. 打开项目\n27. 在 Project Builder Subproject 页面打开 Goto 菜单\n28. 选择 Maintain Settlement Rule\n29. 读取 Maintain Settlement Rule Distribution Rules 表格中的 settlement receiver\n30. 点击 More\n31. 打开 settlement receiver 对应的资产主数据\n32. 读取 Display Asset Master data 页面中的 Asset 字段值\n33. 保存为变量 assetId\n34. 切换到 Time-dependent、Assignments、Origin 页签逐项检查\n35. 确认 Origin 页签中的 WBS element 为 EH-000000254-01\n36. 返回 SAP Easy Access 后\n37. 在 OK Code 输入 AS03\n38. 进入 Display Asset Initial Screen\n39. 按 Enter 打开 Display Asset\n40. 在 Display Asset Initial Screen 输入前面创建/读取到的 assetId\n41. 确认资产主数据可打开\n42. WBS assignment / settlement rule 与 EH-000000254-01 匹配",
+  "jsSource": "async function run(agent) {\n  await agent.aiTap(\"进入 Menu\");\n  await agent.aiTap(\"点击 Settings\");\n  await agent.aiTap(\"点击 Visualization\");\n  await agent.aiTap(\"启用 Show OK Code Field\");\n  await agent.aiTap(\"保存 Visualization 设置\");\n  await agent.aiInput(\"OK Code / 左上角命令\", { value: \"CJ20N\" });\n  await agent.aiTap(\"进入 Project Builder\");\n  await agent.aiKeyboardPress(\"Enter\");\n  await agent.aiTap(\"点击 Project Builder 工具栏上的 Open Project 图标\");\n  await agent.aiInput(\"Open Project 弹窗的 WBS element\", { value: \"EH-000000254-01\" });\n  await agent.aiTap(\"从 listbox shell 中选择匹配的 WBS/project 条目\");\n  await agent.aiTap(\"在 Project Builder Subproject EH-000000254 页面中打开 Edit 菜单\");\n  await agent.aiTap(\"选择创建资产/Create Asset 的菜单项或应用字段\");\n  await agent.aiInput(\"Create Asset 页面\", { value: \"必填资产字段（资产类别、描述、公司代码等\" });\n  await agent.aiTap(\"按当前 WBS 默认值补齐）\");\n  await agent.aiTap(\"在弹出的 listbox shell 中选择正确的资产类别/字段值\");\n  await agent.aiTap(\"点击 Additional data 图标/页签\");\n  await agent.aiTap(\"切换到 Time-dependent 页签\");\n  await agent.aiAssert(\"点击返回/确认图标 sap_178 保存当前资产主数据页签\");\n  await agent.aiTap(\"在 Create Asset 页面点击 OK\");\n  await agent.aiTap(\"回到 Project Builder Subproject 页面后点击保存图标 sap_190\");\n  await agent.aiAssert(\"确认状态栏出现 project EH-000000254 being changed 或项目已保存/已更改提示\");\n  await agent.aiTap(\"关闭 Performance/提示窗口\");\n  await agent.aiTap(\"重新点击 Open Project 图标 sap_244\");\n  await agent.aiInput(\"WBS element\", { value: \"EH-000000254-01\" });\n  await agent.aiTap(\"打开项目\");\n  await agent.aiTap(\"在 Project Builder Subproject 页面打开 Goto 菜单\");\n  await agent.aiTap(\"选择 Maintain Settlement Rule\");\n  const result = await agent.aiQuery(\"string, 读取 Maintain Settlement Rule Distribution Rules 表格中的 settlement receiver\");\n  await agent.aiTap(\"点击 More\");\n  await agent.aiTap(\"打开 settlement receiver 对应的资产主数据\");\n  const result = await agent.aiQuery(\"string, 读取 Display Asset Master data 页面中的 Asset 字段值\");\n  const result = await agent.aiQuery(\"string, 保存为变量 assetId\");\n  await agent.aiAssert(\"切换到 Time-dependent、Assignments、Origin 页签逐项检查\");\n  await agent.aiAssert(\"确认 Origin 页签中的 WBS element 为 EH-000000254-01\");\n  await agent.aiTap(\"返回 SAP Easy Access 后\");\n  await agent.aiInput(\"OK Code\", { value: \"AS03\" });\n  await agent.aiTap(\"进入 Display Asset Initial Screen\");\n  await agent.aiKeyboardPress(\"Enter\");\n  const result = await agent.aiQuery(\"string, 在 Display Asset Initial Screen 输入前面创建/读取到的 assetId\");\n  await agent.aiAssert(\"确认资产主数据可打开\");\n  await agent.aiTap(\"WBS assignment / settlement rule 与 EH-000000254-01 匹配\");\n}",
+  "apiGuide": {
+    "summary": "SAP TEST 12 - Fixed Asset Single Asset Master Data",
+    "assumptions": [
+      "从 https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui# 开始执行。"
+    ],
+    "steps": [
+      {
+        "title": "进入 Menu",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Menu",
+        "reason": "打开 SAP WebGUI 菜单，用于进入 Settings / Visualization。",
+        "exampleCode": "await agent.aiTap(\"进入 Menu\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 1
+      },
+      {
+        "title": "点击 Settings",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Settings",
+        "reason": "进入 SAP WebGUI 设置菜单。",
+        "exampleCode": "await agent.aiTap(\"点击 Settings\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 2
+      },
+      {
+        "title": "点击 Visualization",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Visualization",
+        "reason": "打开可视化设置，准备启用 OK Code 输入框。",
+        "exampleCode": "await agent.aiTap(\"点击 Visualization\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 3
+      },
+      {
+        "title": "启用 Show OK Code Field",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "启用 Show OK Code Field",
+        "reason": "确保 SAP 左上角 OK Code / 命令输入框可见，后续才能输入 T-code。",
+        "exampleCode": "await agent.aiTap(\"启用 Show OK Code Field\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 4
+      },
+      {
+        "title": "保存 Visualization 设置",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "保存 Visualization 设置",
+        "reason": "保存设置并回到 SAP Easy Access。",
+        "exampleCode": "await agent.aiTap(\"保存 Visualization 设置\");",
+        "executionConfidence": 0.95,
+        "sourceEvidence": "Copied from saptest1 OK Code Field setup steps.",
+        "order": 5
+      },
+      {
+        "order": 6,
+        "title": "在 OK Code / 左上角命令输入框输入 CJ20N",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 OK Code / 左上角命令输入框输入 CJ20N",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"OK Code / 左上角命令\", { value: \"CJ20N\" });"
+      },
+      {
+        "order": 7,
+        "title": "进入 Project Builder",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Project Builder",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"进入 Project Builder\");"
+      },
+      {
+        "order": 8,
+        "title": "按 Enter 打开 Project Builder",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 打开 Project Builder",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 9,
+        "title": "点击 Project Builder 工具栏上的 Ope...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Project Builder 工具栏上的 Open Project 图标",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Project Builder 工具栏上的 Open Project 图标\");"
+      },
+      {
+        "order": 10,
+        "title": "在 Open Project 弹窗的 WBS eleme...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Open Project 弹窗的 WBS element 字段输入 EH-000000254-01",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Open Project 弹窗的 WBS element\", { value: \"EH-000000254-01\" });"
+      },
+      {
+        "order": 11,
+        "title": "从 listbox shell 中选择匹配的 WBS/p...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "从 listbox shell 中选择匹配的 WBS/project 条目",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"从 listbox shell 中选择匹配的 WBS/project 条目\");"
+      },
+      {
+        "order": 12,
+        "title": "在 Project Builder Subproject...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Project Builder Subproject EH-000000254 页面中打开 Edit 菜单",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"在 Project Builder Subproject EH-000000254 页面中打开 Edit 菜单\");"
+      },
+      {
+        "order": 13,
+        "title": "选择创建资产/Create Asset 的菜单项或应用字...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "选择创建资产/Create Asset 的菜单项或应用字段",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"选择创建资产/Create Asset 的菜单项或应用字段\");"
+      },
+      {
+        "order": 14,
+        "title": "在 Create Asset 页面填写必填资产字段（资产...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 Create Asset 页面填写必填资产字段（资产类别、描述、公司代码等",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"Create Asset 页面\", { value: \"必填资产字段（资产类别、描述、公司代码等\" });"
+      },
+      {
+        "order": 15,
+        "title": "按当前 WBS 默认值补齐）",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "按当前 WBS 默认值补齐）",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"按当前 WBS 默认值补齐）\");"
+      },
+      {
+        "order": 16,
+        "title": "在弹出的 listbox shell 中选择正确的资产类...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在弹出的 listbox shell 中选择正确的资产类别/字段值",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"在弹出的 listbox shell 中选择正确的资产类别/字段值\");"
+      },
+      {
+        "order": 17,
+        "title": "点击 Additional data 图标/页签",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 Additional data 图标/页签",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 Additional data 图标/页签\");"
+      },
+      {
+        "order": 18,
+        "title": "切换到 Time-dependent 页签",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "切换到 Time-dependent 页签",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"切换到 Time-dependent 页签\");"
+      },
+      {
+        "order": 19,
+        "title": "点击返回/确认图标 sap_178 保存当前资产主数据页...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "点击返回/确认图标 sap_178 保存当前资产主数据页签",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"点击返回/确认图标 sap_178 保存当前资产主数据页签\");"
+      },
+      {
+        "order": 20,
+        "title": "在 Create Asset 页面点击 OK",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Create Asset 页面点击 OK",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"在 Create Asset 页面点击 OK\");"
+      },
+      {
+        "order": 21,
+        "title": "回到 Project Builder Subprojec...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "回到 Project Builder Subproject 页面后点击保存图标 sap_190",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"回到 Project Builder Subproject 页面后点击保存图标 sap_190\");"
+      },
+      {
+        "order": 22,
+        "title": "确认状态栏出现 project EH-000000254...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认状态栏出现 project EH-000000254 being changed 或项目已保存/已更改提示",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"确认状态栏出现 project EH-000000254 being changed 或项目已保存/已更改提示\");"
+      },
+      {
+        "order": 23,
+        "title": "关闭 Performance/提示窗口",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "关闭 Performance/提示窗口",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"关闭 Performance/提示窗口\");"
+      },
+      {
+        "order": 24,
+        "title": "重新点击 Open Project 图标 sap_244",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "重新点击 Open Project 图标 sap_244",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"重新点击 Open Project 图标 sap_244\");"
+      },
+      {
+        "order": 25,
+        "title": "再次在 WBS element 字段输入 EH-0000...",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "再次在 WBS element 字段输入 EH-000000254-01",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"WBS element\", { value: \"EH-000000254-01\" });"
+      },
+      {
+        "order": 26,
+        "title": "打开项目",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开项目",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"打开项目\");"
+      },
+      {
+        "order": 27,
+        "title": "在 Project Builder Subproject...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "在 Project Builder Subproject 页面打开 Goto 菜单",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"在 Project Builder Subproject 页面打开 Goto 菜单\");"
+      },
+      {
+        "order": 28,
+        "title": "选择 Maintain Settlement Rule",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "选择 Maintain Settlement Rule",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"选择 Maintain Settlement Rule\");"
+      },
+      {
+        "order": 29,
+        "title": "读取 Maintain Settlement Rule ...",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "读取 Maintain Settlement Rule Distribution Rules 表格中的 settlement receiver",
+        "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
+        "exampleCode": "const result = await agent.aiQuery(\"string, 读取 Maintain Settlement Rule Distribution Rules 表格中的 settlement receiver\");"
+      },
+      {
+        "order": 30,
+        "title": "点击 More",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "点击 More",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"点击 More\");"
+      },
+      {
+        "order": 31,
+        "title": "打开 settlement receiver 对应的资产...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "打开 settlement receiver 对应的资产主数据",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"打开 settlement receiver 对应的资产主数据\");"
+      },
+      {
+        "order": 32,
+        "title": "读取 Display Asset Master data...",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "读取 Display Asset Master data 页面中的 Asset 字段值",
+        "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
+        "exampleCode": "const result = await agent.aiQuery(\"string, 读取 Display Asset Master data 页面中的 Asset 字段值\");"
+      },
+      {
+        "order": 33,
+        "title": "保存为变量 assetId",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "保存为变量 assetId",
+        "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
+        "exampleCode": "const result = await agent.aiQuery(\"string, 保存为变量 assetId\");"
+      },
+      {
+        "order": 34,
+        "title": "切换到 Time-dependent、Assignmen...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "切换到 Time-dependent、Assignments、Origin 页签逐项检查",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"切换到 Time-dependent、Assignments、Origin 页签逐项检查\");"
+      },
+      {
+        "order": 35,
+        "title": "确认 Origin 页签中的 WBS element 为...",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认 Origin 页签中的 WBS element 为 EH-000000254-01",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"确认 Origin 页签中的 WBS element 为 EH-000000254-01\");"
+      },
+      {
+        "order": 36,
+        "title": "返回 SAP Easy Access 后",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "返回 SAP Easy Access 后",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"返回 SAP Easy Access 后\");"
+      },
+      {
+        "order": 37,
+        "title": "在 OK Code 输入 AS03",
+        "midsceneApi": "agent.aiInput()",
+        "naturalLanguageInstruction": "在 OK Code 输入 AS03",
+        "reason": "向明确字段输入值,拆成独立输入步骤以提升稳定性。",
+        "exampleCode": "await agent.aiInput(\"OK Code\", { value: \"AS03\" });"
+      },
+      {
+        "order": 38,
+        "title": "进入 Display Asset Initial Scr...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "进入 Display Asset Initial Screen",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"进入 Display Asset Initial Screen\");"
+      },
+      {
+        "order": 39,
+        "title": "按 Enter 打开 Display Asset",
+        "midsceneApi": "agent.aiKeyboardPress()",
+        "naturalLanguageInstruction": "按 Enter 打开 Display Asset",
+        "reason": "SAP 中 Enter/Tab/Execute/Continue 等按键动作,优先走 keyboardPress;若屏幕无变化,runner 会回退为 aiTap(原指令)。",
+        "exampleCode": "await agent.aiKeyboardPress(\"Enter\");"
+      },
+      {
+        "order": 40,
+        "title": "在 Display Asset Initial Scre...",
+        "midsceneApi": "agent.aiQuery()",
+        "naturalLanguageInstruction": "在 Display Asset Initial Screen 输入前面创建/读取到的 assetId",
+        "reason": "从 SAP 查询结果/表格列提取值,适合数据提取 API。",
+        "exampleCode": "const result = await agent.aiQuery(\"string, 在 Display Asset Initial Screen 输入前面创建/读取到的 assetId\");"
+      },
+      {
+        "order": 41,
+        "title": "确认资产主数据可打开",
+        "midsceneApi": "agent.aiAssert()",
+        "naturalLanguageInstruction": "确认资产主数据可打开",
+        "reason": "结果校验或变量比较,适合断言 API。",
+        "exampleCode": "await agent.aiAssert(\"确认资产主数据可打开\");"
+      },
+      {
+        "order": 42,
+        "title": "WBS assignment / settlement ...",
+        "midsceneApi": "agent.aiTap()",
+        "naturalLanguageInstruction": "WBS assignment / settlement rule 与 EH-000000254-01 匹配",
+        "reason": "点击菜单/按钮/复选框的界面动作,适合点击 API。",
+        "exampleCode": "await agent.aiTap(\"WBS assignment / settlement rule 与 EH-000000254-01 匹配\");"
+      }
+    ],
+    "recommendedYamlSnippet": "",
+    "docReferences": [],
+    "warnings": [
+      "已使用本地规则生成 API 步骤指南（默认走本地，设 API_GUIDE_USE_LLM=1 启用 LLM）。",
+      "本地规则只做关键字拆分。执行前建议人工检查变量提取、断言和 SAP 页面定位描述。"
+    ],
+    "markdown": "## SAP TEST 12 - Fixed Asset Single Asset Master Data\n\n### Source\n- Fixed_Assets_BP_IT_B2P_GUI_Single_Asset_Master_Dat-SOP-30062026.docx\n- URL: https://zhl.wdisp.bosch.com/sap/bc/gui/sap/its/webgui#\n\n### API Steps\n1. 进入 Menu\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n2. 点击 Settings\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n3. 点击 Visualization\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n4. 启用 Show OK Code Field\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n5. 保存 Visualization 设置\n   - API: `agent.aiTap()`\n   - executionConfidence: 0.95\n   - evidence: Copied from saptest1 OK Code Field setup steps.\n6. 在 OK Code / 左上角命令输入框输入 CJ20N\n   - API: `agent.aiInput()`\n   - executionConfidence: \n   - evidence: \n7. 进入 Project Builder\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n8. 按 Enter 打开 Project Builder\n   - API: `agent.aiKeyboardPress()`\n   - executionConfidence: \n   - evidence: \n9. 点击 Project Builder 工具栏上的 Open Project 图标\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n10. 在 Open Project 弹窗的 WBS element 字段输入 EH-000000254-01\n   - API: `agent.aiInput()`\n   - executionConfidence: \n   - evidence: \n11. 从 listbox shell 中选择匹配的 WBS/project 条目\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n12. 在 Project Builder Subproject EH-000000254 页面中打开 Edit 菜单\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n13. 选择创建资产/Create Asset 的菜单项或应用字段\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n14. 在 Create Asset 页面填写必填资产字段（资产类别、描述、公司代码等\n   - API: `agent.aiInput()`\n   - executionConfidence: \n   - evidence: \n15. 按当前 WBS 默认值补齐）\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n16. 在弹出的 listbox shell 中选择正确的资产类别/字段值\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n17. 点击 Additional data 图标/页签\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n18. 切换到 Time-dependent 页签\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n19. 点击返回/确认图标 sap_178 保存当前资产主数据页签\n   - API: `agent.aiAssert()`\n   - executionConfidence: \n   - evidence: \n20. 在 Create Asset 页面点击 OK\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n21. 回到 Project Builder Subproject 页面后点击保存图标 sap_190\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n22. 确认状态栏出现 project EH-000000254 being changed 或项目已保存/已更改提示\n   - API: `agent.aiAssert()`\n   - executionConfidence: \n   - evidence: \n23. 关闭 Performance/提示窗口\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n24. 重新点击 Open Project 图标 sap_244\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n25. 再次在 WBS element 字段输入 EH-000000254-01\n   - API: `agent.aiInput()`\n   - executionConfidence: \n   - evidence: \n26. 打开项目\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n27. 在 Project Builder Subproject 页面打开 Goto 菜单\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n28. 选择 Maintain Settlement Rule\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n29. 读取 Maintain Settlement Rule Distribution Rules 表格中的 settlement receiver\n   - API: `agent.aiQuery()`\n   - executionConfidence: \n   - evidence: \n30. 点击 More\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n31. 打开 settlement receiver 对应的资产主数据\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n32. 读取 Display Asset Master data 页面中的 Asset 字段值\n   - API: `agent.aiQuery()`\n   - executionConfidence: \n   - evidence: \n33. 保存为变量 assetId\n   - API: `agent.aiQuery()`\n   - executionConfidence: \n   - evidence: \n34. 切换到 Time-dependent、Assignments、Origin 页签逐项检查\n   - API: `agent.aiAssert()`\n   - executionConfidence: \n   - evidence: \n35. 确认 Origin 页签中的 WBS element 为 EH-000000254-01\n   - API: `agent.aiAssert()`\n   - executionConfidence: \n   - evidence: \n36. 返回 SAP Easy Access 后\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n37. 在 OK Code 输入 AS03\n   - API: `agent.aiInput()`\n   - executionConfidence: \n   - evidence: \n38. 进入 Display Asset Initial Screen\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: \n39. 按 Enter 打开 Display Asset\n   - API: `agent.aiKeyboardPress()`\n   - executionConfidence: \n   - evidence: \n40. 在 Display Asset Initial Screen 输入前面创建/读取到的 assetId\n   - API: `agent.aiQuery()`\n   - executionConfidence: \n   - evidence: \n41. 确认资产主数据可打开\n   - API: `agent.aiAssert()`\n   - executionConfidence: \n   - evidence: \n42. WBS assignment / settlement rule 与 EH-000000254-01 匹配\n   - API: `agent.aiTap()`\n   - executionConfidence: \n   - evidence: "
+  },
+  "apiGuideNaturalLanguage": "1. 进入 Menu\n2. 点击 Settings\n3. 点击 Visualization\n4. 启用 Show OK Code Field\n5. 保存 Visualization 设置\n6. 在 OK Code / 左上角命令输入框输入 CJ20N\n7. 进入 Project Builder\n8. 按 Enter 打开 Project Builder\n9. 点击 Project Builder 工具栏上的 Open Project 图标\n10. 在 Open Project 弹窗的 WBS element 字段输入 EH-000000254-01\n11. 从 listbox shell 中选择匹配的 WBS/project 条目\n12. 在 Project Builder Subproject EH-000000254 页面中打开 Edit 菜单\n13. 选择创建资产/Create Asset 的菜单项或应用字段\n14. 在 Create Asset 页面填写必填资产字段（资产类别、描述、公司代码等\n15. 按当前 WBS 默认值补齐）\n16. 在弹出的 listbox shell 中选择正确的资产类别/字段值\n17. 点击 Additional data 图标/页签\n18. 切换到 Time-dependent 页签\n19. 点击返回/确认图标 sap_178 保存当前资产主数据页签\n20. 在 Create Asset 页面点击 OK\n21. 回到 Project Builder Subproject 页面后点击保存图标 sap_190\n22. 确认状态栏出现 project EH-000000254 being changed 或项目已保存/已更改提示\n23. 关闭 Performance/提示窗口\n24. 重新点击 Open Project 图标 sap_244\n25. 再次在 WBS element 字段输入 EH-000000254-01\n26. 打开项目\n27. 在 Project Builder Subproject 页面打开 Goto 菜单\n28. 选择 Maintain Settlement Rule\n29. 读取 Maintain Settlement Rule Distribution Rules 表格中的 settlement receiver\n30. 点击 More\n31. 打开 settlement receiver 对应的资产主数据\n32. 读取 Display Asset Master data 页面中的 Asset 字段值\n33. 保存为变量 assetId\n34. 切换到 Time-dependent、Assignments、Origin 页签逐项检查\n35. 确认 Origin 页签中的 WBS element 为 EH-000000254-01\n36. 返回 SAP Easy Access 后\n37. 在 OK Code 输入 AS03\n38. 进入 Display Asset Initial Screen\n39. 按 Enter 打开 Display Asset\n40. 在 Display Asset Initial Screen 输入前面创建/读取到的 assetId\n41. 确认资产主数据可打开\n42. WBS assignment / settlement rule 与 EH-000000254-01 匹配",
+  "tags": [
+    "SAP",
+    "Fixed Assets",
+    "ZHL",
+    "Asset Master",
+    "Project Builder",
+    "CJ20N",
+    "AS03"
+  ],
+  "source": {
+    "generator": "word-to-step-fixed-assets-v1",
+    "docxSource": "Fixed_Assets_BP_IT_B2P_GUI_Single_Asset_Master_Dat-SOP-30062026.docx",
+    "convertedAt": "2026-07-07T00:00:00.000Z",
+    "system": "ZHL",
+    "conversionMeta": {
+      "stepsGenerated": 42,
+      "confidenceSummary": {
+        "high": 5,
+        "medium": 0,
+        "low": 0
+      },
+      "note": "executionConfidence 是 Word SOP 转步骤置信度，不是真实运行通过率。",
+      "okCodeSetupPrepended": true
+    }
+  }
+}
